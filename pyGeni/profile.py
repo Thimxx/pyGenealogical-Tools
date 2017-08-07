@@ -9,16 +9,18 @@ import requests
 import pyGeni.geni_settings as s
 
 
-# Validate access token, connecting to Geni, this might take a while
-valid_token = requests.get(s.GENI_VALIDATE_TOKEN + s.TOKEN).json()
 
-
-tokenIsOk = False
-if ( str(valid_token['result']) == "OK"):
-    tokenIsOk = True
 
 class profile:
-    def __init__(self, id_geni, type_geni="g"):  # id int or string
+    def __init__(self, id_geni, token, type_geni="g"):  # id int or string
+        self.token = token
+        # Validate access token, connecting to Geni, this might take a while
+        valid_token = requests.get(s.GENI_VALIDATE_TOKEN + self.token).json()
+
+        self.tokenIsOk = False
+        if ( str(valid_token['result']) == "OK"):
+            self.tokenIsOk = True
+            
         url = s.GENI_PROFILE + type_geni + str(id_geni) + self.token_string()
         r = requests.get(url)
         data = r.json()
@@ -42,6 +44,8 @@ class profile:
         self.sibligns = []
         self.partner = []
         self.children = []
+        
+        self.get_relations()
 
 
     def nameLifespan(self):
@@ -53,67 +57,61 @@ class profile:
             return self.data["name"] + " (" + str(birth) + " - " + str(death) + ")"
 
 
-    def relations(self):
+    def token_string(self):
+        return s.GENI_TOKEN + self.token
+    
+    def get_relations(self):
         '''
-        This function will drive a map of all relationships inside the profile
-        :return:
+        Get relations by using the immediate family api
         '''
+        #we initialize the lists
         parents = []
         sibligns = []
         partner = []
         children = []
-        unions = self.data.get("unions")
-        for union in unions:
-
-            tmp_spouses, tmp_children, parent_marriage = self.parse_union(union)
-            if parent_marriage:
-                #Ok, this is the marriage of the parents
-                parents = parents + tmp_spouses
-                sibligns = sibligns + tmp_children
-            else:
-                #In this case we are talking about the marraige... it could be several
-                partner = partner + tmp_spouses
-                children = children + tmp_children
-
-        self.unions_parsed = True
+        url = self.data["url"] + s.GENI_FAMILY + self.token_string()
+        r = requests.get(url)
+        data = r.json()
+        
+        myid = self.data["id"]
+        #the nodes include the data of the different affected profiles and unions
+        for keydata in data["nodes"].keys():
+            #is easier to go to the usions, so we filter by unions.
+            if "union" in keydata:
+                #Good... now we iterate per union the profiles found!
+                #Now, let's create tmp variables for capturing the union information
+                tmp_parents = []
+                tmp_child = []
+                myidischild = False
+                
+                for tmp_profile in data["nodes"][keydata]["edges"]:
+                    
+                    # When we detect the current profile we skip it!!!
+                    if (tmp_profile == myid):
+                        #but before exiting we check if is the relatinohip of fathers!!!
+                        if (data["nodes"][keydata]["edges"][tmp_profile]['rel'] == "child"):
+                            myidischild = True
+                    else:
+                        if (data["nodes"][keydata]["edges"][tmp_profile]['rel'] == "child"):
+                            tmp_child.append(tmp_profile)
+                        else:
+                            tmp_parents.append(tmp_profile)
+                #Great, now we do the append
+                if myidischild:
+                    #If this is a child, parents of the relationship are her parents and children the sibligns
+                    parents = parents + tmp_parents
+                    #Reminder!!! Here we do not see the half-brothers!
+                    sibligns = sibligns + tmp_child
+                else:
+                    #In this case this union reflects her actual children!!!                    
+                    partner = partner + tmp_parents
+                    children = children + tmp_child
+                
         self.parents = parents
         self.sibligns = sibligns
         self.partner = partner
         self.children = children
         return None
-
-
-
-    def parse_union(self, union):
-        '''
-        This function obtains the people involved in each of the unions.
-        :param union: obtained in the format of link without the token data
-        :return: spouses: will be the spouses without the involved profile
-                children: all childrens of the involved profile
-                parent_marriage: will be True if the union refers to the marriage of the parents.
-        '''
-        parent_marriage = False
-        spouses = []
-        children = []
-        url = union + self.token_string()
-        r = requests.get(url).json()
-        for url in r.get("partners"):
-            idg = stripId(url)
-            temp_parent = profile(idg, "")
-            if not (self.data["url"] == url):
-                spouses.append(temp_parent)
-
-        for url in r.get("children"):
-            idg = stripId(url)
-            temp_parent = profile(idg, "")
-            if not (self.data["url"] == url):
-                children.append(temp_parent)
-            else:
-                parent_marriage = True
-        return spouses, children, parent_marriage
-
-    def token_string(self):
-        return s.GENI_TOKEN + s.TOKEN
 
 #===================================================
 # Util functions

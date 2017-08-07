@@ -2,4 +2,5 @@ from pyGeni import profile
 from parser_input import reader_input
 
 data = reader_input.reader_input("INPUT")
-test_profile = profile.profile(data.profile)
+test_profile = profile.profile(data.profile, data.genikey)
+test_profile.get_relations()
