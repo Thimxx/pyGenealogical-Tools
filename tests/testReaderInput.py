@@ -21,4 +21,5 @@ class testReaderInput(unittest.TestCase):
         '''
         data = reader_input.reader_input(self.filelocation)
         assert(str(data.profile) == "60000000xxxxxxxxx")
+        assert(str(data.genikey) == "xxxccc")
 

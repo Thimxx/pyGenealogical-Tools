@@ -7,6 +7,7 @@ class reader_input:
         self.file = open(file_path, "r")
 
         self.profile = ""
+        self.genikey = ""
         self.read_file()
 
         self.file.close()
@@ -19,5 +20,7 @@ class reader_input:
             divided = line.split()
             if (divided[0] == "PROFILE"):
                 self.profile = str(divided[1])
+            elif (divided[0] == "GENIKEY"):
+                self.genikey = str(divided[1])
 
 

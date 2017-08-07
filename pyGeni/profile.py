@@ -8,6 +8,7 @@ import requests
 #copy of geni_settings_template
 import pyGeni.geni_settings as s
 
+
 # Validate access token, connecting to Geni, this might take a while
 valid_token = requests.get(s.GENI_VALIDATE_TOKEN + s.TOKEN).json()
 
@@ -17,16 +18,16 @@ if ( str(valid_token['result']) == "OK"):
     tokenIsOk = True
 
 class profile:
-    def __init__(self, id, type="g"):  # id int or string
-        url = s.GENI_PROFILE + type + str(id) + self.token_string()
+    def __init__(self, id_geni, type_geni="g"):  # id int or string
+        url = s.GENI_PROFILE + type_geni + str(id_geni) + self.token_string()
         r = requests.get(url)
         data = r.json()
 
         if type == "g":
-            self.guid = id
+            self.guid = id_geni
             self.id = stripId(data["id"])
         if type == "":
-            self.id = id
+            self.id = id_geni
             self.guid = int(data["guid"])
 
         self.fulldata = data
@@ -97,14 +98,14 @@ class profile:
         url = union + self.token_string()
         r = requests.get(url).json()
         for url in r.get("partners"):
-            id = stripId(url)
-            temp_parent = profile(id, "")
+            idg = stripId(url)
+            temp_parent = profile(idg, "")
             if not (self.data["url"] == url):
                 spouses.append(temp_parent)
 
         for url in r.get("children"):
-            id = stripId(url)
-            temp_parent = profile(id, "")
+            idg = stripId(url)
+            temp_parent = profile(idg, "")
             if not (self.data["url"] == url):
                 children.append(temp_parent)
             else:
