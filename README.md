@@ -1,6 +1,10 @@
 # GeniTools
 An interface for working using python with Geni.
 
+.. image:: https://travis-ci.org/thimxx/geniTools.svg?branch=master
+  :target: https://travis-ci.org/thimxx/geniTools.svg
+  :alt: Build status
+
 # Installation instructions
 
 Tested using python 3.6.2. You need to have installed the module requests: http://docs.python-requests.org/en/master/
