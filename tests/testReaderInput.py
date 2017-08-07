@@ -4,7 +4,16 @@ import os
 
 class testReaderInput(unittest.TestCase):
     def setUp(self):
-        self.filelocation = os.path.join(os.getcwd(), "fixtures_files", "INPUT_PROFIL")
+        '''
+        Let's make it simple... is just a test not a good code. If it is not located in one place will
+        be in another!
+        '''
+        location1 = os.path.join(os.getcwd(), "fixtures_files", "INPUT_PROFIL")
+        location2 = os.path.join(os.getcwd(), "tests", "fixtures_files", "INPUT_PROFIL")
+        if os.path.exists(location1):
+            self.filelocation = location1
+        else:
+            self.filelocation = location2
 
     def testReadingProfileFile(self):
         '''
