@@ -1,9 +1,7 @@
 # GeniTools
 An interface for working using python with Geni.
 
-.. image:: https://travis-ci.org/thimxx/geniTools.svg?branch=master
-  :target: https://travis-ci.org/thimxx/geniTools.svg
-  :alt: Build status
+![alt text](https://travis-ci.org/Thimxx/GeniTools.svg?branch=master)
 
 # Installation instructions
 
