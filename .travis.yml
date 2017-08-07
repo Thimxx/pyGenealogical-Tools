@@ -2,5 +2,5 @@ language: python
 python:
   - "3.6.2"
 # command to install dependencies
-install: "pip install requests"
+install: "pip install requests coveralls"
 script: python -m unittest discover -v
