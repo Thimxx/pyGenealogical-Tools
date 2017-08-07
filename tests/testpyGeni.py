@@ -25,6 +25,12 @@ class testpyGeni(unittest.TestCase):
         assert(len(self.philip.sibligns) == 8)
         assert(len(self.philip.partner) == 3)
         assert(len(self.philip.children) == 16)
+    
+    def testgetrightid(self):
+        '''
+        Confirms that the id output is correct
+        '''
+        assert(self.philip.get_id() == PHILIPIVid)
 
 
 if __name__ == '__main__':

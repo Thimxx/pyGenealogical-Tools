@@ -3,6 +3,7 @@ Created on 7 ago. 2017
 
 @author: Val
 '''
+from pyGeni.profile import profile
 
 class climb(object):
     '''
@@ -15,11 +16,41 @@ class climb(object):
         As input it is needed a class pyGeni.profile already obtained.
         '''
         self.source_person = source_person
+        self.geni_token = source_person.token
         
     def get_ancestors(self, generations):
         '''
         This functions obtains the ancestors up to the requested generations.
         '''
+        #Firstly we initiate the list which will contain all
+        ancestors = []
+        current_gen =  {self.source_person.get_id() : self.source_person }
+        ancestors.append(current_gen)
         
+        #We introduce also a function to check duplications of profile... if they are duplicated, we take them out!
+        affected_profiles = []
+        affected_profiles.append(self.source_person.get_id())
+        
+        for i in range(1, generations + 1):
+            #We create an intermediate source version we will store all parents.
+            next_gen = {}
+            #We iterate in all ancestors in this generation
+            for prof_id in current_gen.keys():
+                #Now we go one, by one the parents reflecting the next generation
+                for parent in current_gen[prof_id].parents:
+                    #be careful with duplications!!! we will not repeat it!
+                    if not parent in affected_profiles:
+                        #Now we get the profile of the parents
+                        temp_profile = profile(parent, self.geni_token, "") 
+                        next_gen[temp_profile.get_id()] = temp_profile
+                        #We add it to avoid duplications later on!
+                        affected_profiles.append(temp_profile.get_id())
+            #Now...we append this generation to ancestors
+            ancestors.append(next_gen)
+            #And now the next generation is the current!!!
+            current_gen = next_gen  
+            
+        #We just finish delivering the ancestors back!  
+        return ancestors
     
         

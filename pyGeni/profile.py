@@ -112,6 +112,12 @@ class profile:
         self.partner = partner
         self.children = children
         return None
+    
+    def get_id(self):
+        '''
+        Simple function to get Geni ID
+        '''
+        return self.data['id']
 
 #===================================================
 # Util functions

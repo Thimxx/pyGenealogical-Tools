@@ -3,7 +3,7 @@ python:
   - "3.6.2"
 # command to install dependencies
 install: "pip install requests coveralls"
-script: coverage run -m unittest discover -v
+script: coverage run --source=. -m unittest discover -v
 
 after_success:  
   - coveralls 
