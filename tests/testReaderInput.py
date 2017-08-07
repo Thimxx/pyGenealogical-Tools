@@ -8,6 +8,7 @@ class testReaderInput(unittest.TestCase):
         Let's make it simple... is just a test not a good code. If it is not located in one place will
         be in another!
         '''
+        print("HOLA")
         print(os.environ.get('GENI_KEY'))
         location1 = os.path.join(os.getcwd(), "fixtures_files", "INPUT_PROFIL")
         location2 = os.path.join(os.getcwd(), "tests", "fixtures_files", "INPUT_PROFIL")
@@ -20,6 +21,7 @@ class testReaderInput(unittest.TestCase):
         '''
         Easy test that profile is properly read
         '''
+        print("HOLA2")
         data = reader_input.reader_input(self.filelocation)
         assert(str(data.profile) == "60000000xxxxxxxxx")
         assert(str(data.genikey) == "xxxccc")
