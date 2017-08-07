@@ -8,6 +8,7 @@ class testReaderInput(unittest.TestCase):
         Let's make it simple... is just a test not a good code. If it is not located in one place will
         be in another!
         '''
+        print(os.environ.get('GENI_KEY'))
         location1 = os.path.join(os.getcwd(), "fixtures_files", "INPUT_PROFIL")
         location2 = os.path.join(os.getcwd(), "tests", "fixtures_files", "INPUT_PROFIL")
         if os.path.exists(location1):
