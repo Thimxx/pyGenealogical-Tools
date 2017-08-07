@@ -14,4 +14,12 @@ class climb(object):
         '''
         As input it is needed a class pyGeni.profile already obtained.
         '''
+        self.source_person = source_person
+        
+    def get_ancestors(self, generations):
+        '''
+        This functions obtains the ancestors up to the requested generations.
+        '''
+        
+    
         

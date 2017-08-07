@@ -4,3 +4,6 @@ python:
 # command to install dependencies
 install: "pip install requests coveralls"
 script: python -m unittest discover -v
+
+after_success:  
+  - coveralls 
