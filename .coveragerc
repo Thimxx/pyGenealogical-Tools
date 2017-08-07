@@ -1,4 +1,4 @@
 [run]
 omit =
     GeniTools.py
-    /tests/*
+    ./tests/*
