@@ -11,7 +11,7 @@ from pyGeni.data_models import geni_union
 
 class immediate_family(geni_calls):
     '''
-    This function is used to call the immediate family api from Geni. 
+    This function is used to call the immediate family api from Geni.
     '''
 
     def __init__(self, token, myid):
@@ -30,8 +30,7 @@ class immediate_family(geni_calls):
         self.sibligns = []
         self.partner = []
         self.children = []
-        
-        if not( 'error' in self.data ):    
+        if not( 'error' in self.data ):
             #In this case, we have extracted properly the union data
             self.union_extracted = True
             #the nodes include the data of the different affected profiles and unions
