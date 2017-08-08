@@ -7,14 +7,14 @@ import requests
 #If importing this module is providing an error, check the installation instructions, you need to create a local
 #copy of geni_settings_template
 import pyGeni.geni_settings as s
-from pyGeni.data_models import geni_union
+from pyGeni.geniapi_common import geni_calls
+from pyGeni.immediate_family import immediate_family
 
 
-
-
-class profile:
+class profile(geni_calls):
     def __init__(self, id_geni, token, type_geni="g"):  # id int or string
-        self.token = token
+        #We initiate the base class
+        geni_calls.__init__(self, token)
         # Validate access token, connecting to Geni, this might take a while
         valid_token = requests.get(s.GENI_VALIDATE_TOKEN + self.token).json()
 
@@ -40,11 +40,6 @@ class profile:
             data.pop("photo_urls")
         self.data = data
 
-        self.unions_parsed = False
-        self.parents = []
-        self.sibligns = []
-        self.partner = []
-        self.children = []
         
         self.get_relations()
 
@@ -58,46 +53,19 @@ class profile:
             return self.data["name"] + " (" + str(birth) + " - " + str(death) + ")"
 
 
-    def token_string(self):
-        return s.GENI_TOKEN + self.token
     
     def get_relations(self):
         '''
         Get relations by using the immediate family api
         '''
-        #we initialize the lists
-        parents = []
-        sibligns = []
-        partner = []
-        children = []
-        url = self.data["url"] + s.GENI_FAMILY + self.token_string()
-        r = requests.get(url)
-        data = r.json()
         
-        myid = self.data["id"]
-        #the nodes include the data of the different affected profiles and unions
-        for keydata in data["nodes"].keys():
-            #is easier to go to the usions, so we filter by unions.
-            if "union" in keydata:
-                #Good... let's obtain the data from the union
-                tmp_union = geni_union(data["nodes"][keydata], keydata)
-                
-                #Now we need to filter the parents and children as we should not duplicate
-                if tmp_union.is_profile_child(myid):
-                    #We know is a child... so
-                    parents = parents + tmp_union.parents
-                    tmp_union.children.remove(myid)
-                    sibligns = sibligns + tmp_union.children
-                else:
-                    tmp_union.parents.remove(myid)
-                    partner = partner +  tmp_union.parents
-                    children = children + tmp_union.children
-                  
-        self.parents = parents
-        self.sibligns = sibligns
-        self.partner = partner
-        self.children = children
-        return None
+        self.relations = immediate_family(self.token, self.data["id"])
+        
+        self.parents = self.relations.parents
+        self.sibligns = self.relations.sibligns
+        self.partner = self.relations.partner
+        self.children = self.relations.children
+        
     
     def get_id(self):
         '''

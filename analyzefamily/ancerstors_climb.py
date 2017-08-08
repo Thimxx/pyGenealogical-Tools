@@ -4,6 +4,7 @@ Created on 7 ago. 2017
 @author: Val
 '''
 from pyGeni.profile import profile
+from pyGeni.immediate_family import immediate_family
 
 class climb(object):
     '''
@@ -24,7 +25,7 @@ class climb(object):
         '''
         #Firstly we initiate the list which will contain all
         ancestors = []
-        current_gen =  {self.source_person.get_id() : self.source_person }
+        current_gen =  {self.source_person.get_id() : self.source_person.relations }
         ancestors.append(current_gen)
         
         #We introduce also a function to check duplications of profile... if they are duplicated, we take them out!
@@ -41,10 +42,10 @@ class climb(object):
                     #be careful with duplications!!! we will not repeat it!
                     if not parent in affected_profiles:
                         #Now we get the profile of the parents
-                        temp_profile = profile(parent, self.geni_token, "") 
-                        next_gen[temp_profile.get_id()] = temp_profile
+                        temp_im_family = immediate_family(self.geni_token, parent) 
+                        next_gen[parent] = temp_im_family
                         #We add it to avoid duplications later on!
-                        affected_profiles.append(temp_profile.get_id())
+                        affected_profiles.append(parent)
             
             #If there are no longer ancestors, we should stop! 
             if len(next_gen) == 0:

@@ -1,0 +1,53 @@
+'''
+Created on 8 ago. 2017
+
+@author: Val
+'''
+
+import requests
+import pyGeni.geni_settings as s
+from pyGeni.geniapi_common import geni_calls
+from pyGeni.data_models import geni_union
+
+class immediate_family(geni_calls):
+    '''
+    This function is used to call the immediate family api from Geni. 
+    '''
+
+
+    def __init__(self, token, myid):
+        '''
+        The constructor will also make the call to the web to get the right
+        string
+        '''
+        #Initiating base class
+        geni_calls.__init__(self, token)
+        self.union_url = self.get_profile_url(myid) + s.GENI_FAMILY + self.token_string()
+        r = requests.get(self.union_url)
+        self.data = r.json()
+        
+        #we initialize the lists
+        self.parents = []
+        self.sibligns = []
+        self.partner = []
+        self.children = []
+        
+        #the nodes include the data of the different affected profiles and unions
+        for keydata in self.data["nodes"].keys():
+            #is easier to go to the usions, so we filter by unions.
+            if "union" in keydata:
+                #Good... let's obtain the data from the union
+                tmp_union = geni_union(self.data["nodes"][keydata], keydata)
+                
+                #Now we need to filter the parents and children as we should not duplicate
+                if tmp_union.is_profile_child(myid):
+                    #We know is a child... so
+                    self.parents = self.parents + tmp_union.parents
+                    tmp_union.children.remove(myid)
+                    self.sibligns = self.sibligns + tmp_union.children
+                else:
+                    tmp_union.parents.remove(myid)
+                    self.partner = self.partner +  tmp_union.parents
+                    self.children = self.children + tmp_union.children
+                  
+        
