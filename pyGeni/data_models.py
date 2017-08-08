@@ -21,7 +21,7 @@ class geni_union:
         #We create temporal profiles for teh parents and children
         self.parents = []
         self.children = []
-                
+        
         for tmp_profile in union_dict["edges"]:
                    
             if (union_dict["edges"][tmp_profile]['rel'] == "child"):
