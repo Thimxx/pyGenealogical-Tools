@@ -26,10 +26,10 @@ class profile(geni_calls):
         r = requests.get(url)
         data = r.json()
 
-        if type == "g":
+        if type_geni == "g":
             self.guid = id_geni
             self.id = stripId(data["id"])
-        if type == "":
+        if type_geni == "":
             self.id = id_geni
             self.guid = int(data["guid"])
 
