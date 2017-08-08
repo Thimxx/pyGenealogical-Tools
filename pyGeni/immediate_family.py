@@ -14,7 +14,6 @@ class immediate_family(geni_calls):
     This function is used to call the immediate family api from Geni. 
     '''
 
-
     def __init__(self, token, myid):
         '''
         The constructor will also make the call to the web to get the right
@@ -25,14 +24,12 @@ class immediate_family(geni_calls):
         self.union_url = self.get_profile_url(myid) + s.GENI_FAMILY + self.token_string()
         r = requests.get(self.union_url)
         self.data = r.json()
-        
         #we initialize the lists
         self.union_extracted = False
         self.parents = []
         self.sibligns = []
         self.partner = []
         self.children = []
-        
         
         if not( 'error' in self.data ):    
             #In this case, we have extracted properly the union data

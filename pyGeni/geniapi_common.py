@@ -19,12 +19,12 @@ class geni_calls():
         Just introducing the token, a common one between the different functions
         '''
         self.token = token
-        
     
     def token_string(self):
         return s.GENI_TOKEN + self.token
     
-    def get_profile_url(self, profile_id):
+    @classmethod
+    def get_profile_url(cls, profile_id):
         '''
         Small function delivering back the profile url based on the profile_id
         '''
