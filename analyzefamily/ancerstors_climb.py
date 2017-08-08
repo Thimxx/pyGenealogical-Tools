@@ -4,6 +4,7 @@ Created on 7 ago. 2017
 @author: Val
 '''
 from pyGeni.profile import profile
+from _tracemalloc import stop
 
 class climb(object):
     '''
@@ -45,10 +46,14 @@ class climb(object):
                         next_gen[temp_profile.get_id()] = temp_profile
                         #We add it to avoid duplications later on!
                         affected_profiles.append(temp_profile.get_id())
+            
+            #If there are no longer ancestors, we should stop! 
+            if len(next_gen) == 0:
+                return ancestors
             #Now...we append this generation to ancestors
             ancestors.append(next_gen)
             #And now the next generation is the current!!!
-            current_gen = next_gen  
+            current_gen = next_gen 
             
         #We just finish delivering the ancestors back!  
         return ancestors
