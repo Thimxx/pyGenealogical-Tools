@@ -1,7 +1,7 @@
 # GeniTools
 
 ![alt text](https://travis-ci.org/Thimxx/GeniTools.svg?branch=master)
-![alt text](https://coveralls.io/repos/github/Thimxx/GeniTools/badge.svg)
+![alt text](https://coveralls.io/repos/github/Thimxx/GeniTools/badge.svg?branch=master)
 
 An interface under development for Geni based on python. 
 
