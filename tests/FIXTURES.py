@@ -16,3 +16,9 @@ UNION_EXAMPLE_PARENT = "profile-4197014"
 UNION_EXAMPLE_CHILD  = "profile-99981031"
 UNION_EXAMPLE_NOT_INCLUDED = "profile-00000000"
 UNION_EXAMPLE_NUMBER_CHILDREN = 9
+
+#Known wrong profile
+PROFILE_NOT_WORKING = "profile-2064479"
+
+#Cousing test, using a profile with smaller documented relatives!
+COUSIN_PROFILE = "6000000014013164881"

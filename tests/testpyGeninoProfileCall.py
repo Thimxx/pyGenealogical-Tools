@@ -47,9 +47,22 @@ class testpyGeniNoProfile(unittest.TestCase):
         assert(len(philip_family.sibligns) == 8)
         assert(len(philip_family.partner) == 3)
         assert(len(philip_family.children) == 16)
+        assert(philip_family.union_extracted)
+        
+    def test_immediatefamily_not_operational(self):
+        '''
+        I do not know why, but this profile is failing when providing
+        the immediate family
+        '''
+        failing_family = immediate_family(self.token, PROFILE_NOT_WORKING)
+        
+        assert (len(failing_family.parents) == 0)
+        assert(len(failing_family.sibligns) == 0)
+        assert(len(failing_family.partner) == 0)
+        assert(len(failing_family.children) == 0)
+        self.assertFalse(failing_family.union_extracted)
         
         
-
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

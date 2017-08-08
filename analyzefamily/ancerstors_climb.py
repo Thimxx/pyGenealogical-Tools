@@ -42,8 +42,7 @@ class climb(object):
                     #be careful with duplications!!! we will not repeat it!
                     if not parent in affected_profiles:
                         #Now we get the profile of the parents
-                        temp_im_family = immediate_family(self.geni_token, parent) 
-                        next_gen[parent] = temp_im_family
+                        next_gen[parent] = immediate_family(self.geni_token, parent)
                         #We add it to avoid duplications later on!
                         affected_profiles.append(parent)
             
@@ -56,6 +55,55 @@ class climb(object):
             current_gen = next_gen 
             
         #We just finish delivering the ancestors back!  
-        return ancestors
+        return ancestors, affected_profiles
+    
+    def get_cousins(self, generations):
+        '''
+        This function will create a matrix of cousins, just counting the number
+        of affected cousins for a given profile.
+        '''
+        #We initiate an array of 0s for calculating
+        cousins_array = [[0 for j in range(generations +1)] for i in range(generations +1)]
+        cousins_count = [[0 for j in range(generations +1)] for i in range(generations +1)]
+        
+        #We need a list for checking duplications:
+        affected_profiles = []
+        
+        ancestors, affected_ancestors = self.get_ancestors(generations)
+        
+        affected_profiles = affected_profiles + affected_ancestors
+        
+        for i in range(0, generations+1):
+            cousins_array[i][i] = ancestors[i]
+            cousins_count[i][i] = len(ancestors[i])
+            
+        #We have finished the list of grand parents, now we need to go down!
+        for i in range(1, generations+1):
+            #We go down in the matrix, from one we get the previous
+            #we are located in the top previous value! so, the first value
+            #are the gran-parents of the guy!
+            for j in range(i, 0,-1):
+                down_gen = {}
+                #We need to get the childrens from the top guys!
+                #We iterated in family items
+                for family_item in cousins_array[i][j].values():
+                    #Now we have the family of a single person...
+                    for child in family_item.children:
+                        #And now all the children of that person!
+                        if not child in affected_profiles:
+                            down_gen[child] = immediate_family(self.geni_token, child)
+                            #We add it to avoid duplications later on!
+                            affected_profiles.append(child)
+                cousins_array[i][j-1] = down_gen
+                cousins_count[i][j-1] = len(down_gen)
+                
+            
+        return cousins_array, cousins_count, affected_profiles
+                
+                
+        
+        
+        
+        
     
         

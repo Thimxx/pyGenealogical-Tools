@@ -9,6 +9,7 @@ It is mainly offering the following capabilities:
 
 1) Access by command line to profiles and relationship information.
 2) Build a tree of ancestors
+3) Build a map of cousing of a given profile
 
 # Installation instructions
 
