@@ -4,7 +4,6 @@ Created on 7 ago. 2017
 @author: Val
 '''
 from pyGeni.profile import profile
-from _tracemalloc import stop
 
 class climb(object):
     '''

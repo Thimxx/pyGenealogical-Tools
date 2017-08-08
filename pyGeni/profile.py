@@ -7,6 +7,7 @@ import requests
 #If importing this module is providing an error, check the installation instructions, you need to create a local
 #copy of geni_settings_template
 import pyGeni.geni_settings as s
+from pyGeni.data_models import geni_union
 
 
 
@@ -78,35 +79,20 @@ class profile:
         for keydata in data["nodes"].keys():
             #is easier to go to the usions, so we filter by unions.
             if "union" in keydata:
-                #Good... now we iterate per union the profiles found!
-                #Now, let's create tmp variables for capturing the union information
-                tmp_parents = []
-                tmp_child = []
-                myidischild = False
+                #Good... let's obtain the data from the union
+                tmp_union = geni_union(data["nodes"][keydata], keydata)
                 
-                for tmp_profile in data["nodes"][keydata]["edges"]:
-                    
-                    # When we detect the current profile we skip it!!!
-                    if (tmp_profile == myid):
-                        #but before exiting we check if is the relatinohip of fathers!!!
-                        if (data["nodes"][keydata]["edges"][tmp_profile]['rel'] == "child"):
-                            myidischild = True
-                    else:
-                        if (data["nodes"][keydata]["edges"][tmp_profile]['rel'] == "child"):
-                            tmp_child.append(tmp_profile)
-                        else:
-                            tmp_parents.append(tmp_profile)
-                #Great, now we do the append
-                if myidischild:
-                    #If this is a child, parents of the relationship are her parents and children the sibligns
-                    parents = parents + tmp_parents
-                    #Reminder!!! Here we do not see the half-brothers!
-                    sibligns = sibligns + tmp_child
+                #Now we need to filter the parents and children as we should not duplicate
+                if tmp_union.is_profile_child(myid):
+                    #We know is a child... so
+                    parents = parents + tmp_union.parents
+                    tmp_union.children.remove(myid)
+                    sibligns = sibligns + tmp_union.children
                 else:
-                    #In this case this union reflects her actual children!!!                    
-                    partner = partner + tmp_parents
-                    children = children + tmp_child
-                
+                    tmp_union.parents.remove(myid)
+                    partner = partner +  tmp_union.parents
+                    children = children + tmp_union.children
+                  
         self.parents = parents
         self.sibligns = sibligns
         self.partner = partner
