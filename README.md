@@ -2,6 +2,7 @@
 
 ![alt text](https://travis-ci.org/Thimxx/GeniTools.svg?branch=master)
 ![alt text](https://coveralls.io/repos/github/Thimxx/GeniTools/badge.svg?branch=master)
+![alt text](https://api.codacy.com/project/badge/Grade/3603c4580c464d209d44401021ef8642)
 
 An interface under development for Geni based on python. 
 

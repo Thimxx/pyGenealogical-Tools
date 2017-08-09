@@ -21,7 +21,7 @@ class profile(geni_calls):
         self.tokenIsOk = False
         if ( str(valid_token['result']) == "OK"):
             self.tokenIsOk = True
-            
+
         url = s.GENI_PROFILE + type_geni + str(id_geni) + self.token_string()
         r = requests.get(url)
         data = r.json()

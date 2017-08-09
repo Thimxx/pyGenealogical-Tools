@@ -19,7 +19,6 @@ class geni_calls():
         Just introducing the token, a common one between the different functions
         '''
         self.token = token
-    
     def token_string(self):
         return s.GENI_TOKEN + self.token
     
