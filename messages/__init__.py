@@ -1,1 +1,1 @@
-__all__=["parser_messages", "genitools_messages", "pygeni_message"]
+__all__=["parser_messages", "genitools_messages", "pygeni_messages"]

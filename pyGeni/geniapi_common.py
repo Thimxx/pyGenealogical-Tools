@@ -42,5 +42,4 @@ class geni_calls():
             logging.error(NO_VALID_TOKEN)
         elif ( str(valid_token['result']) == "OK"):
             tokenIsOk = True
-            
         return tokenIsOk

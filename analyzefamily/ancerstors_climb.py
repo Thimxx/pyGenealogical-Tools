@@ -25,7 +25,6 @@ class climb(object):
         ancestors = []
         current_gen =  {self.source_person.get_id() : self.source_person.relations }
         ancestors.append(current_gen)
-        
         #We introduce also a function to check duplications of profile... if they are duplicated, we take them out!
         affected_profiles = []
         affected_profiles.append(self.source_person.get_id())

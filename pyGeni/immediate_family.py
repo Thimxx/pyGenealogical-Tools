@@ -49,5 +49,3 @@ class immediate_family(geni_calls):
                         tmp_union.parents.remove(myid)
                         self.partner = self.partner +  tmp_union.parents
                         self.children = self.children + tmp_union.children
-                  
-        

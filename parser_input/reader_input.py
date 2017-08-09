@@ -22,8 +22,6 @@ class reader_input:
         self.profile_given = False
         self.generations_given = False
         self.genikey_given = False
-        
-        
         self.climbancestors = False
         self.climbcousins = False
         

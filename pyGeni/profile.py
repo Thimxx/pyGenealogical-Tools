@@ -15,7 +15,6 @@ class profile(geni_calls):
     def __init__(self, id_geni, token, type_geni="g"):  # id int or string
         #We initiate the base class
         geni_calls.__init__(self, token)
-        
         url = s.GENI_PROFILE + type_geni + str(id_geni) + self.token_string()
         r = requests.get(url)
         data = r.json()
