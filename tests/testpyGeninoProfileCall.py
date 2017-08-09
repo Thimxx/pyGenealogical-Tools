@@ -6,6 +6,7 @@ Created on 8 ago. 2017
 import unittest, os
 from pyGeni.data_models import geni_union
 from pyGeni.immediate_family import immediate_family
+from pyGeni.geniapi_common import geni_calls
 from tests.FIXTURES import *
 
 
@@ -62,6 +63,19 @@ class testpyGeniNoProfile(unittest.TestCase):
         assert(len(failing_family.children) == 0)
         self.assertFalse(failing_family.union_extracted)
         
+    def test_valid_token(self):
+        '''
+        Secure that we are using a valid token
+        '''
+        base_geni = geni_calls(self.token)
+        assert(base_geni.check_valid_genikey())
+    
+    def test_no_valid_token(self):
+        '''
+        Secure no valid token is found
+        '''
+        base_geni2 = geni_calls("")
+        self.assertFalse(base_geni2.check_valid_genikey())
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

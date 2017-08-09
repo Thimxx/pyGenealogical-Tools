@@ -15,15 +15,7 @@ class profile(geni_calls):
     def __init__(self, id_geni, token, type_geni="g"):  # id int or string
         #We initiate the base class
         geni_calls.__init__(self, token)
-        # Validate access token, connecting to Geni, this might take a while
-        valid_token = requests.get(s.GENI_VALIDATE_TOKEN + self.token).json()
-
-        self.tokenIsOk = False
-        #The way the API informs of a wrong token is the following:
-        #{'error': 'invalid_token', 'error_description': 'invalid token'}
-        if ( str(valid_token['result']) == "OK"):
-            self.tokenIsOk = True
-
+        
         url = s.GENI_PROFILE + type_geni + str(id_geni) + self.token_string()
         r = requests.get(url)
         data = r.json()
@@ -41,8 +33,6 @@ class profile(geni_calls):
         if "photo_urls" in data:
             data.pop("photo_urls")
         self.data = data
-
-        
         self.get_relations()
 
 

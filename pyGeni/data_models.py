@@ -22,7 +22,7 @@ class geni_union:
         self.parents = []
         self.children = []
         for tmp_profile in union_dict["edges"]:
-                   
+            
             if (union_dict["edges"][tmp_profile]['rel'] == "child"):
                 self.children.append(tmp_profile)
             else:

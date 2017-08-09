@@ -17,7 +17,6 @@ class climb(object):
         '''
         self.source_person = source_person
         self.geni_token = source_person.token
-        
     def get_ancestors(self, generations):
         '''
         This functions obtains the ancestors up to the requested generations.
@@ -45,15 +44,15 @@ class climb(object):
                         #We add it to avoid duplications later on!
                         affected_profiles.append(parent)
             
-            #If there are no longer ancestors, we should stop! 
+            #If there are no longer ancestors, we should stop!
             if len(next_gen) == 0:
                 return ancestors
             #Now...we append this generation to ancestors
             ancestors.append(next_gen)
             #And now the next generation is the current!!!
-            current_gen = next_gen 
+            current_gen = next_gen
             
-        #We just finish delivering the ancestors back!  
+        #We just finish delivering the ancestors back!!
         return ancestors, affected_profiles
     
     def get_cousins(self, generations):

@@ -39,7 +39,6 @@ class immediate_family(geni_calls):
                 if "union" in keydata:
                     #Good... let's obtain the data from the union
                     tmp_union = geni_union(self.data["nodes"][keydata], keydata)
-                
                     #Now we need to filter the parents and children as we should not duplicate
                     if tmp_union.is_profile_child(myid):
                         #We know is a child... so

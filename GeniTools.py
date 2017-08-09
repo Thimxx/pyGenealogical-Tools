@@ -1,4 +1,5 @@
 from pyGeni import profile
+from pyGeni.geniapi_common import geni_calls
 from parser_input import reader_input
 from analyzefamily.ancerstors_climb import climb
 from messages.genitools_messages import *
@@ -13,7 +14,10 @@ def main():
     #Firstly the Input File is Read
     data = reader_input.reader_input("INPUT")
     
-    if (data.continue_execution):
+    base_call = geni_calls(data.genikey)
+    
+    
+    if (data.continue_execution and base_call.check_valid_genikey()):
         #We only continue if inputs are correct!
         test_profile = profile.profile(data.profile, data.genikey)
 

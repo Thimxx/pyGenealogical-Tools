@@ -19,7 +19,6 @@ class reader_input:
         Internal function reading the input file line by line
         '''
         self.continue_execution = True
-        
         self.profile_given = False
         self.generations_given = False
         self.genikey_given = False
