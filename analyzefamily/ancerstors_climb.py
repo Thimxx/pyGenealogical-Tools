@@ -3,7 +3,6 @@ Created on 7 ago. 2017
 
 @author: Val
 '''
-from pyGeni.profile import profile
 from pyGeni.immediate_family import immediate_family
 
 class climb(object):

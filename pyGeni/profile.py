@@ -19,6 +19,8 @@ class profile(geni_calls):
         valid_token = requests.get(s.GENI_VALIDATE_TOKEN + self.token).json()
 
         self.tokenIsOk = False
+        #The way the API informs of a wrong token is the following:
+        #{'error': 'invalid_token', 'error_description': 'invalid token'}
         if ( str(valid_token['result']) == "OK"):
             self.tokenIsOk = True
 

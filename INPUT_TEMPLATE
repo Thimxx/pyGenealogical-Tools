@@ -1,3 +1,8 @@
 #Introduce the input profile
 PROFILE 60000000xxxxxxxxx
+#Get the GENI key from: https://www.geni.com/platform/developer/api_explorer
 GENIKEY xxxxxxxxxxxx
+
+#GENERATIONS 4
+#CLIMB_COUSINS
+#CLIMB_ANCESTORS
