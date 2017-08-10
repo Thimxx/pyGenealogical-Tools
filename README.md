@@ -18,6 +18,8 @@ Tested using python 3.6.2, happy to test other versions if needed.
 
 In order to use the tools you will need to install the module requests: http://docs.python-requests.org/en/master/
 
+Concerning testing, the repository if configured to use nose, coverage, nose-htmloutput, so you will need to install in your local installation as well.
+
 # Usage
 
 The file GeniTools is the one I am using as main programme. It is not yet very stable, but the libraries are getting. Just use the input file "INPUT_TEMPLATE" and select as input inside the script GeniTools.py, the input file needs to include the Geni token and the starting profile.

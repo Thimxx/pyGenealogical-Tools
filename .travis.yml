@@ -2,8 +2,8 @@ language: python
 python:
   - "3.6.2"
 # command to install dependencies
-install: "pip install requests coveralls"
-script: coverage run --source=. -m unittest discover -v
+install: "pip install requests coveralls nose-htmloutput nose coverage"
+script: nosetests -v --with-id  --with-coverage --with-html --cover-package=./
 
 after_success:  
   - coveralls 
