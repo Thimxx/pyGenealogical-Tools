@@ -4,7 +4,7 @@ python:
 # command to install dependencies
 install: 
   - "pip install requests coveralls nose-htmloutput nose coverage"
-  - "pip install -c travis wxpython"
+  - "pip install -U wxpython"
 script: nosetests -v --with-id  --with-coverage --with-html --cover-package=./
 
 after_success:  
