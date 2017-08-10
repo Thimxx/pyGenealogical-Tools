@@ -102,3 +102,5 @@ ENV/
 /.project
 /.pydevproject
 /INPUT
+/.noseids
+/nosetests.html

@@ -29,6 +29,7 @@ class testAncestorsClimb(unittest.TestCase):
         for generation in ancestors:
             i = i + len(generation.values())
         assert(i == 23)
+        assert(len(profiles) == 23)
     def testStopWithNoAncestors(self):
         '''
         If there are no longer ancestors, the ancestor climb should stop.
@@ -66,6 +67,7 @@ class testAncestorsClimb(unittest.TestCase):
             for j in range(0, generations + 1):
                 total_final = total_final + anc_count[i][j]
         assert(total_final == 38)
+        assert(len(profiles) == 38)
         
         
         

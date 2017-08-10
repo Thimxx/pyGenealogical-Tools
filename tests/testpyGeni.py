@@ -1,7 +1,7 @@
 import unittest
 import os
 from pyGeni import profile
-from tests.FIXTURES import *
+from tests.FIXTURES import PHILIPIVid, PHILIPIVg, PHILIPIVget
 
 
 class testpyGeni(unittest.TestCase):
