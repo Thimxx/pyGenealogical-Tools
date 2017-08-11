@@ -22,3 +22,6 @@ PROFILE_NOT_WORKING = "profile-2064479"
 
 #Cousing test, using a profile with smaller documented relatives!
 COUSIN_PROFILE = "6000000014013164881"
+
+#Small example of a Geni_KEY
+GENI_KEY_EXAMPLE = "fasjkgsdfsnnk44534078262"
