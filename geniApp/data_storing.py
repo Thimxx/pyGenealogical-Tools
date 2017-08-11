@@ -18,7 +18,6 @@ class StoringKeys():
         Simple initiation of the object
         '''
         self.persistent = shelve.open(filename)
-    
     def getGENIkey(self):
         '''
         This method provides back the data of GENI_KEY
@@ -32,16 +31,13 @@ class StoringKeys():
         This function saves the geni key inside the filename
         '''
         self.persistent["GENI_KEY"] = geni_key
-        
     def iskeypresent(self, key):
         '''
         Informs if the key is present
         '''
         return key in self.persistent
-    
     def close(self):
         '''
         Closes the file finally.
         '''
         self.persistent.close()
-        

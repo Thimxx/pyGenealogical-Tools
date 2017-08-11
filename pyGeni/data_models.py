@@ -27,16 +27,13 @@ class geni_union:
                 self.children.append(tmp_profile)
             else:
                 self.parents.append(tmp_profile)
-    
     def is_profile_child(self, profile2check):
         '''
         Simple function that checks if the given profile is a child inside the union
         '''
         return profile2check in self.children
-    
     def is_profile_parent(self, profile2check):
         '''
         Simple function that checks if the given profile is a parent inside the union
         '''
         return profile2check in self.parents
-                    

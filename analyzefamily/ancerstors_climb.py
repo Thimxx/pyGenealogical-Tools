@@ -28,7 +28,6 @@ class climb(object):
         #We introduce also a function to check duplications of profile... if they are duplicated, we take them out!
         affected_profiles = []
         affected_profiles.append(self.source_person.get_id())
-        
         for i in range(1, generations + 1):
             #We create an intermediate source version we will store all parents.
             next_gen = {}
@@ -42,7 +41,6 @@ class climb(object):
                         next_gen[parent] = immediate_family(self.geni_token, parent)
                         #We add it to avoid duplications later on!
                         affected_profiles.append(parent)
-            
             #If there are no longer ancestors, we should stop!
             if len(next_gen) == 0:
                 return ancestors
@@ -50,10 +48,8 @@ class climb(object):
             ancestors.append(next_gen)
             #And now the next generation is the current!!!
             current_gen = next_gen
-            
         #We just finish delivering the ancestors back!!
         return ancestors, affected_profiles
-    
     def get_cousins(self, generations):
         '''
         This function will create a matrix of cousins, just counting the number
@@ -62,18 +58,13 @@ class climb(object):
         #We initiate an array of 0s for calculating
         cousins_array = [[0 for j in range(generations +1)] for i in range(generations +1)]
         cousins_count = [[0 for j in range(generations +1)] for i in range(generations +1)]
-        
         #We need a list for checking duplications:
         affected_profiles = []
-        
         ancestors, affected_ancestors = self.get_ancestors(generations)
-        
         affected_profiles = affected_profiles + affected_ancestors
-        
         for i in range(0, generations+1):
             cousins_array[i][i] = ancestors[i]
             cousins_count[i][i] = len(ancestors[i])
-            
         #We have finished the list of grand parents, now we need to go down!
         for i in range(1, generations+1):
             #We go down in the matrix, from one we get the previous
@@ -93,14 +84,4 @@ class climb(object):
                             affected_profiles.append(child)
                 cousins_array[i][j-1] = down_gen
                 cousins_count[i][j-1] = len(down_gen)
-                
-            
         return cousins_array, cousins_count, affected_profiles
-                
-                
-        
-        
-        
-        
-    
-        
