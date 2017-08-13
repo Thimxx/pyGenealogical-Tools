@@ -25,7 +25,7 @@ class StoringKeys():
         if("GENI_KEY" in self.persistent):
             return self.persistent["GENI_KEY"]
         else:
-            return ""
+            return "EMPTY"
     def setGENIkey(self, geni_key):
         '''
         This function saves the geni key inside the filename

@@ -21,7 +21,7 @@ class Test(unittest.TestCase):
         filename = "testData" + str(irand) + "--" + time.strftime("%d.%m.%Y")
         d = StoringKeys(filename)
         assert(not d.iskeypresent("GENI_KEY"))
-        assert(d.getGENIkey() == "")
+        assert(d.getGENIkey() == "EMPTY")
         d.close()
         
         delete_files(filename)

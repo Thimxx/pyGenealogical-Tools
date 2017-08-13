@@ -30,6 +30,22 @@ class Test(unittest.TestCase):
         assert(profile.setCheckedBirthDate(birth_date, "AFTER"))
         assert(profile.setCheckedBirthDate(birth_date, "ABOUT"))
         assert(not profile.setCheckedBirthDate(birth_date, "OTHER"))
+    def test_introducing_death_date(self):
+        '''
+        Testing introduction of several death dates and the logic
+        '''
+        birth_date = date(2016,10, 20)
+        death_date = date(2017,12, 31)
+        death_date_before = date(2015,12, 31)
+        profile = gen_profile("Name", "Surname")
+        assert(profile.setCheckedDeathDate(death_date, "EXACT"))
+        assert(profile.setCheckedDeathDate(death_date, "BEFORE"))
+        assert(profile.setCheckedDeathDate(death_date, "AFTER"))
+        assert(profile.setCheckedDeathDate(death_date, "ABOUT"))
+        assert(not profile.setCheckedDeathDate(death_date, "OTHER"))
+        
+        assert(profile.setCheckedBirthDate(birth_date))
+        assert(not profile.setCheckedDeathDate(death_date_before))
         
 
 

@@ -20,8 +20,11 @@ class gen_profile(object):
         self.surname = surname
         
         self.gender = ""
+        
         self.birth_date = ""
         self.accuracy_birth_date = ""
+        self.birth_place = ""
+        
         self.death_date = ""
         self.death_place = ""
         self.accuracy_death_date = ""
@@ -58,6 +61,23 @@ class gen_profile(object):
         '''
         if (accuracy in VALUES_ACCURACY):
             self.birth_date = birth_date
+            return True
+        else:
+            return False
+    def setBirthPlace(self, place):
+        '''
+        Birth place will be a place introduction of data in a list
+        '''
+        self.birth_place = place
+    def setCheckedDeathDate(self, death_date, accuracy = "EXACT"):
+        '''
+        Input shall be a datetime.date format
+        '''
+        if (self.birth_date != "") and (death_date < self.birth_date):
+            #So death before being born? No way..
+            return False
+        if (accuracy in VALUES_ACCURACY):
+            self.death_date = death_date
             return True
         else:
             return False
