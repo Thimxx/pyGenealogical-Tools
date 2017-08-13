@@ -6,6 +6,7 @@ Created on 13 ago. 2017
 import unittest
 from gui_genitools.gui_frame.geni_key_frame import GeniKeyInput
 import wx
+import os
 
 class Test(unittest.TestCase):
 
@@ -14,6 +15,8 @@ class Test(unittest.TestCase):
         '''
         Simply test of opening the main App
         '''
+        new_env = dict(os.environ)
+        new_env['DISPLAY'] = '0.0'
         app = wx.App(False)
         geniKey = GeniKeyInput(None)
         
