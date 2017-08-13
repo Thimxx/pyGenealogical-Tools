@@ -17,8 +17,8 @@ class Test(unittest.TestCase):
         '''
         new_env = dict(os.environ)
         new_env['DISPLAY'] = '0.0'
-        app = wx.App(False)
-        geniKey = GeniKeyInput(None)
+        #app = wx.App(False)
+        #geniKey = GeniKeyInput(None)
         
 
 
