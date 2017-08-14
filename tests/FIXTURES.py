@@ -25,3 +25,7 @@ COUSIN_PROFILE = "6000000014013164881"
 
 #Small example of a Geni_KEY
 GENI_KEY_EXAMPLE = "fasjkgsdfsnnk44534078262"
+
+
+#Living place
+GENERIC_PLACE = ["Portillo", "Valladolid", "Castile and Leon", "Spain"]
