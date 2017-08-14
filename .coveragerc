@@ -3,3 +3,4 @@ omit =
     GeniTools.py
     GEniToolsGUI.py
     ./tests/*
+    C:\Program*
