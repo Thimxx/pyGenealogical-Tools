@@ -14,7 +14,7 @@ It is mainly offering the following capabilities:
 
 # Installation instructions
 
-Tested using python 3.6.2, happy to test other versions if needed.
+Tested using python 3.5.3 and 3.6.2, happy to test other versions if needed. Main limitation are the testing capabilities in travis for wxpython.
 
 In order to use the tools you will need to install the module requests: http://docs.python-requests.org/en/master/
 

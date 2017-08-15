@@ -17,9 +17,9 @@ addons:
 # command to install dependencies
 install: 
   - sudo apt-get update
-  - wget "https://wxpython.org/Phoenix/snapshot-builds/linux/gtk3/ubuntu-14.04/wxPython-4.0.0a2.dev3038+953a2e5-cp35-cp35m-linux_x86_64.whl"
-  - pip install wxPython-4.0.0a2.dev3038+953a2e5-cp35-cp35m-linux_x86_64.whl 
-  - "pip install requests coveralls nose-htmloutput nose coverage"
+  - wget "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-14.04/wxPython-4.0.0b1-cp35-cp35m-linux_x86_64.whl"
+  - pip install wxPython-4.0.0b1-cp35-cp35m-linux_x86_64.whl 
+  - "pip install requests coveralls nose-htmloutput nose coverage openpyxl"
 # Commented as failing  - "pip install -U wxpython"
 script: nosetests -v --with-id  --with-coverage --cover-package=./
 
