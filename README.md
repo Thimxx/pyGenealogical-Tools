@@ -4,13 +4,18 @@
 ![alt text](https://coveralls.io/repos/github/Thimxx/GeniTools/badge.svg?branch=master)
 ![alt text](https://api.codacy.com/project/badge/Grade/3603c4580c464d209d44401021ef8642)
 
-An interface under development for Geni based on python. 
+Several genealogical python tools included which are under development.
 
 It is mainly offering the following capabilities:
 
-1) Access by command line to profiles and relationship information.
-2) Build a tree of ancestors
-3) Build a map of cousing of a given profile
+1) Access by command line to Geni profiles and relationship information.
+2) Build a tree of ancestors in Geni
+3) Build a map of cousins of a given profile in Geni-
+4) Several genealogical functions.
+    4.1) Get children surname based on several naming conventions
+    4.2) Get name removing surnames
+5) A common base profile for any genealogical input
+6) A tool for parsing FamilySearch excel outputs of sons in a family.
 
 # Installation instructions
 

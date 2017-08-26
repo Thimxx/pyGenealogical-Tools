@@ -29,3 +29,18 @@ GENI_KEY_EXAMPLE = "fasjkgsdfsnnk44534078262"
 
 #Living place
 GENERIC_PLACE = ["Portillo", "Valladolid", "Castile and Leon", "Spain"]
+
+#Year Examples
+RIGHT_YEAR = "1894"
+RIGHT_YEAR_IN_A_TEXT = "This year is 1894"
+RIGHT_YEAR_IN_A_DATE = "14 Aug 1894"
+WRONG_YEAR = "3845"
+JUST_TEXT = "This is text"
+
+#Surnames
+FATHER_SURNAME = "Perez"
+MOTHER_SURNAME = "Smith"
+SPANISH_CHILD_SURNAME = "Perez Smith"
+FULL_NAME = "Emilio Perez"
+FULL_NAME_SPANISH = "Emilio Perez Smith"
+ACTUAL_NAME = "Emilio"

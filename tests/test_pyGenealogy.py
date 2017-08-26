@@ -125,6 +125,33 @@ class Test(unittest.TestCase):
         
         assert(not profile.setCheckedResidenceDate(earliest_date))
         assert(not profile.setCheckedResidenceDate(latest_date))
+    def test_accuracy_in_dates(self):
+        '''
+        Testing the accuracy as introduced in dates
+        '''
+        profile = gen_profile("Name", "Surname")
+        test_date = date(2016,10, 20)
+        residence_date = date(2016,1, 1)
+        death_date = date(2016,12, 31)
+        late_residence_date = date(2016,1,1)
+        assert(profile.setCheckedBirthDate(test_date))
+        assert(profile.setCheckedResidenceDate(residence_date, "ABOUT"))
+        profile2 = gen_profile("Name", "Surname")
+        assert(profile2.setCheckedBirthDate(test_date))
+        assert(profile2.setCheckedDeathDate(death_date))
+        assert(profile2.setCheckedResidenceDate(late_residence_date, "ABOUT"))
+  
+    def test_burial_date_earlier_than_death_date(self):
+        '''
+        Test burial date before death date is wrong
+        '''
+        profile = gen_profile("Name", "Surname")
+        death_date = date(2016,10, 20)
+        burial_date = date(2016,10, 19)
+        assert(profile.setCheckedDeathDate(death_date))
+        self.assertFalse(profile.setCheckedBurialDate(burial_date))
+        
+        
     def test_other_functions(self):
         '''
         Testing of other functions in common profile
