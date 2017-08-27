@@ -34,6 +34,15 @@ class Test(unittest.TestCase):
         assert(fsclass.initial_row == 6)
         assert(fsclass.sheet_title == "Sheet0")
     
+    def test_wrong_inputs(self):
+        '''
+        Test FS reader wrong inputs are detected
+        '''
+        input_file = os.path.join(self.filelocation, "fs-PotenteAsegurado.xlsx")
+        fsclass = getFSfamily(input_file, naming_convention = "wrong_input")
+        self.assertFalse(fsclass.correct_execution)
+        
+    
     def test_fs_reader_single_person(self):
         '''
         Tests in detail the correct reading of a person

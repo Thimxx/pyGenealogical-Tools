@@ -14,6 +14,7 @@ It is mainly offering the following capabilities:
 4) Several genealogical functions.
     4.1) Get children surname based on several naming conventions
     4.2) Get name removing surnames
+    4.3) Check dates consistency in profiles
 5) A common base profile for any genealogical input
 6) A tool for parsing FamilySearch excel outputs of sons in a family.
 

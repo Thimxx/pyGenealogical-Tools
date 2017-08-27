@@ -1,1 +1,1 @@
-__all__ = ["profile", "data_models", "immediate_family", "geniapi_common"]
+__all__ = ["profile", "data_models", "immediate_family", "geniapi_common", "geni_settings"]

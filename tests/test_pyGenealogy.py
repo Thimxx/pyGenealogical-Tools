@@ -89,25 +89,6 @@ class Test(unittest.TestCase):
         #Notice that will be ok to introudce a very late burial date
         assert(profile.setCheckedBurialDate(latest_date))
         assert(not profile.setCheckedBurialDate(burial_date,"OTHER"))
-            
-    def test_date_check(self):
-        '''
-        Test of the function for date check
-        '''
-        profile = gen_profile("Name", "Surname")
-        date1 = date(2017,1,1)
-        date2 = date(2016,1,1)
-        date3 = date(2015,1,1)
-        date2b = date(2014,2,1)
-        date4 = date(2014,1,1)
-        assert(profile.checkDateConsistency("",date2b, "","","",""))
-        assert(profile.checkDateConsistency(date4,"", "","","",""))
-        assert(profile.checkDateConsistency(date4,"", "","","",date1))
-        assert(profile.checkDateConsistency(date4,"", date3,date2,date1,""))
-        
-        assert(not profile.checkDateConsistency(date1,"", "","",date4,""))
-        assert(not profile.checkDateConsistency("","", date1,"",date4,""))
-        assert(not profile.checkDateConsistency(date1,"", date4,"","",""))
      
     def test_introduce_residence_date(self):
         '''
@@ -125,6 +106,7 @@ class Test(unittest.TestCase):
         
         assert(not profile.setCheckedResidenceDate(earliest_date))
         assert(not profile.setCheckedResidenceDate(latest_date))
+        assert(not profile.setCheckedBurialDate(residence_date,"OTHER"))
     def test_accuracy_in_dates(self):
         '''
         Testing the accuracy as introduced in dates

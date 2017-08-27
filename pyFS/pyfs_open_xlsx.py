@@ -3,11 +3,13 @@ Created on 15 ago. 2017
 
 @author: Val
 '''
+import logging
 from openpyxl import load_workbook
 from openpyxl.utils import  column_index_from_string
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import is_year, naming_conventions, get_children_surname, get_name_from_fullname
 from datetime import datetime
+from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION
 
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name"]
 date_fields = ["birth_date", "burial_date", "chr_date", "residence_date", "death_date"]
@@ -16,8 +18,6 @@ class getFSfamily(object):
     '''
     This class reads the  FS output excel from the website of FamilySearch
     '''
-
-
     def __init__(self, filename, naming_convention = "father_surname"):
         '''
         This contructor reads the output file from FS in xlsx format
@@ -25,13 +25,13 @@ class getFSfamily(object):
         #TODO: include further naming conventions
         self.correct_execution = True
         if (not naming_convention in naming_conventions):
+            logging.error(NO_VALID_NAMING_CONVENTION) 
             self.correct_execution = False
         self.naming_convention = naming_convention
         self.loaded_data = load_workbook(filename, data_only=True)
-        self.correct_execution = self.__locate_key_fields__()
+        if (not self.__locate_key_fields__()): self.correct_execution = False
         self.profiles = []
         self.__get_profiles__()
-    
     def __locate_key_fields__(self):
         '''
         This function is used to locate the key areas within the file in order to later
@@ -53,11 +53,11 @@ class getFSfamily(object):
         This function will take all different profiles included inside the excel file
         '''
         current_sheet = self.loaded_data[self.sheet_title]
-        
+        #Iterator of missing inptus
         number_missing = 0
-        
+        #Temporal variable checking the correct reading
         correct_introduction = True
-        
+        #Intermediate variables for potential surnames in the input file
         potential_father_surname = []
         potential_father_surname_repetitions = []
         potential_mother_surname = []
@@ -89,13 +89,12 @@ class getFSfamily(object):
                         else:
                             index = potential_mother_surname.index(surname)
                             potential_mother_surname_repetitions[index] = potential_mother_surname_repetitions[index] + 1
-        
         index_father_surname = potential_father_surname_repetitions.index(max(potential_father_surname_repetitions))
         index_mother_surname = potential_mother_surname_repetitions.index(max(potential_mother_surname_repetitions))
         father_surname = potential_father_surname[index_father_surname]
         mother_surname = potential_mother_surname[index_mother_surname]
         children_surname = get_children_surname(father_surname, mother_surname, self.naming_convention)
-        
+        #Now we read the complete file
         for row in range(self.initial_row+1, self.loaded_data[self.sheet_title].max_row+1):
             included_profile = gen_profile("TBD", children_surname)
             included_right = True
@@ -135,9 +134,11 @@ class getFSfamily(object):
                     if (not this_introduction): included_right = False
             if(not included_right) : correct_introduction = False
             self.profiles.append(included_profile)
-        self.correct_execution = correct_introduction
-    
+        return correct_introduction
     def __include_a_date__(self, column_criteria, profile, date_object, accuracy ):
+        '''
+        Function to avoid repetition
+        '''
         if (column_criteria  == "birth_date"):
             return profile.setCheckedBirthDate(date_object, accuracy)
         elif (column_criteria  == "burial_date"):
@@ -148,9 +149,3 @@ class getFSfamily(object):
             return profile.setCheckedResidenceDate(date_object, accuracy)
         elif (column_criteria == "death_date"):
             return profile.setCheckedDeathDate(date_object, accuracy)
-            
-        
-        
-                
-        
-        
