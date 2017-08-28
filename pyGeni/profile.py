@@ -17,8 +17,8 @@ class profile(geni_calls):
         geni_calls.__init__(self, token)
         url = s.GENI_PROFILE + type_geni + str(id_geni) + self.token_string()
         r = requests.get(url)
+        #TODO:add error checking when a data is empty
         data = r.json()
-
         if type_geni == "g":
             self.guid = id_geni
             self.id = stripId(data["id"])
