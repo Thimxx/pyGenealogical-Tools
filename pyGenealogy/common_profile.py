@@ -4,8 +4,7 @@ Created on 13 ago. 2017
 @author: Val
 '''
 from pyGenealogy.gen_utils import checkDateConsistency
-
-VALUES_ACCURACY = ["EXACT", "BEFORE", "AFTER", "ABOUT"]
+from pyGenealogy import VALUES_ACCURACY
 
 class gen_profile(object):
     '''

@@ -4,9 +4,10 @@ Created on 26 ago. 2017
 @author: Val
 '''
 import logging
-from messages.pyGenealogymessages import NO_VALID_CONVENTION
+from messages.pyGenealogymessages import NO_VALID_CONVENTION, NO_VALID_ACCURACY
 from messages.pyGenealogymessages import NO_VALID_BIRTH_DATE, NO_VALID_DEATH_DATE, NO_VALID_DEATH_AND_BURIAL
 from datetime import date
+from pyGenealogy import VALUES_ACCURACY
 
 naming_conventions = ["father_surname", "spanish_surname"]
 
@@ -105,4 +106,32 @@ def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date
                 logging.error(NO_VALID_DEATH_DATE) 
                 return False
     return True
+
+def getBestDate(date1, accuracy1, date2, accuracy2):
+    '''
+    This method takes 2 dates with their accuracy and returns the most probable
+    date
+    '''
+    #TODO: we need to change the model fo the data to allow the inclusion of 2 values
+    #in such case we will have the possibility of having before and after
+    #Wrong accuracy provided will provide None data
+    if (not accuracy1 in VALUES_ACCURACY) or (not accuracy2 in VALUES_ACCURACY):
+        logging.error(NO_VALID_ACCURACY) 
+        return None, None
+    #If we have an exact date, that's the one!
+    if (accuracy1 == "EXACT"):
+        return date1, accuracy1
+    elif (accuracy2 == "EXACT"):
+        return date2, accuracy2
+    #Ok, now AFTER or BEFORE becomes more precise
+    if (accuracy1 in ["BEFORE", "AFTER"]):
+        return date1, accuracy1
+    elif (accuracy2 in ["BEFORE", "AFTER"]):
+        return date2, accuracy2
+    else:
+        #The only option is having 2 abouts... we get the middle value
+        newyear = int((date1.year +date2.year)/2)
+        return date(newyear,1,1), accuracy1
+    
+    
     

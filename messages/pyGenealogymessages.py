@@ -10,3 +10,4 @@ NO_VALID_DEATH_AND_BURIAL = "Death cannot be after Burial date"
 
 #Utils errors
 NO_VALID_CONVENTION = "The selected naming convention is not supported"
+NO_VALID_ACCURACY = "The provided accuracy definition of the date is not supported"
