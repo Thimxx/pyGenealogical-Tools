@@ -4,7 +4,6 @@ Created on 8 ago. 2017
 @author: Val
 '''
 
-import requests
 import pyGeni as s
 from pyGeni.geniapi_common import geni_calls
 from pyGeni.data_models import geni_union
@@ -22,7 +21,7 @@ class immediate_family(geni_calls):
         #Initiating base class
         geni_calls.__init__(self, token)
         self.union_url = self.get_profile_url(myid) + s.GENI_FAMILY + self.token_string()
-        r = requests.get(self.union_url)
+        r = s.geni_request_get(self.union_url)
         self.data = r.json()
         #we initialize the lists
         self.union_extracted = False

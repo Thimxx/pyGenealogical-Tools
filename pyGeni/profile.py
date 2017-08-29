@@ -2,8 +2,6 @@
 # Actually, the initial version is a reordering of that version.
 # All credits to the original creator of that file: liuyao12
 
-import requests
-
 #If importing this module is providing an error, check the installation instructions, you need to create a local
 #copy of geni_settings_template
 import pyGeni as s
@@ -16,7 +14,7 @@ class profile(geni_calls):
         #We initiate the base class
         geni_calls.__init__(self, token)
         url = s.GENI_PROFILE + type_geni + str(id_geni) + self.token_string()
-        r = requests.get(url)
+        r = s.geni_request_get(url)
         #TODO:add error checking when a data is empty
         data = r.json()
         if type_geni == "g":
