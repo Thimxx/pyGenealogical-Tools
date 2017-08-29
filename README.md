@@ -18,6 +18,8 @@ It is mainly offering the following capabilities:
 5) A common base profile for any genealogical input
 6) A tool for parsing FamilySearch excel outputs of sons in a family.
 
+This application uses the Geni API but is not endorsed, operated, or sponsored by Geni.com.
+
 # Installation instructions
 
 Tested using python 3.5.3 and 3.6.2, happy to test other versions if needed. Main limitation are the testing capabilities in travis for wxpython.
