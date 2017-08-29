@@ -12,7 +12,6 @@ class Test(unittest.TestCase):
 
 
     def setUp(self):
-        time.sleep(123)
         #We used the sandbox here
         self.stoken = os.environ['SANDBOX_KEY']
         profile.s.update_geni_address("https://www.sandbox.geni.com")

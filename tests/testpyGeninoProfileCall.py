@@ -6,7 +6,7 @@ Created on 8 ago. 2017
 import unittest, os
 from pyGeni.data_models import geni_union
 from pyGeni.immediate_family import immediate_family
-from pyGeni.geniapi_common import geni_calls
+from pyGeni import  geniapi_common
 from tests import FIXTURES 
 
 
@@ -14,6 +14,8 @@ class testpyGeniNoProfile(unittest.TestCase):
  
     def setUp(self):
         self.token = os.environ['GENI_KEY']
+        geniapi_common.s.update_geni_address("https://www.geni.com")
+        geniapi_common.s.VERIFY_INPUT = "standard"
         
 
     def testgenerateunion(self):
@@ -67,14 +69,14 @@ class testpyGeniNoProfile(unittest.TestCase):
         '''
         Secure that we are using a valid token
         '''
-        base_geni = geni_calls(self.token)
+        base_geni = geniapi_common.geni_calls(self.token)
         assert(base_geni.check_valid_genikey())
     
     def test_no_valid_token(self):
         '''
         Secure no valid token is found
         '''
-        base_geni2 = geni_calls("")
+        base_geni2 = geniapi_common.geni_calls("")
         self.assertFalse(base_geni2.check_valid_genikey())
         
 if __name__ == "__main__":
