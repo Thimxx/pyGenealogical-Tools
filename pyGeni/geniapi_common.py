@@ -5,7 +5,7 @@ Created on 8 ago. 2017
 '''
 
 
-import pyGeni.geni_settings as s
+import pyGeni as s
 import requests
 from messages.pygeni_messages import *
 import logging

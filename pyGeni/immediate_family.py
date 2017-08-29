@@ -5,7 +5,7 @@ Created on 8 ago. 2017
 '''
 
 import requests
-import pyGeni.geni_settings as s
+import pyGeni as s
 from pyGeni.geniapi_common import geni_calls
 from pyGeni.data_models import geni_union
 

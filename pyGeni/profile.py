@@ -6,7 +6,7 @@ import requests
 
 #If importing this module is providing an error, check the installation instructions, you need to create a local
 #copy of geni_settings_template
-import pyGeni.geni_settings as s
+import pyGeni as s
 from pyGeni.geniapi_common import geni_calls
 from pyGeni.immediate_family import immediate_family
 
