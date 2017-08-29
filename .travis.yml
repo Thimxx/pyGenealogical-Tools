@@ -20,7 +20,10 @@ install:
   - wget "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-14.04/wxPython-4.0.0b1-cp35-cp35m-linux_x86_64.whl"
   - pip install wxPython-4.0.0b1-cp35-cp35m-linux_x86_64.whl 
   - pip install requests coveralls nose-htmloutput nose coverage openpyxl
-
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
 script: nosetests -v --with-id  --with-coverage --cover-package=./
 
 after_success:  

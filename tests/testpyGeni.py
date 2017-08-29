@@ -7,6 +7,8 @@ from tests.FIXTURES import PHILIPIVid, PHILIPIVg, PHILIPIVget
 class testpyGeni(unittest.TestCase):
     def setUp(self):
         token = os.environ['GENI_KEY']
+        profile.s.update_geni_address("https://www.geni.com")
+        profile.s.VERIFY_INPUT = "standard"
         self.philip = profile.profile(PHILIPIVg, token)
 
     def testGettingCorrectName(self):
