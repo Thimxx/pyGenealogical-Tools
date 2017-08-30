@@ -5,11 +5,15 @@ from messages.pygeni_messages import ERROR_REQUESTS
 
 #Several addresses of the Geni API
 GENI_ADDRESS = "https://www.geni.com"
-GENI_VALIDATE_TOKEN = GENI_ADDRESS + "/platform/oauth/validate_token?access_token="
+GENI_FAMILY = "/immediate-family"
+GENI_INITIATE_PARAMETER = "?"
+GENI_ADD_PARAMETER = "&"
+GENI_SINGLE_TOKEN = GENI_INITIATE_PARAMETER + "access_token="
+GENI_PARAM_TOKEN = GENI_ADD_PARAMETER + "access_token="
+#Parameters that depend on others
+GENI_VALIDATE_TOKEN = GENI_ADDRESS + "/platform/oauth/validate_token" + GENI_SINGLE_TOKEN
 GENI_API = GENI_ADDRESS + "/api/"
 GENI_PROFILE =  GENI_API + "profile-"
-GENI_FAMILY = "/immediate-family"
-GENI_TOKEN = "?access_token="
 
 VERIFY_INPUT="standard"
 
@@ -22,9 +26,10 @@ def update_geni_address(new_geni_address):
     global GENI_VALIDATE_TOKEN 
     global GENI_API 
     global GENI_PROFILE
+    global GENI_SINGLE_TOKEN
     
     GENI_ADDRESS = new_geni_address
-    GENI_VALIDATE_TOKEN = GENI_ADDRESS + "/platform/oauth/validate_token?access_token="
+    GENI_VALIDATE_TOKEN = GENI_ADDRESS + "/platform/oauth/validate_token" + GENI_SINGLE_TOKEN
     GENI_API = GENI_ADDRESS + "/api/"
     GENI_PROFILE =  GENI_API + "profile-"
     

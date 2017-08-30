@@ -6,7 +6,7 @@ Created on 8 ago. 2017
 
 
 import pyGeni as s
-from messages.pygeni_messages import *
+from messages.pygeni_messages import NO_VALID_TOKEN
 import logging
 
 class geni_calls():
@@ -22,7 +22,7 @@ class geni_calls():
         '''
         self.token = token
     def token_string(self):
-        return s.GENI_TOKEN + self.token
+        return s.GENI_SINGLE_TOKEN + self.token
     @classmethod
     def get_profile_url(cls, profile_id):
         '''

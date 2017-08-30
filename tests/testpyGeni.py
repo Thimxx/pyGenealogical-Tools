@@ -32,7 +32,7 @@ class testpyGeni(unittest.TestCase):
         This test checks that all relationships of the profile are correct
         '''
         assert (len(self.philip.parents) == 2)
-        assert(len(self.philip.sibligns) == 8)
+        assert(len(self.philip.sibligns) == 7)
         assert(len(self.philip.partner) == 3)
         assert(len(self.philip.children) == 16)
     
