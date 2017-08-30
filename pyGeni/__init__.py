@@ -1,6 +1,7 @@
 __all__ = ["profile", "data_models", "immediate_family", "geniapi_common"]
 
-import requests
+import requests, logging
+from messages.pygeni_messages import ERROR_REQUESTS
 
 #Several addresses of the Geni API
 GENI_ADDRESS = "https://www.geni.com"
@@ -34,7 +35,12 @@ def geni_request_get(url):
     '''
     global VERIFY_INPUT
     if (VERIFY_INPUT == "standard"):
-        return requests.get(url)
+        data = requests.get(url)
     else:
-        return requests.get(url, verify=VERIFY_INPUT)
+        data = requests.get(url, verify=VERIFY_INPUT)
+    
+    if "error" in data.json().keys():
+        #Ok, now we know we have an error, we need to inform the user!
+        logging.error(ERROR_REQUESTS, data.json())
+    return data 
     

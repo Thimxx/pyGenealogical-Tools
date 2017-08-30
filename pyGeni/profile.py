@@ -11,26 +11,28 @@ from pyGeni.immediate_family import immediate_family
 
 class profile(geni_calls):
     def __init__(self, id_geni, token, type_geni="g"):  # id int or string
+        self.properly_executed = False
         #We initiate the base class
         geni_calls.__init__(self, token)
         url = s.GENI_PROFILE + type_geni + str(id_geni) + self.token_string()
         r = s.geni_request_get(url)
-        #TODO:add error checking when a data is empty
         data = r.json()
-        if type_geni == "g":
-            self.guid = id_geni
-            self.id = stripId(data["id"])
-        if type_geni == "":
-            self.id = id_geni
-            self.guid = int(data["guid"])
+        if not "error" in data.keys():
+            if type_geni == "g":
+                self.guid = id_geni
+                self.id = stripId(data["id"])
+            if type_geni == "":
+                self.id = id_geni
+                self.guid = int(data["guid"])
 
-        self.fulldata = data
-        if "mugshot_urls" in data:
-            data.pop("mugshot_urls")
-        if "photo_urls" in data:
-            data.pop("photo_urls")
-        self.data = data
-        self.get_relations()
+            self.fulldata = data
+            if "mugshot_urls" in data:
+                data.pop("mugshot_urls")
+            if "photo_urls" in data:
+                data.pop("photo_urls")
+            self.data = data
+            self.get_relations()
+            self.properly_executed = True
 
 
     def nameLifespan(self):
