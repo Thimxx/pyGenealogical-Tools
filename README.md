@@ -9,14 +9,17 @@ Several genealogical python tools included which are under development.
 It is mainly offering the following capabilities:
 
 1) Access by command line to Geni profiles and relationship information.
-2) Build a tree of ancestors in Geni
-3) Build a map of cousins of a given profile in Geni-
-4) Several genealogical functions.
-    4.1) Get children surname based on several naming conventions
-    4.2) Get name removing surnames
-    4.3) Check dates consistency in profiles
-5) A common base profile for any genealogical input
-6) A tool for parsing FamilySearch excel outputs of sons in a family.
+2) Geni interface
+    2.1) Build a tree of ancestors in Geni
+    2.2) Build a map of cousins of a given profile in Geni.
+    2.3) Create a child in geni
+    2.4) Delete a profile in geni
+3) Several genealogical functions.
+    3.1) Get children surname based on several naming conventions
+    3.2) Get name removing surnames
+    3.3) Check dates consistency in profiles
+4) A common base profile for any genealogical input
+5) A tool for parsing FamilySearch excel outputs of sons in a family.
 
 This application uses the Geni API but is not endorsed, operated, or sponsored by Geni.com.
 

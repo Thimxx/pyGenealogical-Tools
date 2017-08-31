@@ -8,8 +8,11 @@ GENI_ADDRESS = "https://www.geni.com"
 GENI_FAMILY = "/immediate-family"
 GENI_INITIATE_PARAMETER = "?"
 GENI_ADD_PARAMETER = "&"
-GENI_SINGLE_TOKEN = GENI_INITIATE_PARAMETER + "access_token="
-GENI_PARAM_TOKEN = GENI_ADD_PARAMETER + "access_token="
+GENI_TOKEN = "access_token="
+GENI_SINGLE_TOKEN = GENI_INITIATE_PARAMETER + GENI_TOKEN
+GENI_PARAM_TOKEN = GENI_ADD_PARAMETER + GENI_TOKEN
+GENI_ADD_CHILD = "/add-child"
+GENI_DELETE = "/delete"
 #Parameters that depend on others
 GENI_VALIDATE_TOKEN = GENI_ADDRESS + "/platform/oauth/validate_token" + GENI_SINGLE_TOKEN
 GENI_API = GENI_ADDRESS + "/api/"
@@ -35,8 +38,7 @@ def update_geni_address(new_geni_address):
     
 def geni_request_get(url):
     '''
-    Function to activate/de-activate execution of the code. Just for being able
-    to debug
+    Function to perform get calls.
     '''
     global VERIFY_INPUT
     if (VERIFY_INPUT == "standard"):
@@ -44,6 +46,20 @@ def geni_request_get(url):
     else:
         data = requests.get(url, verify=VERIFY_INPUT)
     
+    if "error" in data.json().keys():
+        #Ok, now we know we have an error, we need to inform the user!
+        logging.error(ERROR_REQUESTS, data.json())
+    return data 
+    
+def geni_request_post(url):
+    '''
+    Function to perform post calls.
+    '''
+    global VERIFY_INPUT
+    if (VERIFY_INPUT == "standard"):
+        data = requests.post(url)
+    else:
+        data = requests.post(url, verify=VERIFY_INPUT)
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!
         logging.error(ERROR_REQUESTS, data.json())
