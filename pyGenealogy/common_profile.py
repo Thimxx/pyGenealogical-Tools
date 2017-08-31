@@ -11,39 +11,48 @@ class gen_profile(object):
     This class will include a single genealogical profile common for all tools,
     common information like birth dates, death dates... will be covered here.
     '''
-    def __init__(self, name, surname):
+    def __init__(self, name, surname, name2show=None):
         '''
         Constructor, name and surname as minimal parameters
         '''
         self.name = name
         self.surname = surname
-        self.gender = ""
+        self.name_to_show = self.set_name_2_show(name2show)
+        self.gender = None
         #Birth info
-        self.birth_date = ""
-        self.accuracy_birth_date = ""
-        self.birth_place = ""
+        self.birth_date = None
+        self.accuracy_birth_date = None
+        self.birth_place = None
         #Death info
-        self.death_date = ""
-        self.death_place = ""
-        self.accuracy_death_date = ""
+        self.death_date = None
+        self.death_place = None
+        self.accuracy_death_date = None
         #Baptism info
-        self.baptism_date = ""
-        self.baptism_place = ""
-        self.accuracy_baptism_date = ""
+        self.baptism_date = None
+        self.baptism_place = None
+        self.accuracy_baptism_date = None
         #Residence info
-        self.residence_date = ""
-        self.residence_place = ""
-        self.accuracy_residence_date = ""
+        self.residence_date = None
+        self.residence_place = None
+        self.accuracy_residence_date = None
         #Burial info
-        self.burial_date = ""
-        self.burial_place = ""
-        self.accuracy_burial_date = ""
+        self.burial_date = None
+        self.burial_place = None
+        self.accuracy_burial_date = None
         #Marriage info
-        self.marriage_date = ""
-        self.accuracy_marriage_date = ""
+        self.marriage_date = None
+        self.accuracy_marriage_date = None
         #Other info
-        self.comments = ""
+        self.comments = None
         self.web_ref = []
+    def set_name_2_show(self, name2show):
+        '''
+        Setting the name to be shown if not existing
+        '''
+        if (name2show == None):
+            return self.returnFullName()
+        else:
+            return name2show
     def returnFullName(self):
         return self.name + " " + self.surname
     def setCheckedGender(self, gender):
@@ -150,7 +159,21 @@ class gen_profile(object):
         '''
         Comments are aditive on top of the preivous one
         '''
+        if (self.comments == None):
+            self.comments = "" 
         self.comments = self.comments + comment
+    def nameLifespan(self):
+        '''
+        Function for printing an standard format of naming
+        '''
+        year_birth = "?"
+        if(self.birth_date != None): year_birth = str(self.birth_date.year) 
+        year_death = "?"
+        if(self.death_date != None): year_death = str(self.death_date.year)
+        if (self.birth_date == None) and (self.death_date == None):
+            return self.name_to_show
+        else:
+            return self.name_to_show + " (" + year_birth + " - " + year_death + ")"
     def setWebReference(self, address):
         '''
         Includes web references for the profile.

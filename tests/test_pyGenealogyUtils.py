@@ -54,16 +54,16 @@ class Test(unittest.TestCase):
         date3 = date(2015,1,1)
         date2b = date(2014,2,1)
         date4 = date(2014,1,1)
-        assert(checkDateConsistency("",date2b, "","","",""))
-        assert(checkDateConsistency(date4,"", "","","",""))
-        assert(checkDateConsistency(date4,"", "","","",date1))
-        assert(checkDateConsistency(date4,"", date3,date2,date1,""))
+        assert(checkDateConsistency(None,date2b, None,None,None,None))
+        assert(checkDateConsistency(date4,None, None,None,None,None))
+        assert(checkDateConsistency(date4,None, None,None,None,date1))
+        assert(checkDateConsistency(date4,None, date3,date2,date1,None))
         
-        assert(not checkDateConsistency(date1,"", "","",date4,""))
-        assert(not checkDateConsistency("","", date1,"",date4,""))
-        assert(not checkDateConsistency(date1,"", date4,"","",""))
+        assert(not checkDateConsistency(date1,None, None,None,date4,None))
+        assert(not checkDateConsistency(None,None, date1,None,date4,None))
+        assert(not checkDateConsistency(date1,None, date4,None,None,None))
         #Checking that about dates are ok although the date2b is later than date4
-        assert(checkDateConsistency(date2b, "", "", "", date4, date4, accuracy_death = "ABOUT", accuracy_burial = "ABOUT"))
+        assert(checkDateConsistency(date2b, None, None, None, date4, date4, accuracy_death = "ABOUT", accuracy_burial = "ABOUT"))
     
     def test_getting_a_date(self):
         '''

@@ -5,7 +5,7 @@ Created on 29 ago. 2017
 '''
 import unittest
 from pyGeni import profile
-import os, time
+import os
 
 
 class Test(unittest.TestCase):

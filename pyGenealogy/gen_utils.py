@@ -58,12 +58,12 @@ def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date
     dates_birth_check = []
     burial_death = []
     #If there is no birth date included there is no need for the check
-    if (birth_date != ""):
+    if (birth_date != None):
         dates_birth_check.append(birth_date)
         check_dates_in_birth = [residence_date, baptism_date, marriage_date, death_date, burial_date]
         accuracy_in_birth = [accuracy_residence, accuracy_baptism, accuracy_marriage, accuracy_death, accuracy_burial]
         for index in range(0, len(check_dates_in_birth)):
-            if (check_dates_in_birth[index] != ""):
+            if (check_dates_in_birth[index] != None):
                 if (accuracy_in_birth[index] == "ABOUT"):
                     #If we have an "about" the event has been around that year, with some margin, in this case, we just include
                     #the last date of the year for the check
@@ -75,12 +75,12 @@ def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date
             logging.error(NO_VALID_BIRTH_DATE) 
             return False
     #Burial and Death dates are the latests ones
-    if (burial_date != ""): 
+    if (burial_date != None): 
         if (accuracy_burial == "ABOUT"):
             burial_death.append(date(burial_date.year,12,31))
         else:
             burial_death.append(burial_date)
-    if (death_date != ""):
+    if (death_date != None):
         intermediate_death = death_date  
         if (accuracy_death == "ABOUT"):
             intermediate_death = date(death_date.year,12,31)
@@ -93,7 +93,7 @@ def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date
         check_dates_in_db = [residence_date, baptism_date, marriage_date]
         accuracy_in_db = [accuracy_residence, accuracy_baptism, accuracy_marriage]
         for index in range(0, len(check_dates_in_db)):
-            if (check_dates_in_db[index] != ""):
+            if (check_dates_in_db[index] != None):
                 if (accuracy_in_db[index] == "ABOUT"):
                     #If we have an "about" the event has been around that year, with some margin, in this case, we just include
                     #the first date of the  year

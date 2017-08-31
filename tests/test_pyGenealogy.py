@@ -6,7 +6,7 @@ Created on 13 ago. 2017
 import unittest
 from datetime import date
 from pyGenealogy.common_profile import gen_profile
-from tests.FIXTURES import GENERIC_PLACE
+from tests.FIXTURES import GENERIC_PLACE, ACTUAL_NAME, FATHER_SURNAME
 
 
 class Test(unittest.TestCase):
@@ -16,9 +16,10 @@ class Test(unittest.TestCase):
         '''
         Testing right introduction of gender in common_profile
         '''
-        profile = gen_profile("Name", "Surname")
+        profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
         assert(profile.setCheckedGender("F"))
         assert(profile.setCheckedGender("M"))
+        assert(profile.name_to_show == ACTUAL_NAME + " " + FATHER_SURNAME)
         self.assertFalse(profile.setCheckedGender("J"))
     def test_introducing_birth_date(self):
         '''
