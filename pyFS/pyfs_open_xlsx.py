@@ -126,7 +126,8 @@ class getFSfamily(object):
                         else:
                             this_introduction = self.__include_a_date__(column_criteria, included_profile, datetime.strptime(cell_value, "%d %b %Y").date(), "EXACT")
                     elif(column_criteria == "full_name"):
-                        included_profile.name = get_name_from_fullname(cell_value,potential_father_surname, potential_mother_surname)
+                        #TODO:Better replace by a method call
+                        included_profile.gen_data["name"] = get_name_from_fullname(cell_value,potential_father_surname, potential_mother_surname)
                     elif (column_criteria in ignored_fields):
                         pass
                     else:

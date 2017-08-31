@@ -19,7 +19,7 @@ class Test(unittest.TestCase):
         profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
         assert(profile.setCheckedGender("F"))
         assert(profile.setCheckedGender("M"))
-        assert(profile.name_to_show == ACTUAL_NAME + " " + FATHER_SURNAME)
+        assert(profile.gen_data["name_to_show"] == ACTUAL_NAME + " " + FATHER_SURNAME)
         self.assertFalse(profile.setCheckedGender("J"))
     def test_introducing_birth_date(self):
         '''
@@ -147,6 +147,9 @@ class Test(unittest.TestCase):
         profile.setResidencePlace(GENERIC_PLACE)
         profile.setBurialPlace(GENERIC_PLACE)
         profile.setComments("TEST COMMENT")
+        profile.setWebReference("Myaddress")
+        #Wrong declaration in the past created issues
+        assert(len(profile.gen_data["web_ref"]) == 1)
         
       
 if __name__ == "__main__":
