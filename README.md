@@ -27,7 +27,7 @@ This application uses the Geni API but is not endorsed, operated, or sponsored b
 
 Tested using python 3.5.3 and 3.6.2, happy to test other versions if needed. Main limitation are the testing capabilities in travis for wxpython.
 
-In order to use the tools you will need to install the module requests: http://docs.python-requests.org/en/master/
+In order to use the tools you will need to install the module requests: http://docs.python-requests.org/en/master/ and wxpython
 
 Concerning testing, the repository if configured to use nose, coverage, nose-htmloutput, so you will need to install in your local installation as well.
 

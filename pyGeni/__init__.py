@@ -51,15 +51,15 @@ def geni_request_get(url):
         logging.error(ERROR_REQUESTS, data.json())
     return data 
     
-def geni_request_post(url):
+def geni_request_post(url, data_input={}):
     '''
     Function to perform post calls.
     '''
     global VERIFY_INPUT
     if (VERIFY_INPUT == "standard"):
-        data = requests.post(url)
+        data = requests.post(url, json=data_input)
     else:
-        data = requests.post(url, verify=VERIFY_INPUT)
+        data = requests.post(url, verify=VERIFY_INPUT, json=data_input)
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!
         logging.error(ERROR_REQUESTS, data.json())
