@@ -13,17 +13,20 @@ from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION
 
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name"]
 date_fields = ["birth_date", "burial_date", "chr_date", "residence_date", "death_date"]
+LOCATION_EQUIVALENCE = {"death_place_text" : "death_place", "residence_place_text" : "residence_place",
+                        "chr_place_text" : "baptism_place"}
 
 class getFSfamily(object):
     '''
     This class reads the  FS output excel from the website of FamilySearch
     '''
-    def __init__(self, filename, naming_convention = "father_surname"):
+    def __init__(self, filename, naming_convention = "father_surname", language = "en"):
         '''
         This contructor reads the output file from FS in xlsx format
         '''
         #TODO: include further naming conventions
         self.correct_execution = True
+        self.language = language
         if (not naming_convention in naming_conventions):
             logging.error(NO_VALID_NAMING_CONVENTION) 
             self.correct_execution = False
@@ -107,15 +110,8 @@ class getFSfamily(object):
                     #Ok, now we go one by one each of the different values
                     if(column_criteria == "gender"):
                         this_introduction = included_profile.setCheckedGender(cell_value)
-                    elif (column_criteria == "death_place_text"):
-                        location = [place.strip() for place in cell_value.split(',')]
-                        included_profile.setDeathPlace(location)
-                    elif (column_criteria == "residence_place_text"):
-                        location = [place.strip() for place in cell_value.split(',')]
-                        included_profile.setResidencePlace(location)
-                    elif (column_criteria == "chr_place_text"):
-                        location = [place.strip() for place in cell_value.split(',')]
-                        included_profile.setBaptismPlace(location)
+                    elif (column_criteria in LOCATION_EQUIVALENCE.keys()):
+                        included_profile.setPlaces(LOCATION_EQUIVALENCE[column_criteria], cell_value, self.language)
                     elif (column_criteria == "person_url"):
                         included_profile.setWebReference("https://familysearch.org/" +cell_value)
                     elif (column_criteria in date_fields):

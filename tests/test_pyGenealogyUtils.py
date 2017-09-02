@@ -6,9 +6,10 @@ Created on 26 ago. 2017
 import unittest
 from datetime import date
 from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_fullname, checkDateConsistency, getBestDate
+from pyGenealogy.gen_utils import get_formatted_location
 from tests.FIXTURES import RIGHT_YEAR, RIGHT_YEAR_IN_A_TEXT, WRONG_YEAR, JUST_TEXT, RIGHT_YEAR_IN_A_DATE
 from tests.FIXTURES import FATHER_SURNAME, MOTHER_SURNAME, SPANISH_CHILD_SURNAME
-from tests.FIXTURES import FULL_NAME, FULL_NAME_SPANISH, ACTUAL_NAME
+from tests.FIXTURES import FULL_NAME, FULL_NAME_SPANISH, ACTUAL_NAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
 
 class Test(unittest.TestCase):
     '''
@@ -94,7 +95,28 @@ class Test(unittest.TestCase):
         date8, accuracy8 = getBestDate(date1, "LALALA", date2, "ABOUT")
         assert(date8 == None)
         assert(accuracy8 == None)
+    
+    def test_get_location_data(self):
+        '''
+        Test the translation of location data using google API
+        '''
         
+        output = get_formatted_location(GENERIC_PLACE_STRING, language="en")
+        assert(output["latitude"] > 41.4781556 )
+        assert(output["longitude"] < -4.5863 )
+        assert(output["city"] == "Portillo")
+        assert(output["county"] == "Valladolid")
+        assert(output["state"] == "Castilla y León")
+        assert(output["country"] == "Spain")
+        self.assertFalse("place_name" in output.keys())
+        output2 = get_formatted_location(GENERIC_PLACE_WITH_PLACE, language="es")
+        assert(output2["latitude"] > 41.535338 )
+        assert(output2["longitude"] < -4.53061)
+        assert(output2["city"] == "La Parrilla")
+        assert(output2["county"] == "Valladolid")
+        assert(output2["state"] == "Castilla y León")
+        assert(output2["country"] == "Spain")
+        assert(output2["place_name"] == "Nuestra Señora de los Remedios")
         
     
 if __name__ == "__main__":

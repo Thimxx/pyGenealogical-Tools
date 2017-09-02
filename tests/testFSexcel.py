@@ -67,9 +67,12 @@ class Test(unittest.TestCase):
         assert(this_profile.gen_data["accuracy_death_date"] == "EXACT")
         assert(this_profile.gen_data["burial_date"] == datetime.date(1863,6,28))
         assert(this_profile.gen_data["accuracy_burial_date"] == "EXACT")
-        assert(this_profile.gen_data["death_place"] == ['La Parrilla', 'Valladolid', 'Spain'])
-        assert(this_profile.gen_data["residence_place"] == ['La Parrilla', 'Valladolid', 'Spain'])
-        assert(this_profile.gen_data["baptism_place"] == ['Nuestra Señora de los Remedios', 'La Parrilla', 'Valladolid', 'Spain'])
+        print(this_profile.gen_data["death_place"])
+        print(this_profile.gen_data["residence_place"])
+        print(this_profile.gen_data["baptism_place"])
+        assert(this_profile.gen_data["death_place"]["city"] == 'La Parrilla')
+        assert(this_profile.gen_data["residence_place"]["state"] == 'Castile and León')
+        assert(this_profile.gen_data["baptism_place"]["place_name"] == 'Nuestra Señora de los Remedios')
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_fs_reader']

@@ -3,7 +3,7 @@ Created on 13 ago. 2017
 
 @author: Val
 '''
-from pyGenealogy.gen_utils import checkDateConsistency
+from pyGenealogy.gen_utils import checkDateConsistency, get_formatted_location
 from pyGenealogy import VALUES_ACCURACY
 
 DATA_STRING = ["name", "surname", "name_to_show", "gender", "comment"]
@@ -61,11 +61,6 @@ class gen_profile(object):
             self.gen_data["birth_date"] = birth_date
             self.gen_data["accuracy_birth_date"] = accuracy
             return True
-    def setBirthPlace(self, place):
-        '''
-        Birth place will be a place introduction of data in a list
-        '''
-        self.gen_data["birth_place"] = place
     def setCheckedDeathDate(self, death_date, accuracy = "EXACT"):
         '''
         Input shall be a datetime.date format
@@ -76,11 +71,6 @@ class gen_profile(object):
             self.gen_data["death_date"] = death_date
             self.gen_data["accuracy_death_date"] = accuracy
             return True
-    def setDeathPlace(self, place):
-        '''
-        Birth place will be a place introduction of data in a list
-        '''
-        self.gen_data["death_place"] = place  
     def setCheckedBaptismDate(self, baptism_date, accuracy = "EXACT"):
         '''
         Introducing the baptism date
@@ -91,11 +81,6 @@ class gen_profile(object):
             self.gen_data["baptism_date"] = baptism_date
             self.gen_data["accuracy_baptism_date"] = accuracy
             return True
-    def setBaptismPlace(self, place):
-        '''
-        Birth place will be a place introduction of data in a list
-        '''
-        self.gen_data["baptism_place"] = place   
     def setCheckedResidenceDate(self, residence_date, accuracy = "EXACT"):
         '''
         Input shall be a datetime.date format
@@ -106,11 +91,6 @@ class gen_profile(object):
             self.gen_data["residence_date"] = residence_date
             self.gen_data["accuracy_residence_date"] = accuracy
             return True
-    def setResidencePlace(self, place):
-        '''
-        Birth place will be a place introduction of data in a list
-        '''
-        self.gen_data["residence_place"] = place    
     def setCheckedBurialDate(self, burial_date, accuracy = "EXACT"):
         '''
         Introducing the baptism date
@@ -121,11 +101,6 @@ class gen_profile(object):
             self.gen_data["burial_date"] = burial_date
             self.gen_data["accuracy_burial_date"] = accuracy
             return True
-    def setBurialPlace(self, place):
-        '''
-        Birth place will be a place introduction of data in a list
-        '''
-        self.gen_data["burial_place"] = place  
     def setComments(self, comment):
         '''
         Comments are aditive on top of the preivous one
@@ -150,6 +125,19 @@ class gen_profile(object):
         Includes web references for the profile.
         '''
         self.gen_data["web_ref"].append(address)
+    def setPlaces(self, event_place, location, language="en" ):
+        '''
+        This function will introduce the location related to each event
+        '''
+        if event_place in DATA_PLACES:
+            location_data = get_formatted_location(location, language)
+            if (location_data == None): 
+                return False
+            else:
+                self.gen_data[event_place] = location_data
+                return True
+        else:
+            return False
     def selfcheckDateConsistency(self, birth_date = None, residence_date = None, baptism_date = None, 
             marriage_date = None, death_date = None, burial_date = None,
             accuracy_birth = None, accuracy_residence = None, accuracy_baptism = None, 

@@ -6,7 +6,7 @@ Created on 13 ago. 2017
 import unittest
 from datetime import date
 from pyGenealogy.common_profile import gen_profile
-from tests.FIXTURES import GENERIC_PLACE, ACTUAL_NAME, FATHER_SURNAME
+from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, GENERIC_PLACE_STRING
 
 
 class Test(unittest.TestCase):
@@ -133,7 +133,18 @@ class Test(unittest.TestCase):
         burial_date = date(2016,10, 19)
         assert(profile.setCheckedDeathDate(death_date))
         self.assertFalse(profile.setCheckedBurialDate(burial_date))
+    
+    def test_event_places(self):
+        '''
+        Test introduction of places
+        '''
+        profile = gen_profile("Name", "Surname")
         
+        self.assertFalse(profile.setPlaces("notvalid", GENERIC_PLACE_STRING))
+        assert(profile.setPlaces("birth_place", GENERIC_PLACE_STRING))
+        self.assertFalse("death_place" in profile.gen_data.keys())
+        assert("birth_place" in profile.gen_data.keys())
+           
         
     def test_other_functions(self):
         '''
@@ -141,11 +152,6 @@ class Test(unittest.TestCase):
         '''
         profile = gen_profile("Name", "Surname")
         profile.returnFullName()
-        profile.setBirthPlace(GENERIC_PLACE)
-        profile.setDeathPlace(GENERIC_PLACE)
-        profile.setBaptismPlace(GENERIC_PLACE)
-        profile.setResidencePlace(GENERIC_PLACE)
-        profile.setBurialPlace(GENERIC_PLACE)
         profile.setComments("TEST COMMENT")
         profile.setWebReference("Myaddress")
         #Wrong declaration in the past created issues

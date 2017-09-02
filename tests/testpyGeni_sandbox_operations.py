@@ -5,9 +5,10 @@ Created on 29 ago. 2017
 '''
 import unittest
 from pyGeni import profile
+from pyGenealogy.gen_utils import get_formatted_location
 from datetime import date
 from pyGenealogy.common_profile import gen_profile
-from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE, UNION_MAIN_PROFILE
+from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
 import os
 
 class Test(unittest.TestCase):
@@ -106,10 +107,10 @@ class Test(unittest.TestCase):
         '''
         Test the location input to Geni
         '''
-        data_location = profile.getLocationStructureGeni(GENERIC_PLACE)
+        data_location = profile.getLocationStructureGeni(GENERIC_PLACE_IN_DICTIONARY)
         
         assert(data_location["country"] == "Spain")
-        assert(data_location["state"] == "Castile and Leon")
+        assert(data_location["state"] == 'Castilla y León')
         assert(data_location["county"] == "Valladolid")
         assert(data_location["city"] == "Portillo")
         

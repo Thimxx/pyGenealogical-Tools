@@ -8,6 +8,9 @@ from messages.pyGenealogymessages import NO_VALID_CONVENTION, NO_VALID_ACCURACY
 from messages.pyGenealogymessages import NO_VALID_BIRTH_DATE, NO_VALID_DEATH_DATE, NO_VALID_DEATH_AND_BURIAL
 from datetime import date
 from pyGenealogy import VALUES_ACCURACY
+import requests
+
+GOOGLE_GEOLOCATION_ADDRESS = "https://maps.googleapis.com/maps/api/geocode/json?"
 
 naming_conventions = ["father_surname", "spanish_surname"]
 
@@ -133,5 +136,32 @@ def getBestDate(date1, accuracy1, date2, accuracy2):
         newyear = int((date1.year +date2.year)/2)
         return date(newyear,1,1), accuracy1
     
-    
-    
+def get_formatted_location(location_string, language="en"):
+    '''
+    This function will provide a standard location based on google maps service
+    online
+    '''
+    output = {}
+    output["raw"] = location_string
+    url = GOOGLE_GEOLOCATION_ADDRESS + language + "&address=" + location_string
+    r = requests.get(url)
+    data = r.json()
+    if (data["status"] == "OK"):
+        #Received data is ok, we can proceed
+        for result_input in data["results"][0].keys():
+            if(result_input == "geometry"):
+                #As we got the location details, let's get them
+                output["latitude"] = data["results"][0]["geometry"]["location"]["lat"]
+                output["longitude"] = data["results"][0]["geometry"]["location"]["lng"]
+            elif(result_input == "address_components"):  
+                #This is the data of the name of the location
+                for level in  data["results"][0]["address_components"]:
+                    if "locality" in level["types"]: output["city"] = level["long_name"]
+                    elif "administrative_area_level_2" in level["types"]: output["county"] = level["long_name"]
+                    elif "administrative_area_level_1" in level["types"]: output["state"] = level["long_name"]
+                    elif "country" in level["types"]: output["country"] = level["long_name"]
+    else:
+        return None
+    if (not location_string.split(",")[0] in output.values()):
+        output["place_name"] = location_string.split(",")[0]
+    return output

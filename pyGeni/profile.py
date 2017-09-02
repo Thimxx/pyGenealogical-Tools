@@ -9,14 +9,17 @@ from pyGeni.geniapi_common import geni_calls
 from pyGeni.immediate_family import immediate_family
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy import NOT_KNOWN_VALUE
+from messages.pygeni_messages import ABOUT_ME_MESSAGE
 from datetime import date
 
 SPECIFIC_GENI_STRING = ['id', 'url', 'profile_url', 'creator' ]
 SPECIFIC_GENI_BOOLEAN =  ['public', 'is_alive', 'deleted']
 SPECIFIC_GENI_INTEGER = ['guid', 'created_at', 'updated_at']
 #TODO: review teh complete post method and include all fields here : https://www.geni.com/platform/developer/help/api?path=profile%2Fadd-child&version=1
-DATA_STRING_IN_GENI = { "name" : "first_name", "surname" : "last_name", "name_to_show" : "display_name", 
+DATA_STRING_IN_GENI = { "name" : "first_name", "surname" : "last_name",  
                        "gender": "gender", "comment": "about_me"}
+#TODO: think about a logic for display name...
+NOT_USED = {"name_to_show" : "display_name"}
 EQUIVALENT_SEX = { "male" : "M", "female" : "F"}
 
 GENI_EVENT_DATA = {"birth" : {"date":"birth_date", "accuracy": "accuracy_birth_date", "location": "birth_place" },
@@ -174,7 +177,11 @@ class profile(geni_calls, gen_profile):
         for profile_value in DATA_STRING_IN_GENI.keys():
             if (self.gen_data.get(profile_value, None) != None):
                 data[DATA_STRING_IN_GENI[profile_value]] = self.gen_data[profile_value]
-    
+        if [self.gen_data["web_ref"] != []]:
+            msg = ABOUT_ME_MESSAGE
+            for value in self.gen_data["web_ref"]:
+                msg += " [" + value + " FamilySearch-link]"
+            data["about_me"] = msg
         for event_geni in GENI_EVENT_DATA:
             date = self.gen_data.get(GENI_EVENT_DATA[event_geni]["date"], None)
             accuracy = self.gen_data.get(GENI_EVENT_DATA[event_geni]["accuracy"], None)
@@ -217,9 +224,9 @@ def getLocationStructureGeni(location):
     '''
     location_data = {}
     if(location != None):
-        locations = ["country", "state", "county", "city", "place_name"]
-        for index, value in enumerate(reversed(location)):
-            location_data[locations[index]] = value
+        for key in location.keys():
+            if (key != "raw"):
+                location_data[key] = location[key]
     return location_data
 
 def getEventStructureGeni(date, accuracy, location):

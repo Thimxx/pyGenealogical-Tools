@@ -20,6 +20,9 @@ It is mainly offering the following capabilities:
     3.3) Check dates consistency in profiles
 4) A common base profile for any genealogical input
 5) A tool for parsing FamilySearch excel outputs of sons in a family.
+    5.1) Import to Geni an excel output of children from FamilySearch records
+
+Notice that this import is intended to import registers from FamilySearch, is you are interested in importing profiles from a family tree located in FamilySearch to Geni use this tool: https://github.com/jeffg2k/SmartCopy, which is a pretty nice piece of software and very helpful.
 
 This application uses the Geni API but is not endorsed, operated, or sponsored by Geni.com.
 

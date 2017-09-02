@@ -28,8 +28,9 @@ GENI_KEY_EXAMPLE = "fasjkgsdfsnnk44534078262"
 
 
 #Living place
-GENERIC_PLACE = ["Portillo", "Valladolid", "Castile and Leon", "Spain"]
-
+GENERIC_PLACE_STRING = "Portillo,Valladolid,Castile and Leon,Spain"
+GENERIC_PLACE_WITH_PLACE = "Nuestra Señora de los Remedios, La Parrilla, Valladolid, Spain" 
+GENERIC_PLACE_IN_DICTIONARY = {'raw': 'Portillo,Valladolid,Castile and Leon,Spain', 'city': 'Portillo', 'county': 'Valladolid', 'state': 'Castilla y León', 'country': 'Spain', 'latitude': 41.47815569999999, 'longitude': -4.5863041}
 #Year Examples
 RIGHT_YEAR = "1894"
 RIGHT_YEAR_IN_A_TEXT = "This year is 1894"
