@@ -143,7 +143,7 @@ def get_formatted_location(location_string, language="en"):
     '''
     output = {}
     output["raw"] = location_string
-    url = GOOGLE_GEOLOCATION_ADDRESS + language + "&address=" + location_string
+    url = GOOGLE_GEOLOCATION_ADDRESS + "language=" + language + "&address=" + location_string
     r = requests.get(url)
     data = r.json()
     if (data["status"] == "OK"):

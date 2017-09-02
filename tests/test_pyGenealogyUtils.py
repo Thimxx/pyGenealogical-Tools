@@ -110,12 +110,13 @@ class Test(unittest.TestCase):
         assert(output["country"] == "Spain")
         self.assertFalse("place_name" in output.keys())
         output2 = get_formatted_location(GENERIC_PLACE_WITH_PLACE, language="es")
+        print(output2)
         assert(output2["latitude"] > 41.535338 )
         assert(output2["longitude"] < -4.53061)
         assert(output2["city"] == "La Parrilla")
         assert(output2["county"] == "Valladolid")
         assert(output2["state"] == "Castilla y León")
-        assert(output2["country"] == "Spain")
+        assert(output2["country"] == "España")
         assert(output2["place_name"] == "Nuestra Señora de los Remedios")
         
     
