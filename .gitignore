@@ -108,3 +108,4 @@ ENV/
 /genidata.out.dat
 /genidata.out.dir
 /update_key.py
+/testing_exec.py

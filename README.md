@@ -1,7 +1,7 @@
 # GeniTools
 
 ![alt text](https://travis-ci.org/Thimxx/Genealogical-Tools.svg?branch=master)
-![alt text](https://coveralls.io/repos/github/Thimxx/Genealogical-Tools/badge.svg?branch=master)
+![alt text](https://coveralls.io/repos/github/Thimxx/pyGenealogical-Tools/badge.svg?branch=master)
 ![alt text](https://api.codacy.com/project/badge/Grade/3603c4580c464d209d44401021ef8642)
 
 Several genealogical python tools included which are under development.

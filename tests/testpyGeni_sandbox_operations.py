@@ -5,10 +5,10 @@ Created on 29 ago. 2017
 '''
 import unittest
 from pyGeni import profile
-from pyGenealogy.gen_utils import get_formatted_location
 from datetime import date
 from pyGenealogy.common_profile import gen_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
+from tests.FIXTURES import SANDBOX_MAIN_ADDRESS, SANDBOX_MAIN_API_G, SANDBOX_MAIN_API_NOG, MAIN_SANDBOX_PROFILE_ID
 import os
 
 class Test(unittest.TestCase):
@@ -115,6 +115,19 @@ class Test(unittest.TestCase):
         assert(data_location["city"] == "Portillo")
         
         self.assertFalse(profile.getLocationStructureGeni(None))
+    
+    def test_different_geni_inptus(self):
+        '''
+        Test different Geni inputs to profile
+        '''
+        prof = profile.profile(SANDBOX_MAIN_ADDRESS, self.stoken)
+        prof2 = profile.profile(SANDBOX_MAIN_API_G, self.stoken)
+        prof3 = profile.profile(SANDBOX_MAIN_API_NOG, self.stoken)
+        
+        assert(prof.geni_specific_data["id"] == MAIN_SANDBOX_PROFILE_ID)
+        assert(prof2.geni_specific_data["id"] == MAIN_SANDBOX_PROFILE_ID)
+        assert(prof3.geni_specific_data["id"] == MAIN_SANDBOX_PROFILE_ID)
+        
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

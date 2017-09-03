@@ -29,14 +29,20 @@ GENI_EVENT_DATA = {"birth" : {"date":"birth_date", "accuracy": "accuracy_birth_d
                    }
 
 class profile(geni_calls, gen_profile):
-    def __init__(self, id_geni, token, type_geni="g"):  # id int or string
+    def __init__(self, geni_input, token, type_geni="g"):  # id int or string
+        '''
+        The geni input provided can be:
+        - The id of the profile
+        - The id of the profile with g
+        - Each address of the profile.
+        '''
         #Some checking parameters initiated
         self.properly_executed = False
         self.existing_in_geni = False
         self.geni_specific_data = {}
         #We initiate the base classes
         geni_calls.__init__(self, token)
-        url = s.GENI_PROFILE + type_geni + str(id_geni) + self.token_string()
+        url = self.process_geni_input(geni_input, type_geni) + self.token_string()
         r = s.geni_request_get(url)
         data = r.json()
         #Now we can execute the constructor
@@ -190,7 +196,17 @@ class profile(geni_calls, gen_profile):
             if (event_value): data[event_geni] = event_value
         return data
         
-
+    def process_geni_input(self, geni_input, type_geni):
+        '''
+        This input provides needed input for accessing the profile
+        '''
+        if ("/api" in str(geni_input)):
+            return geni_input
+        elif ("/people/" in str(geni_input)):
+            return s.GENI_PROFILE + "g" + geni_input.split("/")[-1]
+        else:
+            return s.GENI_PROFILE + type_geni + str(geni_input)
+    
 #===================================================
 # Util functions
 #===================================================
