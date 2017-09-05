@@ -8,7 +8,7 @@ from pyGeni import profile
 from datetime import date
 from pyGenealogy.common_profile import gen_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
-from tests.FIXTURES import SANDBOX_MAIN_ADDRESS, SANDBOX_MAIN_API_G, SANDBOX_MAIN_API_NOG, MAIN_SANDBOX_PROFILE_ID
+from tests.FIXTURES import SANDBOX_MAIN_ADDRESS, SANDBOX_MAIN_API_G, SANDBOX_MAIN_API_NOG, MAIN_SANDBOX_PROFILE_ID, ACTUAL_SECOND, ACTUAL_THIRD
 import os
 
 class Test(unittest.TestCase):
@@ -47,7 +47,7 @@ class Test(unittest.TestCase):
         child_profile.set_name_2_show(ACTUAL_NAME)
         child_profile.setCheckedBirthDate(date(2017,11,20), "ABOUT")
         child_profile.setCheckedDeathDate(date(2017,12,1), "EXACT")
-        profile.profile.create_as_a_child(child_profile, self.stoken, UNION_MAIN_PROFILE )
+        profile.profile.create_as_a_child(child_profile, self.stoken, union = UNION_MAIN_PROFILE )
         
         data_id = child_profile.geni_specific_data['guid']
         assert(child_profile.properly_executed)
@@ -63,8 +63,26 @@ class Test(unittest.TestCase):
         assert(child_profile.data["death"]["date"]["month"] == 12)
         assert(child_profile.data["death"]["date"]["day"] == 1)
         
+        prof_relations = profile.profile(MAIN_SANDBOX_PROFILE, self.stoken, type_geni="")
+        
+        assert(len(prof_relations.marriage_union) == 1)
+        for dif_union in prof_relations.marriage_union:
+            assert("union-156" in dif_union.union_id)
+        for dif_union in prof_relations.parent_union:
+            assert("union-155" in dif_union.union_id)
+        
+        #We introduce other 2 childs using different methods
+        second_profile = gen_profile(ACTUAL_SECOND, FATHER_SURNAME)
+        profile.profile.create_as_a_child(second_profile, self.stoken, profile = prof_relations )
+        third_profile = gen_profile(ACTUAL_THIRD, FATHER_SURNAME)
+        profile.profile.create_as_a_child(third_profile, self.stoken, geni_input = MAIN_SANDBOX_PROFILE, type_geni="" )
+        assert(second_profile.properly_executed)
+        assert(third_profile.properly_executed)
+        
         #We delete to avoid creation of data
         assert(child_profile.delete_profile())
+        assert(second_profile.delete_profile())
+        assert(third_profile.delete_profile())
         self.assertFalse(child_profile.existing_in_geni)
         
         #We check is deleted

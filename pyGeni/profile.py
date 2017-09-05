@@ -65,15 +65,15 @@ class profile(geni_calls, gen_profile):
         '''
         Get relations by using the immediate family api
         '''
-        
         self.relations = immediate_family(self.token, self.geni_specific_data['id'])
         
         self.parents = self.relations.parents
         self.sibligns = self.relations.sibligns
         self.partner = self.relations.partner
         self.children = self.relations.children
+        self.parent_union = self.relations.parent_union
+        self.marriage_union = self.relations.marriage_union
         
-    
     def get_id(self):
         '''
         Simple function to get Geni ID
@@ -129,13 +129,28 @@ class profile(geni_calls, gen_profile):
                     self.setCheckedGender(EQUIVALENT_SEX[data[value_geni]])
                 else:
                     self.gen_data[value_profile] = data[value_geni]
+    
+    @classmethod
+    def create_internally(cls, geni_input , token, type_geni): 
+        return cls(geni_input , token, type_geni)
                 
     @classmethod
-    def create_as_a_child(cls, base_profile, token, union):
+    def create_as_a_child(cls, base_profile, token, union = None, profile = None,
+                          geni_input = None, type_geni="g"):
         '''
         From a common profile from pyGenealogy library, a new profile will be created
         as a child of a given union of 2 profiles.
         '''
+        union_to_use = None
+        if (union != None):
+            union_to_use = union
+        elif (profile != None):
+            if (len(profile.marriage_union) == 1):
+                union_to_use = profile.marriage_union[0].union_id
+        elif (geni_input != None):
+            tmp_prof = cls.create_internally(geni_input ,token, type_geni)
+            if (len(tmp_prof.marriage_union) == 1):
+                union_to_use = tmp_prof.marriage_union[0].union_id
         #Calling essentially the constructors
         base_profile.__class__ = cls
         geni_calls.__init__(cls, token)
@@ -145,7 +160,7 @@ class profile(geni_calls, gen_profile):
         base_profile.data = {}
         base_profile.geni_specific_data = {}
         #We create the url for creating the child
-        add_child = s.GENI_API + union + s.GENI_ADD_CHILD + s.GENI_INITIATE_PARAMETER + "first_name="
+        add_child = s.GENI_API + union_to_use + s.GENI_ADD_CHILD + s.GENI_INITIATE_PARAMETER + "first_name="
         add_child += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + cls.token
         #We also add the needed data, that we take from the base profile directly
         data_input = base_profile.create_input_file_2_geni()
@@ -180,6 +195,7 @@ class profile(geni_calls, gen_profile):
         for the post file
         '''
         data = {}
+        data["public"] = "false"
         for profile_value in DATA_STRING_IN_GENI.keys():
             if (self.gen_data.get(profile_value, None) != None):
                 data[DATA_STRING_IN_GENI[profile_value]] = self.gen_data[profile_value]

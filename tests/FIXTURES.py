@@ -45,6 +45,8 @@ SPANISH_CHILD_SURNAME = "Perez Smith"
 FULL_NAME = "Emilio Perez"
 FULL_NAME_SPANISH = "Emilio Perez Smith"
 ACTUAL_NAME = "Emilio"
+ACTUAL_SECOND = "Alberto"
+ACTUAL_THIRD = "Camilo"
 
 #SANDBOX Data
 MAIN_SANDBOX_PROFILE = "399"

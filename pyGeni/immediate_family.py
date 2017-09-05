@@ -29,6 +29,8 @@ class immediate_family(geni_calls):
         self.sibligns = []
         self.partner = []
         self.children = []
+        self.parent_union = []
+        self.marriage_union = []
         if not( 'error' in self.data ):
             #In this case, we have extracted properly the union data
             self.union_extracted = True
@@ -44,7 +46,9 @@ class immediate_family(geni_calls):
                         self.parents = self.parents + tmp_union.parents
                         tmp_union.children.remove(myid)
                         self.sibligns = self.sibligns + tmp_union.children
+                        self.parent_union.append(tmp_union)
                     else:
                         tmp_union.parents.remove(myid)
                         self.partner = self.partner +  tmp_union.parents
                         self.children = self.children + tmp_union.children
+                        self.marriage_union.append(tmp_union)
