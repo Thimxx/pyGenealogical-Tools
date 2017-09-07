@@ -34,6 +34,22 @@ class Test(unittest.TestCase):
         assert(fsclass.initial_row == 6)
         assert(fsclass.sheet_title == "Sheet0")
     
+    def test_fs_with_a_marriage(self):
+        '''
+        Test a FS file with marriage
+        '''
+        input_file = os.path.join(self.filelocation, "fs-MartinPerez.xlsx")
+        fsclass = getFSfamily(input_file)
+        assert(fsclass.correct_execution)
+        first_profile = fsclass.profiles[0]
+        print()
+        assert(first_profile.gen_data["name"] == "Tiburcio")
+        second_profile = fsclass.profiles[1]
+        assert(second_profile.gen_data["name"] == "Lucia")
+        married_profile = fsclass.profiles[2]
+        assert(married_profile.gen_data["name"] == "Nicasia")
+        assert(married_profile.gen_data["marriage_place"]["city"] == "Tudela de Duero")
+    
     def test_wrong_inputs(self):
         '''
         Test FS reader wrong inputs are detected
@@ -54,7 +70,6 @@ class Test(unittest.TestCase):
         assert(fsclass.correct_execution)
         assert (len(fsclass.profiles) == 1)
         assert(this_profile.gen_data["gender"] == "M")
-        print(this_profile.gen_data["name"])
         assert(this_profile.gen_data["name"] == "Wenceslao")
         assert(this_profile.gen_data["surname"] == "Potente Asegurado")
         assert(this_profile.gen_data["birth_date"] == datetime.date(1862,9,28))

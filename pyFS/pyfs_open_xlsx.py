@@ -12,9 +12,9 @@ from datetime import datetime
 from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION
 
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name"]
-date_fields = ["birth_date", "burial_date", "chr_date", "residence_date", "death_date"]
+date_fields = ["birth_date", "burial_date", "chr_date", "residence_date", "death_date", "marriage_date"]
 LOCATION_EQUIVALENCE = {"death_place_text" : "death_place", "residence_place_text" : "residence_place",
-                        "chr_place_text" : "baptism_place"}
+                        "chr_place_text" : "baptism_place", "marriage_place_text" : "marriage_place"}
 
 class getFSfamily(object):
     '''
@@ -123,11 +123,12 @@ class getFSfamily(object):
                             this_introduction = self.__include_a_date__(column_criteria, included_profile, datetime.strptime(cell_value, "%d %b %Y").date(), "EXACT")
                     elif(column_criteria == "full_name"):
                         #TODO:Better replace by a method call
-                        included_profile.gen_data["name"] = get_name_from_fullname(cell_value,potential_father_surname, potential_mother_surname)
+                        included_profile.set_name(get_name_from_fullname(cell_value,potential_father_surname, potential_mother_surname))
                     elif (column_criteria in ignored_fields):
                         pass
                     else:
                         number_missing = number_missing + 1
+                        print(column_criteria)
                     if (not this_introduction): included_right = False
             if(not included_right) : correct_introduction = False
             self.profiles.append(included_profile)

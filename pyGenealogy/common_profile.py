@@ -26,6 +26,18 @@ class gen_profile(object):
         self.gen_data["surname"] = surname
         self.gen_data["name_to_show"] = self.set_name_2_show(name2show)
         self.gen_data["web_ref"] = []
+    def set_name(self,name):
+        '''
+        Modifies name to show
+        '''
+        self.gen_data["name"] = name
+        self.gen_data["name_to_show"] = self.set_name_2_show(None)
+    def set_surname(self, surname):
+        '''
+        Modified name to show as well
+        '''
+        self.gen_data["surname"] = surname
+        self.gen_data["name_to_show"] = self.set_name_2_show(None)
     def set_name_2_show(self, name2show):
         '''
         Setting the name to be shown if not existing

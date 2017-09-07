@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
         assert(child_profile.data["death"]["date"]["year"] == 2017)
         assert(child_profile.data["death"]["date"]["month"] == 12)
         assert(child_profile.data["death"]["date"]["day"] == 1)
-        
+        assert(child_profile.data["public"] == False)
         prof_relations = profile.profile(MAIN_SANDBOX_PROFILE, self.stoken, type_geni="")
         
         assert(len(prof_relations.marriage_union) == 1)
