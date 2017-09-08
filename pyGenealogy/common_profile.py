@@ -67,7 +67,7 @@ class gen_profile(object):
         '''
         Input shall be a datetime.date format
         '''
-        if (not self.selfcheckDateConsistency(birth_date = birth_date, accuracy_birth = accuracy)) or (not accuracy in VALUES_ACCURACY):
+        if (not self.selfcheckDateConsistency({"birth_date" : birth_date}, {"accuracy_birth_date" : accuracy})) or (not accuracy in VALUES_ACCURACY):
             return False
         else:
             self.gen_data["birth_date"] = birth_date
@@ -77,7 +77,7 @@ class gen_profile(object):
         '''
         Input shall be a datetime.date format
         '''
-        if (not self.selfcheckDateConsistency(death_date = death_date, accuracy_death = accuracy)) or (not accuracy in VALUES_ACCURACY):
+        if (not self.selfcheckDateConsistency({"death_date" : death_date}, {"accuracy_death_date" : accuracy})) or (not accuracy in VALUES_ACCURACY):
             return False
         else:
             self.gen_data["death_date"] = death_date
@@ -87,7 +87,7 @@ class gen_profile(object):
         '''
         Introducing the baptism date
         '''
-        if (not self.selfcheckDateConsistency(baptism_date = baptism_date, accuracy_baptism = accuracy)) or (not accuracy in VALUES_ACCURACY):
+        if (not self.selfcheckDateConsistency({"baptism_date" : baptism_date}, {"accuracy_baptism_date" : accuracy})) or (not accuracy in VALUES_ACCURACY):
             return False
         else:
             self.gen_data["baptism_date"] = baptism_date
@@ -97,7 +97,7 @@ class gen_profile(object):
         '''
         Input shall be a datetime.date format
         '''
-        if (not self.selfcheckDateConsistency(residence_date = residence_date, accuracy_residence = accuracy)) or (not accuracy in VALUES_ACCURACY):
+        if (not self.selfcheckDateConsistency({"residence_date" : residence_date}, {"accuracy_residence_date" : accuracy})) or (not accuracy in VALUES_ACCURACY):
             return False
         else:
             self.gen_data["residence_date"] = residence_date
@@ -107,7 +107,7 @@ class gen_profile(object):
         '''
         Introducing the baptism date
         '''
-        if (not self.selfcheckDateConsistency(burial_date = burial_date, accuracy_burial = accuracy)) or (not accuracy in VALUES_ACCURACY):
+        if (not self.selfcheckDateConsistency({"burial_date" : burial_date}, {"accuracy_burial_date" : accuracy})) or (not accuracy in VALUES_ACCURACY):
             return False
         else:
             self.gen_data["burial_date"] = burial_date
@@ -150,22 +150,21 @@ class gen_profile(object):
                 return True
         else:
             return False
-    def selfcheckDateConsistency(self, birth_date = None, residence_date = None, baptism_date = None, 
-            marriage_date = None, death_date = None, burial_date = None,
-            accuracy_birth = None, accuracy_residence = None, accuracy_baptism = None, 
-            accuracy_marriage= None , accuracy_death = None, accuracy_burial = None):
-        if (birth_date == None): birth_date = self.gen_data.get("birth_date", None)
-        if (residence_date == None) : residence_date = self.gen_data.get("residence_date", None)
-        if (baptism_date == None) : baptism_date = self.gen_data.get("baptism_date", None)
-        if (marriage_date == None) : marriage_date = self.gen_data.get("marriage_date", None)
-        if (death_date == None) : death_date = self.gen_data.get("death_date", None)
-        if (burial_date == None) : burial_date = self.gen_data.get("burial_date", None)
-        if (accuracy_birth == None) : accuracy_birth = self.gen_data.get("accuracy_birth_date", None)
-        if (accuracy_residence == None) : accuracy_residence = self.gen_data.get("accuracy_residence_date", None)
-        if (accuracy_baptism == None) : accuracy_baptism = self.gen_data.get("accuracy_baptism_date", None)
-        if (accuracy_marriage == None) : accuracy_marriage = self.gen_data.get("accuracy_marriage_date", None)
-        if (accuracy_death == None) : accuracy_death = self.gen_data.get("accuracy_death_date", None)
-        if (accuracy_burial == None) : accuracy_burial = self.gen_data.get("accuracy_burial_date", None)
+    def selfcheckDateConsistency(self, dict_dates, dict_accuracy):
+        #We set the dates received or taken from the profiles
+        birth_date = dict_dates.get("birth_date", self.gen_data.get("birth_date", None) )
+        residence_date = dict_dates.get("residence_date", self.gen_data.get("residence_date", None) )
+        baptism_date = dict_dates.get("baptism_date", self.gen_data.get("baptism_date", None) )
+        marriage_date = dict_dates.get("marriage_date", self.gen_data.get("marriage_date", None) )
+        death_date = dict_dates.get("death_date", self.gen_data.get("death_date", None) )
+        burial_date = dict_dates.get("burial_date", self.gen_data.get("burial_date", None) )
+        #Similar attemp using accuracy
+        accuracy_birth = dict_accuracy.get("accuracy_birth_date", self.gen_data.get("accuracy_birth_date", None) )
+        accuracy_residence = dict_accuracy.get("accuracy_residence_date", self.gen_data.get("accuracy_residence_date", None) )
+        accuracy_baptism = dict_accuracy.get("accuracy_baptism_date", self.gen_data.get("accuracy_baptism_date", None) )
+        accuracy_marriage = dict_accuracy.get("accuracy_marriage_date", self.gen_data.get("accuracy_marriage_date", None) )
+        accuracy_death = dict_accuracy.get("accuracy_death_date", self.gen_data.get("accuracy_death_date", None) )
+        accuracy_burial = dict_accuracy.get("accuracy_burial_date", self.gen_data.get("accuracy_burial_date", None) )
         return checkDateConsistency(birth_date, residence_date, baptism_date, 
                          marriage_date, death_date, burial_date,
                          accuracy_birth, accuracy_residence, accuracy_baptism , 
