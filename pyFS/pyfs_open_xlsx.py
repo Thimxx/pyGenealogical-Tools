@@ -164,7 +164,6 @@ class getFSfamily(object):
                         pass
                     else:
                         number_missing = number_missing + 1
-                        print(column_criteria)
                     if (not this_introduction): included_right = False
                 #This is a way to later on identify the link between the profiles
             id_profiles += 1
@@ -201,8 +200,6 @@ class getFSfamily(object):
                 partner.setCheckedDate("marriage_date", profile_obtained.gen_data["marriage_date"], profile_obtained.gen_data["accuracy_marriage_date"]  )
                 self.related_geni_profiles.append(partner)
                 logging.info(partner.geni_specific_data["url"])
-                print(partner.geni_specific_data["id"])
-                print(id_of_marriage, self.parents_profiles.keys(), partner.geni_specific_data["id"])
                 if id_of_marriage in self.parents_profiles.keys():
                     father = self.parents_profiles[id_of_marriage][0]
                     mother = self.parents_profiles[id_of_marriage][1]

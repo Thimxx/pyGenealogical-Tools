@@ -48,7 +48,7 @@ class profile(geni_calls, gen_profile):
         self.geni_specific_data = {}
         #We initiate the base classes
         geni_calls.__init__(self, token)
-        url = self.process_geni_input(geni_input, type_geni) + self.token_string()
+        url = process_geni_input(geni_input, type_geni) + self.token_string()
         r = s.geni_request_get(url)
         data = r.json()
         #Now we can execute the constructor
@@ -219,7 +219,7 @@ class profile(geni_calls, gen_profile):
         if (profile != None):
             child_to_use = profile.geni_specific_data["url"]
         elif (geni_input != None):
-            child_to_use = cls.process_geni_input(cls, geni_input, type_geni)
+            child_to_use = process_geni_input(geni_input, type_geni)
         #Calling essentially the constructors
         base_profile.__class__ = cls
         geni_calls.__init__(cls, token)
@@ -253,7 +253,7 @@ class profile(geni_calls, gen_profile):
         if (profile != None):
             partner_to_use = profile.geni_specific_data["url"]
         elif (geni_input != None):
-            partner_to_use = cls.process_geni_input(cls, geni_input, type_geni)
+            partner_to_use = process_geni_input(geni_input, type_geni)
         #Calling essentially the constructors
         base_profile.__class__ = cls
         geni_calls.__init__(cls, token)
@@ -325,21 +325,22 @@ class profile(geni_calls, gen_profile):
         return event_value
         
         
-    def process_geni_input(self, geni_input, type_geni):
-        '''
-        This input provides needed input for accessing the profile
-        '''
-        if ("/api" in str(geni_input)):
-            return geni_input
-        elif ("/people/" in str(geni_input)):
-            return s.GENI_PROFILE + "g" + geni_input.split("/")[-1]
-        else:
-            return s.GENI_PROFILE + type_geni + str(geni_input)
-    
+
 #===================================================
 # Util functions
 #===================================================
-
+def process_geni_input(geni_input, type_geni):
+    '''
+    This input provides needed input for accessing the profile
+    '''
+    if ("/api" in str(geni_input)):
+        return geni_input
+    elif ("/people/" in str(geni_input)):
+        #The ?through is in case the use has introduced the complete address
+        return s.GENI_PROFILE + "g" + geni_input.split("?through")[0].split("/")[-1]
+    else:
+        return s.GENI_PROFILE + type_geni + str(geni_input)
+    
 def stripId(url):  # get node id from url (not guid)
     return (int(url[url.find("profile-") + 8:]))
 

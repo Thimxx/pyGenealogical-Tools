@@ -60,3 +60,8 @@ MAIN_SANDBOX_PROFILE_ID = "profile-399"
 FATHER_PROFILE_SANDBOX = "https://sandbox.geni.com/api/profile-g1149810"
 BROTHER_PROFILE_SANDBOX = "https://sandbox.geni.com/api/profile-g1150205"
 
+#Other data
+GENI_INPUT_THROUGH = "https://www.geni.com/people/Leoncio-Cerro-Siguenza/6000000048574355159?through=6000000048688500197"
+GENI_INPUT_THROUGH_API = "https://www.sandbox.geni.com/api/profile-g6000000048574355159"
+GENI_WRONG_GET_METHOD =  "https://www.geni.com/api/profiles-g6000000048374355159?tokren=sfsdfsdfsdfsd"
+

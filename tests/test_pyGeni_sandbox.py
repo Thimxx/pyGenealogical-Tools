@@ -4,7 +4,8 @@ Created on 27 ago. 2017
 @author: Val
 '''
 import unittest
-from pyGeni import profile
+from pyGeni import profile, geni_request_get, geni_request_post
+from tests.FIXTURES import GENI_WRONG_GET_METHOD
 import os
 
 
@@ -25,6 +26,16 @@ class Test_sandbox_certificate(unittest.TestCase):
             assert(False)
         except:
             assert(True)
+            
+    
+    def test_error_get_post(self):
+        '''
+        Test error get and post
+        '''
+        data = geni_request_get(GENI_WRONG_GET_METHOD)
+        assert("error" in data.json())
+        data2 = geni_request_post(GENI_WRONG_GET_METHOD)
+        assert("error" in data2.json())
     
    
          

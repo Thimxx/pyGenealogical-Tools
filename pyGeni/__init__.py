@@ -51,10 +51,10 @@ def geni_request_get(url):
         data = requests.get(url)
     else:
         data = requests.get(url, verify=VERIFY_INPUT)
-    
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!
-        logging.error(ERROR_REQUESTS, data.json())
+        print(data.json())
+        logging.error(ERROR_REQUESTS + str(data.json()))
     return data 
     
 def geni_request_post(url, data_input={}):
@@ -68,6 +68,6 @@ def geni_request_post(url, data_input={}):
         data = requests.post(url, verify=VERIFY_INPUT, json=data_input)
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!
-        logging.error(ERROR_REQUESTS, data.json())
+        logging.error(ERROR_REQUESTS + str(data.json()))
     return data 
     

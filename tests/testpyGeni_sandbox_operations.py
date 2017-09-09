@@ -9,7 +9,7 @@ from datetime import date
 from pyGenealogy.common_profile import gen_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
 from tests.FIXTURES import SANDBOX_MAIN_ADDRESS, SANDBOX_MAIN_API_G, SANDBOX_MAIN_API_NOG, MAIN_SANDBOX_PROFILE_ID, ACTUAL_SECOND, ACTUAL_THIRD
-from tests.FIXTURES import FATHER_PROFILE_SANDBOX, BROTHER_PROFILE_SANDBOX, GENERIC_PLACE_STRING
+from tests.FIXTURES import FATHER_PROFILE_SANDBOX, BROTHER_PROFILE_SANDBOX, GENERIC_PLACE_STRING, GENI_INPUT_THROUGH, GENI_INPUT_THROUGH_API
 import os
 
 class Test(unittest.TestCase):
@@ -173,6 +173,14 @@ class Test(unittest.TestCase):
         prof3 = profile.profile(FATHER_PROFILE_SANDBOX, self.stoken)
         assert(father_profile.geni_specific_data["id"] in prof3.parents)
         assert(father_profile.delete_profile())
+        
+    def test_adding_with_through(self):
+        '''
+        Test including Geni link with through
+        '''
+        data = profile.process_geni_input(GENI_INPUT_THROUGH, "g") 
+        assert(data == GENI_INPUT_THROUGH_API)
+        
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
