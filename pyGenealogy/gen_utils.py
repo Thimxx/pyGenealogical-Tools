@@ -165,3 +165,11 @@ def get_formatted_location(location_string, language="en"):
     if (not location_string.split(",")[0] in output.values()):
         output["place_name"] = location_string.split(",")[0]
     return output
+
+def get_partner_gender(gender):
+    '''
+    Simple function, it provides the opposite sex
+    '''
+    if ( gender == "M"): return "F"
+    elif( gender == "F"): return "M"
+    else: return None

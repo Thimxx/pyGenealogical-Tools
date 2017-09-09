@@ -14,6 +14,9 @@ GENI_SINGLE_TOKEN = GENI_INITIATE_PARAMETER + GENI_TOKEN
 GENI_PARAM_TOKEN = GENI_ADD_PARAMETER + GENI_TOKEN
 GENI_ADD_CHILD = "/add-child"
 GENI_DELETE = "/delete"
+GENI_ADD_PARTNER = "/add-partner"
+GENI_UPDATE = "/update"
+GENI_ADD_PARENT = "/add-parent"
 #Parameters that depend on others
 GENI_VALIDATE_TOKEN = GENI_ADDRESS + "/platform/oauth/validate_token" + GENI_SINGLE_TOKEN
 GENI_API = GENI_ADDRESS + "/api/"

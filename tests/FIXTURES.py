@@ -57,3 +57,6 @@ SANDBOX_MAIN_ADDRESS = "https://sandbox.geni.com/people/Testing-Profile/1149101"
 SANDBOX_MAIN_API_G = "https://sandbox.geni.com/api/profile-g1149101"
 SANDBOX_MAIN_API_NOG = "https://sandbox.geni.com/api/profile-399"
 MAIN_SANDBOX_PROFILE_ID = "profile-399"
+FATHER_PROFILE_SANDBOX = "https://sandbox.geni.com/api/profile-g1149810"
+BROTHER_PROFILE_SANDBOX = "https://sandbox.geni.com/api/profile-g1150205"
+

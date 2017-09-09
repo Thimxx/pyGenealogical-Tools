@@ -9,8 +9,9 @@ from pyGeni.geniapi_common import geni_calls
 from pyGeni.immediate_family import immediate_family
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy import NOT_KNOWN_VALUE
-from messages.pygeni_messages import ABOUT_ME_MESSAGE
+from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS
 from datetime import date
+import logging
 
 SPECIFIC_GENI_STRING = ['id', 'url', 'profile_url', 'creator' ]
 SPECIFIC_GENI_BOOLEAN =  ['public', 'is_alive', 'deleted']
@@ -27,6 +28,11 @@ GENI_EVENT_DATA = {"birth" : {"date":"birth_date", "accuracy": "accuracy_birth_d
                    "baptism" : {"date":"baptism_date", "accuracy": "accuracy_baptism_date", "location": "baptism_place" },
                    "burial" : {"date":"burial_date", "accuracy": "accuracy_burial_date", "location": "burial_place"}
                    }
+
+GENI_EVENT_MARRIAGE = {"marriage" : {"date":"marriage_date", "accuracy": "accuracy_marriage_date", "location": "marriage_place" }}
+
+GENI_ALL_EVENT_DATA = dict(GENI_EVENT_DATA)
+GENI_ALL_EVENT_DATA.update(GENI_EVENT_MARRIAGE)
 
 class profile(geni_calls, gen_profile):
     def __init__(self, geni_input, token, type_geni="g"):  # id int or string
@@ -87,10 +93,10 @@ class profile(geni_calls, gen_profile):
         data.get("birth", {}).get("date", {}).get("year", "?")
         if (data.get("birth", {}).get("date", {}) != {}): 
             format_date, accuracy_geni = self.get_date(data.get("birth", {}).get("date", {}))
-            self.setCheckedBirthDate(format_date, accuracy=accuracy_geni)
+            self.setCheckedDate("birth_date", format_date, accuracy=accuracy_geni)
         if (data.get("death", {}).get("date", {}) != {}):  
             format_date, accuracy_geni = self.get_date(data.get("death", {}).get("date", {}))
-            self.setCheckedDeathDate(format_date, accuracy=accuracy_geni)
+            self.setCheckedDate("death_date", format_date, accuracy=accuracy_geni)
         #TODO: introduce further parameters
          
     def get_date(self, data_dict):
@@ -130,6 +136,32 @@ class profile(geni_calls, gen_profile):
                 else:
                     self.gen_data[value_profile] = data[value_geni]
     
+    def add_marriage_in_geni(self, union = None):
+        '''
+        This method add marriage data in geni, add union if there is no unique
+        marriage
+        '''
+        if (union == None):
+            #If no union is added is because is the unique... 
+            if(len(self.marriage_union) == 1):
+                union = self.marriage_union[0].union_id
+            else: 
+                #If we have more than one marriage we cannot proceed
+                return False
+        #We create the url for creating the child
+        update_marriage = s.GENI_API + union + s.GENI_UPDATE + s.GENI_INITIATE_PARAMETER +  s.GENI_TOKEN + self.token
+        #We add the event data for marriage
+        data_input={}
+        event_value = self.event_value( "marriage")
+        if (event_value): data_input["marriage"] = event_value
+        #We also add the needed data, that we take from the base profile directly
+        r = s.geni_request_post(update_marriage, data_input=data_input)
+        data = r.json()
+        if "error" in data.keys():
+            logging.error(ERROR_REQUESTS + data["error"])
+            #TODO: process the data creation and update relations
+        
+        
     @classmethod
     def create_internally(cls, geni_input , token, type_geni): 
         return cls(geni_input , token, type_geni)
@@ -149,6 +181,7 @@ class profile(geni_calls, gen_profile):
                 union_to_use = profile.marriage_union[0].union_id
         elif (geni_input != None):
             tmp_prof = cls.create_internally(geni_input ,token, type_geni)
+            #TODO: add error checking if tmp_prof is not properly created.
             if (len(tmp_prof.marriage_union) == 1):
                 union_to_use = tmp_prof.marriage_union[0].union_id
         #Calling essentially the constructors
@@ -173,7 +206,79 @@ class profile(geni_calls, gen_profile):
             base_profile.id = stripId(data["id"])
             base_profile.guid = int(data["guid"])
             base_profile.get_geni_data(data)
-        
+                
+    @classmethod
+    def create_as_a_parent(cls, base_profile, token, profile = None,
+                          geni_input = None, type_geni="g"):
+        '''
+        From a common profile from pyGenealogy library, a new profile will be created
+        as a parent of a given profile
+        '''
+        #TODO:merge with other adding functions
+        child_to_use = None
+        if (profile != None):
+            child_to_use = profile.geni_specific_data["url"]
+        elif (geni_input != None):
+            child_to_use = cls.process_geni_input(cls, geni_input, type_geni)
+        #Calling essentially the constructors
+        base_profile.__class__ = cls
+        geni_calls.__init__(cls, token)
+        #Some checking parameters initiated
+        base_profile.properly_executed = False
+        base_profile.existing_in_geni = False
+        base_profile.data = {}
+        base_profile.geni_specific_data = {}
+        #We create the url for creating the child
+        add_parent = child_to_use + s.GENI_ADD_PARENT + s.GENI_INITIATE_PARAMETER  + s.GENI_TOKEN + cls.token
+        print(add_parent)
+        #We also add the needed data, that we take from the base profile directly
+        data_input = base_profile.create_input_file_2_geni()
+        r = s.geni_request_post(add_parent, data_input=data_input)
+        data = r.json()
+        if not "error" in data.keys():
+            base_profile.data = data
+            base_profile.properly_executed = True
+            base_profile.existing_in_geni = True
+            base_profile.id = stripId(data["id"])
+            base_profile.guid = int(data["guid"])
+            base_profile.get_geni_data(data)
+                                    
+    @classmethod
+    def create_as_a_partner(cls, base_profile, token,  profile = None,
+                          geni_input = None, type_geni="g"):
+        '''
+        From a common profile we take another profile and we create at parnter.
+        '''
+        partner_to_use = None
+        if (profile != None):
+            partner_to_use = profile.geni_specific_data["url"]
+        elif (geni_input != None):
+            partner_to_use = cls.process_geni_input(cls, geni_input, type_geni)
+        #Calling essentially the constructors
+        base_profile.__class__ = cls
+        geni_calls.__init__(cls, token)
+        #Some checking parameters initiated
+        base_profile.properly_executed = False
+        base_profile.existing_in_geni = False
+        base_profile.data = {}
+        base_profile.geni_specific_data = {}
+        #We create the url for creating the child
+        add_partner = partner_to_use + s.GENI_ADD_PARTNER + s.GENI_INITIATE_PARAMETER + "first_name="
+        add_partner += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + cls.token
+        #We also add the needed data, that we take from the base profile directly
+        data_input = base_profile.create_input_file_2_geni()
+        r = s.geni_request_post(add_partner, data_input=data_input)
+        data = r.json()
+        if not "error" in data.keys():
+            base_profile.data = data
+            base_profile.properly_executed = True
+            base_profile.existing_in_geni = True
+            base_profile.id = stripId(data["id"])
+            base_profile.guid = int(data["guid"])
+            base_profile.get_geni_data(data)
+            #TODO: update relations data
+        #And finally we add the marriage date
+        base_profile.add_marriage_in_geni()
     def delete_profile(self):
         '''
         We delete this profile from Geni
@@ -205,12 +310,20 @@ class profile(geni_calls, gen_profile):
                 msg += " [" + value + " FamilySearch-link]"
             data["about_me"] = msg
         for event_geni in GENI_EVENT_DATA:
-            date = self.gen_data.get(GENI_EVENT_DATA[event_geni]["date"], None)
-            accuracy = self.gen_data.get(GENI_EVENT_DATA[event_geni]["accuracy"], None)
-            location = self.gen_data.get(GENI_EVENT_DATA[event_geni]["location"], None)
-            event_value = getEventStructureGeni(date, accuracy, location)
+            event_value = self.event_value(event_geni)
             if (event_value): data[event_geni] = event_value
         return data
+    
+    def event_value(self, event_geni):
+        '''
+        Provides event value, uses the function
+        '''
+        date = self.gen_data.get(GENI_ALL_EVENT_DATA[event_geni]["date"], None)
+        accuracy = self.gen_data.get(GENI_ALL_EVENT_DATA[event_geni]["accuracy"], None)
+        location = self.gen_data.get(GENI_ALL_EVENT_DATA[event_geni]["location"], None)
+        event_value = getEventStructureGeni(date, accuracy, location)
+        return event_value
+        
         
     def process_geni_input(self, geni_input, type_geni):
         '''

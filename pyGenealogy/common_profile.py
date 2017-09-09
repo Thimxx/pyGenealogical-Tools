@@ -6,6 +6,7 @@ Created on 13 ago. 2017
 from pyGenealogy.gen_utils import checkDateConsistency, get_formatted_location
 from pyGenealogy import VALUES_ACCURACY
 
+TOOL_ID = "PY-GENEALOGY"
 DATA_STRING = ["name", "surname", "name_to_show", "gender", "comment"]
 DATA_DATES = ["birth_date", "death_date", "baptism_date", "residence_date", "burial_date", "marriage_date"]
 DATA_ACCURACY = ["accuracy_birth_date", "accuracy_death_date", "accuracy_baptism_date", "accuracy_residence_date", "accuracy_burial_date", "accuracy_marriage_date"]
@@ -22,10 +23,21 @@ class gen_profile(object):
         Constructor, name and surname as minimal parameters
         '''
         self.gen_data = {}
+        self.gen_data["id"] = None
         self.gen_data["name"] = name
         self.gen_data["surname"] = surname
         self.gen_data["name_to_show"] = self.set_name_2_show(name2show)
         self.gen_data["web_ref"] = []
+    def set_id(self, id_profile):
+        """
+        Introduce an id for later on compare the data for introduction
+        """
+        self.gen_data["id"] = TOOL_ID + str(id_profile)
+    def set_marriage_id_link(self, id_partner):
+        """
+        Sets the link to the id of the partner
+        """
+        self.gen_data["marriage_link"] =  id_partner
     def set_name(self,name):
         '''
         Modifies name to show
@@ -63,55 +75,15 @@ class gen_profile(object):
             return True
         else:
             return False
-    def setCheckedBirthDate(self, birth_date, accuracy = "EXACT"):
+    def setCheckedDate(self, date_name, date, accuracy = "EXACT"):
         '''
         Input shall be a datetime.date format
         '''
-        if (not self.selfcheckDateConsistency({"birth_date" : birth_date}, {"accuracy_birth_date" : accuracy})) or (not accuracy in VALUES_ACCURACY):
+        if (not self.selfcheckDateConsistency({ date_name : date}, {"accuracy_" + date_name : accuracy})) or (not accuracy in VALUES_ACCURACY) or (not date_name in DATA_DATES):
             return False
         else:
-            self.gen_data["birth_date"] = birth_date
-            self.gen_data["accuracy_birth_date"] = accuracy
-            return True
-    def setCheckedDeathDate(self, death_date, accuracy = "EXACT"):
-        '''
-        Input shall be a datetime.date format
-        '''
-        if (not self.selfcheckDateConsistency({"death_date" : death_date}, {"accuracy_death_date" : accuracy})) or (not accuracy in VALUES_ACCURACY):
-            return False
-        else:
-            self.gen_data["death_date"] = death_date
-            self.gen_data["accuracy_death_date"] = accuracy
-            return True
-    def setCheckedBaptismDate(self, baptism_date, accuracy = "EXACT"):
-        '''
-        Introducing the baptism date
-        '''
-        if (not self.selfcheckDateConsistency({"baptism_date" : baptism_date}, {"accuracy_baptism_date" : accuracy})) or (not accuracy in VALUES_ACCURACY):
-            return False
-        else:
-            self.gen_data["baptism_date"] = baptism_date
-            self.gen_data["accuracy_baptism_date"] = accuracy
-            return True
-    def setCheckedResidenceDate(self, residence_date, accuracy = "EXACT"):
-        '''
-        Input shall be a datetime.date format
-        '''
-        if (not self.selfcheckDateConsistency({"residence_date" : residence_date}, {"accuracy_residence_date" : accuracy})) or (not accuracy in VALUES_ACCURACY):
-            return False
-        else:
-            self.gen_data["residence_date"] = residence_date
-            self.gen_data["accuracy_residence_date"] = accuracy
-            return True
-    def setCheckedBurialDate(self, burial_date, accuracy = "EXACT"):
-        '''
-        Introducing the baptism date
-        '''
-        if (not self.selfcheckDateConsistency({"burial_date" : burial_date}, {"accuracy_burial_date" : accuracy})) or (not accuracy in VALUES_ACCURACY):
-            return False
-        else:
-            self.gen_data["burial_date"] = burial_date
-            self.gen_data["accuracy_burial_date"] = accuracy
+            self.gen_data[date_name] = date
+            self.gen_data["accuracy_" + date_name] = accuracy
             return True
     def setComments(self, comment):
         '''
@@ -136,7 +108,10 @@ class gen_profile(object):
         '''
         Includes web references for the profile.
         '''
-        self.gen_data["web_ref"].append(address)
+        if type(address) is list:
+            self.gen_data["web_ref"] += address
+        elif type(address) is str:
+            self.gen_data["web_ref"].append(address)
     def setPlaces(self, event_place, location, language="en" ):
         '''
         This function will introduce the location related to each event

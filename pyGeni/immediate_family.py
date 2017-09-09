@@ -12,7 +12,6 @@ class immediate_family(geni_calls):
     '''
     This function is used to call the immediate family api from Geni.
     '''
-
     def __init__(self, token, myid):
         '''
         The constructor will also make the call to the web to get the right

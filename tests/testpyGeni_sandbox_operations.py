@@ -9,6 +9,7 @@ from datetime import date
 from pyGenealogy.common_profile import gen_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
 from tests.FIXTURES import SANDBOX_MAIN_ADDRESS, SANDBOX_MAIN_API_G, SANDBOX_MAIN_API_NOG, MAIN_SANDBOX_PROFILE_ID, ACTUAL_SECOND, ACTUAL_THIRD
+from tests.FIXTURES import FATHER_PROFILE_SANDBOX, BROTHER_PROFILE_SANDBOX, GENERIC_PLACE_STRING
 import os
 
 class Test(unittest.TestCase):
@@ -45,8 +46,8 @@ class Test(unittest.TestCase):
         child_profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
         child_profile.setCheckedGender("M")
         child_profile.set_name_2_show(ACTUAL_NAME)
-        child_profile.setCheckedBirthDate(date(2017,11,20), "ABOUT")
-        child_profile.setCheckedDeathDate(date(2017,12,1), "EXACT")
+        child_profile.setCheckedDate("birth_date", date(2017,11,20), "ABOUT")
+        child_profile.setCheckedDate("death_date", date(2017,12,1), "EXACT")
         profile.profile.create_as_a_child(child_profile, self.stoken, union = UNION_MAIN_PROFILE )
         
         data_id = child_profile.geni_specific_data['guid']
@@ -145,7 +146,33 @@ class Test(unittest.TestCase):
         assert(prof.geni_specific_data["id"] == MAIN_SANDBOX_PROFILE_ID)
         assert(prof2.geni_specific_data["id"] == MAIN_SANDBOX_PROFILE_ID)
         assert(prof3.geni_specific_data["id"] == MAIN_SANDBOX_PROFILE_ID)
+    
+    def test_adding_a_partner(self):
+        '''
+        Testing adding a parent to a profile
+        '''
+        partner_profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
+        partner_profile.setCheckedDate("marriage_date", date(2017,11,20) , "EXACT")
+        partner_profile.setPlaces("marriage_place",GENERIC_PLACE_STRING , language="es")
         
+        profile.profile.create_as_a_partner(partner_profile, self.stoken, geni_input = BROTHER_PROFILE_SANDBOX)
+        #TODO: add checking of marriage data once is included
+        assert(partner_profile.properly_executed)
+        assert(partner_profile.delete_profile())
+        
+    def test_adding_a_parent(self):
+        '''
+        Test adding a parent in Geni
+        '''
+        
+        father_profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
+        father_profile.setCheckedGender("M")
+        
+        profile.profile.create_as_a_parent(father_profile, self.stoken, geni_input=FATHER_PROFILE_SANDBOX)
+        
+        prof3 = profile.profile(FATHER_PROFILE_SANDBOX, self.stoken)
+        assert(father_profile.geni_specific_data["id"] in prof3.parents)
+        assert(father_profile.delete_profile())
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
