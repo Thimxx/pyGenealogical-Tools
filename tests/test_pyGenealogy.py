@@ -161,6 +161,7 @@ class Test(unittest.TestCase):
         profile = gen_profile("Name", "Surname")
         profile.returnFullName()
         profile.setComments("TEST COMMENT")
+        profile.set_surname("TEST SURNAME")
     
     def test_web_reference_adding(self):
         '''
@@ -169,11 +170,9 @@ class Test(unittest.TestCase):
         profile = gen_profile("Name", "Surname")
         profile.setWebReference("Myaddress")
         #Wrong declaration in the past created issues
-        print(profile.gen_data["web_ref"])
         assert(len(profile.gen_data["web_ref"]) == 1)
         profile.setWebReference(["Myaddress"])
         #This will check the data types is working
-        print(profile.gen_data["web_ref"])
         assert(len(profile.gen_data["web_ref"]) == 2)
             
     

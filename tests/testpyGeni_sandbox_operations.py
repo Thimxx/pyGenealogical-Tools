@@ -10,6 +10,7 @@ from pyGenealogy.common_profile import gen_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
 from tests.FIXTURES import SANDBOX_MAIN_ADDRESS, SANDBOX_MAIN_API_G, SANDBOX_MAIN_API_NOG, MAIN_SANDBOX_PROFILE_ID, ACTUAL_SECOND, ACTUAL_THIRD
 from tests.FIXTURES import FATHER_PROFILE_SANDBOX, BROTHER_PROFILE_SANDBOX, GENERIC_PLACE_STRING, GENI_INPUT_THROUGH, GENI_INPUT_THROUGH_API
+from tests.FIXTURES import GENI_TWO_MARRIAGES_PROFILE, GENI_TWO_MARRIAGES_PROFILE_LINK
 import os
 
 class Test(unittest.TestCase):
@@ -181,6 +182,21 @@ class Test(unittest.TestCase):
         data = profile.process_geni_input(GENI_INPUT_THROUGH, "g") 
         assert(data == GENI_INPUT_THROUGH_API)
         
+    def test_error_adding_marriage(self):
+        '''
+        Test no adding marriage data due to error
+        '''
+        prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, self.stoken, type_geni="")
+        self.assertFalse(prof.add_marriage_in_geni())
+        self.assertFalse(prof.delete_profile())
+    
+    def test_parser_profile_input(self):
+        '''
+        Tests that a profile inputs provide the right result
+        '''
+        prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, self.stoken, type_geni="")
+        example = profile.process_profile_input(profile=prof)
+        assert(example == GENI_TWO_MARRIAGES_PROFILE_LINK)
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

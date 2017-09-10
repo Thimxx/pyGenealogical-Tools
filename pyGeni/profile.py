@@ -165,6 +165,28 @@ class profile(geni_calls, gen_profile):
     @classmethod
     def create_internally(cls, geni_input , token, type_geni): 
         return cls(geni_input , token, type_geni)
+    
+    def creation_operations(self, adding_input):
+        '''
+        Common functions on creating profiles
+        '''
+        #Some checking parameters initiated
+        self.properly_executed = False
+        self.existing_in_geni = False
+        self.data = {}
+        self.geni_specific_data = {}
+        #We also add the needed data, that we take from the base profile directly
+        data_input = self.create_input_file_2_geni()
+        r = s.geni_request_post(adding_input, data_input=data_input)
+        data = r.json()
+        if not "error" in data.keys():
+            self.data = data
+            self.properly_executed = True
+            self.existing_in_geni = True
+            self.id = stripId(data["id"])
+            self.guid = int(data["guid"])
+            self.get_geni_data(data)
+        
                 
     @classmethod
     def create_as_a_child(cls, base_profile, token, union = None, profile = None,
@@ -187,26 +209,11 @@ class profile(geni_calls, gen_profile):
         #Calling essentially the constructors
         base_profile.__class__ = cls
         geni_calls.__init__(cls, token)
-        #Some checking parameters initiated
-        base_profile.properly_executed = False
-        base_profile.existing_in_geni = False
-        base_profile.data = {}
-        base_profile.geni_specific_data = {}
         #We create the url for creating the child
         add_child = s.GENI_API + union_to_use + s.GENI_ADD_CHILD + s.GENI_INITIATE_PARAMETER + "first_name="
         add_child += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + cls.token
-        #We also add the needed data, that we take from the base profile directly
-        data_input = base_profile.create_input_file_2_geni()
-        r = s.geni_request_post(add_child, data_input=data_input)
-        data = r.json()
-        if not "error" in data.keys():
-            base_profile.data = data
-            base_profile.properly_executed = True
-            base_profile.existing_in_geni = True
-            base_profile.id = stripId(data["id"])
-            base_profile.guid = int(data["guid"])
-            base_profile.get_geni_data(data)
-                
+        base_profile.creation_operations(add_child)
+               
     @classmethod
     def create_as_a_parent(cls, base_profile, token, profile = None,
                           geni_input = None, type_geni="g"):
@@ -214,33 +221,14 @@ class profile(geni_calls, gen_profile):
         From a common profile from pyGenealogy library, a new profile will be created
         as a parent of a given profile
         '''
-        #TODO:merge with other adding functions
-        child_to_use = None
-        if (profile != None):
-            child_to_use = profile.geni_specific_data["url"]
-        elif (geni_input != None):
-            child_to_use = process_geni_input(geni_input, type_geni)
+        child_to_use = process_profile_input(profile, geni_input, type_geni)
         #Calling essentially the constructors
         base_profile.__class__ = cls
         geni_calls.__init__(cls, token)
-        #Some checking parameters initiated
-        base_profile.properly_executed = False
-        base_profile.existing_in_geni = False
-        base_profile.data = {}
-        base_profile.geni_specific_data = {}
         #We create the url for creating the child
         add_parent = child_to_use + s.GENI_ADD_PARENT + s.GENI_INITIATE_PARAMETER  + s.GENI_TOKEN + cls.token
         #We also add the needed data, that we take from the base profile directly
-        data_input = base_profile.create_input_file_2_geni()
-        r = s.geni_request_post(add_parent, data_input=data_input)
-        data = r.json()
-        if not "error" in data.keys():
-            base_profile.data = data
-            base_profile.properly_executed = True
-            base_profile.existing_in_geni = True
-            base_profile.id = stripId(data["id"])
-            base_profile.guid = int(data["guid"])
-            base_profile.get_geni_data(data)
+        base_profile.creation_operations(add_parent)
                                     
     @classmethod
     def create_as_a_partner(cls, base_profile, token,  profile = None,
@@ -248,35 +236,14 @@ class profile(geni_calls, gen_profile):
         '''
         From a common profile we take another profile and we create at parnter.
         '''
-        partner_to_use = None
-        if (profile != None):
-            partner_to_use = profile.geni_specific_data["url"]
-        elif (geni_input != None):
-            partner_to_use = process_geni_input(geni_input, type_geni)
+        partner_to_use = process_profile_input(profile, geni_input, type_geni)
         #Calling essentially the constructors
         base_profile.__class__ = cls
         geni_calls.__init__(cls, token)
-        #Some checking parameters initiated
-        base_profile.properly_executed = False
-        base_profile.existing_in_geni = False
-        base_profile.data = {}
-        base_profile.geni_specific_data = {}
         #We create the url for creating the child
         add_partner = partner_to_use + s.GENI_ADD_PARTNER + s.GENI_INITIATE_PARAMETER + "first_name="
         add_partner += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + cls.token
-        #We also add the needed data, that we take from the base profile directly
-        data_input = base_profile.create_input_file_2_geni()
-        r = s.geni_request_post(add_partner, data_input=data_input)
-        data = r.json()
-        if not "error" in data.keys():
-            base_profile.data = data
-            base_profile.properly_executed = True
-            base_profile.existing_in_geni = True
-            base_profile.id = stripId(data["id"])
-            base_profile.guid = int(data["guid"])
-            base_profile.get_geni_data(data)
-            #TODO: update relations data
-        #And finally we add the marriage date
+        base_profile.creation_operations(add_partner)
         base_profile.add_marriage_in_geni()
     def delete_profile(self):
         '''
@@ -322,9 +289,7 @@ class profile(geni_calls, gen_profile):
         location = self.gen_data.get(GENI_ALL_EVENT_DATA[event_geni]["location"], None)
         event_value = getEventStructureGeni(date, accuracy, location)
         return event_value
-        
-        
-
+      
 #===================================================
 # Util functions
 #===================================================
@@ -384,6 +349,17 @@ def getEventStructureGeni(date, accuracy, location):
     if(date_structure) : event_data["date"] = date_structure
     if(location_structure) :event_data["location"] = location_structure
     return event_data
+
+def process_profile_input(profile = None, geni_input = None, type_geni="g"):
+    '''
+       Function to avoid code duplication that takes returns the right profile id
+    '''
+    profile_to_use = None
+    if (profile != None):
+        profile_to_use = profile.geni_specific_data["url"]
+    elif (geni_input != None):
+        profile_to_use = process_geni_input(geni_input, type_geni)
+    return profile_to_use
     
         
         

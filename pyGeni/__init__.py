@@ -53,7 +53,6 @@ def geni_request_get(url):
         data = requests.get(url, verify=VERIFY_INPUT)
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!
-        print(data.json())
         logging.error(ERROR_REQUESTS + str(data.json()))
     return data 
     

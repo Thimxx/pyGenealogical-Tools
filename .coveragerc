@@ -4,3 +4,4 @@ omit =
     GEniToolsGUI.py
     ./tests/*
     C:\Program*
+    ./examples/*
