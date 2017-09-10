@@ -230,7 +230,6 @@ class profile(geni_calls, gen_profile):
         base_profile.geni_specific_data = {}
         #We create the url for creating the child
         add_parent = child_to_use + s.GENI_ADD_PARENT + s.GENI_INITIATE_PARAMETER  + s.GENI_TOKEN + cls.token
-        print(add_parent)
         #We also add the needed data, that we take from the base profile directly
         data_input = base_profile.create_input_file_2_geni()
         r = s.geni_request_post(add_parent, data_input=data_input)

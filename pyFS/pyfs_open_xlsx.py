@@ -17,7 +17,7 @@ from pyGenealogy import NOT_KNOWN_VALUE
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name"]
 date_fields = {"birth_date" : "birth_date" , "burial_date" : "burial_date", "chr_date" : "baptism_date", 
                "residence_date" : "residence_date", "death_date" : "death_date", "marriage_date" : "marriage_date"}
-LOCATION_EQUIVALENCE = {"death_place_text" : "death_place", "residence_place_text" : "residence_place",
+LOCATION_EQUIVALENCE = {"birth_place_text" : "birth_place", "death_place_text" : "death_place", "residence_place_text" : "residence_place",
                         "chr_place_text" : "baptism_place", "marriage_place_text" : "marriage_place"}
 
 class getFSfamily(object):

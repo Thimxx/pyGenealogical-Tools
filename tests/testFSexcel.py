@@ -103,6 +103,7 @@ class Test(unittest.TestCase):
         assert(this_profile.gen_data["burial_date"] == datetime.date(1863,6,28))
         assert(this_profile.gen_data["accuracy_burial_date"] == "EXACT")
         assert(this_profile.gen_data["death_place"]["city"] == 'La Parrilla')
+        assert(this_profile.gen_data["birth_place"]["city"] == 'La Parrilla')
         assert(this_profile.gen_data["residence_place"]["state"] == 'Castile and León')
         assert(this_profile.gen_data["baptism_place"]["place_name"] == 'Nuestra Señora de los Remedios')
         

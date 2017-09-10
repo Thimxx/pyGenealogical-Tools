@@ -1,4 +1,4 @@
-# GeniTools
+# pyGenealogical-Tools
 
 ![alt text](https://travis-ci.org/Thimxx/pyGenealogical-Tools.svg?branch=master)
 ![alt text](https://coveralls.io/repos/github/Thimxx/pyGenealogical-Tools/badge.svg?branch=master)
