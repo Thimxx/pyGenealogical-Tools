@@ -197,6 +197,14 @@ class Test(unittest.TestCase):
         prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, self.stoken, type_geni="")
         example = profile.process_profile_input(profile=prof)
         assert(example == GENI_TWO_MARRIAGES_PROFILE_LINK)
+    
+    def test_alternative_data_in_profile(self):
+        '''
+        Test other data in the profile
+        '''
+        prof = profile.profile(BROTHER_PROFILE_SANDBOX, self.stoken)
+        assert(len(prof.gen_data["nicknames"]) == 2)
+        assert("brother" in prof.gen_data["nicknames"])
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

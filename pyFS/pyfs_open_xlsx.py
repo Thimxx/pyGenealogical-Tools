@@ -9,7 +9,7 @@ from openpyxl.utils import  column_index_from_string
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import is_year, naming_conventions, get_children_surname, get_name_from_fullname, get_partner_gender
 from datetime import datetime
-from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED
+from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED, NO_VALID_FILE
 from pyGeni import profile
 from pyGenealogy import NOT_KNOWN_VALUE
 
@@ -36,14 +36,18 @@ class getFSfamily(object):
             self.correct_execution = False
         self.naming_convention = naming_convention
         self.loaded_data = load_workbook(filename, data_only=True)
-        if (not self.__locate_key_fields__()): self.correct_execution = False
-        self.profiles = []
-        self.geni_profiles = []
-        self.related_profiles = {}
-        self.related_geni_profiles = []
-        self.parents_profiles = {}
-        self.parents_geni_profiles = []
-        self.__get_profiles__()
+        if (self.__locate_key_fields__()):
+            self.profiles = []
+            self.geni_profiles = []
+            self.related_profiles = {}
+            self.related_geni_profiles = []
+            self.parents_profiles = {}
+            self.parents_geni_profiles = []
+            self.__get_profiles__()
+        else:
+            #If no we do not locate the key files we continue
+            self.correct_execution = False
+            logging.error(NO_VALID_FILE)
     def __locate_key_fields__(self):
         '''
         This function is used to locate the key areas within the file in order to later
@@ -135,6 +139,8 @@ class getFSfamily(object):
                     elif(column_criteria == "full_name"):
                         #TODO:Better replace by a method call
                         included_profile.set_name(get_name_from_fullname(cell_value,potential_father_surname, potential_mother_surname))
+                        #In the case the name if not the same, we create it as nickname
+                        if (cell_value != included_profile.returnFullName()): included_profile.add_nickname(cell_value)
                     elif (column_criteria == "spouse_full_name"):
                         #Here we create a new profile using the surname of the guy
                         names = cell_value.split(" ")

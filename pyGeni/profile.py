@@ -19,6 +19,7 @@ SPECIFIC_GENI_INTEGER = ['guid', 'created_at', 'updated_at']
 #TODO: review teh complete post method and include all fields here : https://www.geni.com/platform/developer/help/api?path=profile%2Fadd-child&version=1
 DATA_STRING_IN_GENI = { "name" : "first_name", "surname" : "last_name",  
                        "gender": "gender", "comment": "about_me"}
+DATA_LIST_IN_GENI = {"nicknames": "nicknames"}
 #TODO: think about a logic for display name...
 NOT_USED = {"name_to_show" : "display_name"}
 EQUIVALENT_SEX = { "male" : "M", "female" : "F"}
@@ -135,6 +136,11 @@ class profile(geni_calls, gen_profile):
                     self.setCheckedGender(EQUIVALENT_SEX[data[value_geni]])
                 else:
                     self.gen_data[value_profile] = data[value_geni]
+            elif value_geni in DATA_LIST_IN_GENI.values():
+                data_location = list(DATA_LIST_IN_GENI.values()).index(value_geni)
+                value_profile = list(DATA_LIST_IN_GENI.keys())[data_location]
+                self.gen_data[value_geni] = data[value_geni]
+                
     
     def add_marriage_in_geni(self, union = None):
         '''

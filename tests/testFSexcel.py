@@ -77,7 +77,15 @@ class Test(unittest.TestCase):
         input_file = os.path.join(self.filelocation, "fs-PotenteAsegurado.xlsx")
         fsclass = getFSfamily(input_file, naming_convention = "wrong_input")
         self.assertFalse(fsclass.correct_execution)
-        
+    
+    def test_empty_excel(self):
+        '''
+        Test an empty excel from FS
+        '''
+        input_file = os.path.join(self.filelocation, "fs-Empty.xlsx")
+        fsclass = getFSfamily(input_file)
+        self.assertFalse(fsclass.correct_execution)
+            
     
     def test_fs_reader_single_person(self):
         '''
@@ -106,7 +114,8 @@ class Test(unittest.TestCase):
         assert(this_profile.gen_data["birth_place"]["city"] == 'La Parrilla')
         assert(this_profile.gen_data["residence_place"]["state"] == 'Castile and León')
         assert(this_profile.gen_data["baptism_place"]["place_name"] == 'Nuestra Señora de los Remedios')
-        
+        assert(len(this_profile.gen_data["nicknames"]))
+        assert("Wenceslao Potente" in this_profile.gen_data["nicknames"])
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_fs_reader']
     unittest.main()

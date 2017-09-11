@@ -11,7 +11,7 @@ DATA_STRING = ["name", "surname", "name_to_show", "gender", "comment"]
 DATA_DATES = ["birth_date", "death_date", "baptism_date", "residence_date", "burial_date", "marriage_date"]
 DATA_ACCURACY = ["accuracy_birth_date", "accuracy_death_date", "accuracy_baptism_date", "accuracy_residence_date", "accuracy_burial_date", "accuracy_marriage_date"]
 DATA_PLACES = ["birth_place", "death_place", "baptism_place", "residence_place", "burial_place", "marriage_place"]
-DATA_LISTS = ["web_ref"]
+DATA_LISTS = ["web_ref", "nickname"]
 
 class gen_profile(object):
     '''
@@ -28,6 +28,12 @@ class gen_profile(object):
         self.gen_data["surname"] = surname
         self.gen_data["name_to_show"] = self.set_name_2_show(name2show)
         self.gen_data["web_ref"] = []
+        self.gen_data["nicknames"] = []
+    def add_nickname(self, nick_name):
+        '''
+        Add a nickname
+        '''
+        self.gen_data["nicknames"].append(nick_name)
     def set_id(self, id_profile):
         """
         Introduce an id for later on compare the data for introduction
