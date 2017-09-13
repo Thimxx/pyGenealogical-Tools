@@ -86,6 +86,15 @@ class Test(unittest.TestCase):
         fsclass = getFSfamily(input_file)
         self.assertFalse(fsclass.correct_execution)
             
+    def test_issue_double_names(self):
+        '''
+        Test composed names
+        '''
+        input_file = os.path.join(self.filelocation, "fs-MolpecerezGomez.xlsx")
+        fsclass = getFSfamily(input_file, naming_convention = "spanish_surname")
+        for profile in fsclass.profiles:
+            assert(profile.gen_data["name"] in ["Eusebio", "Petra", "Román", "Gila", "Segunda", "Julián", "Petra Regalada"]) 
+        
     
     def test_fs_reader_single_person(self):
         '''

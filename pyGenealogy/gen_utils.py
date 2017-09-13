@@ -8,6 +8,7 @@ from messages.pyGenealogymessages import NO_VALID_CONVENTION, NO_VALID_ACCURACY
 from messages.pyGenealogymessages import NO_VALID_BIRTH_DATE, NO_VALID_DEATH_DATE, NO_VALID_DEATH_AND_BURIAL
 from datetime import date
 from pyGenealogy import VALUES_ACCURACY
+from metaphone import doublemetaphone
 import requests
 
 GOOGLE_GEOLOCATION_ADDRESS = "https://maps.googleapis.com/maps/api/geocode/json?"
@@ -45,11 +46,19 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
     Given a full name, including surname, this function will provide out the first name of
     the person removing the surname of the person
     '''
-    name_string = full_name
     merged_list = list_father_surnames + list_mother_surnames
-    for surname in merged_list:
-        name_string = name_string.replace(" " + surname, "")
-    return name_string
+    merged_metaphore = []
+    for data in merged_list:
+        if doublemetaphone(data) not in merged_metaphore:
+            merged_metaphore.append(doublemetaphone(data))
+    
+    full_name_list = full_name.split(" ")
+    for i, value in enumerate(full_name_list):
+        if (doublemetaphone(value) in merged_metaphore):
+            full_name_list[i] = ""
+    
+    return " ".join(full_name_list).rstrip() 
+    
 def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date, death_date, burial_date,
                          accuracy_birth = "EXACT", accuracy_residence = "EXACT", accuracy_baptism = "EXACT", 
                          accuracy_marriage = "EXACT", accuracy_death = "EXACT", accuracy_burial = "EXACT"):

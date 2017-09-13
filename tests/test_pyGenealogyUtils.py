@@ -126,6 +126,19 @@ class Test(unittest.TestCase):
         assert(get_partner_gender("M") == "F")
         assert(get_partner_gender("F") == "M")
         assert(get_partner_gender("G") == None)
+    
+    def test_wrong_google_maps_message(self):
+        '''
+        Test wrong google maps message
+        '''
+        assert(get_formatted_location("") == None)
+    
+    def test_wrong_inputs(self):
+        '''
+        Test wrong inputs to get_name
+        '''
+        assert("Petra Regalada" == get_name_from_fullname("Petra Regalada Molpezérez Gómez", ['Molpecérez', 'Molpezerez'], ['Gómez', 'Gomez']))
+        assert("Segunda" == get_name_from_fullname("Segunda Molpécerez Gómez", ['Molpecérez', 'Molpezerez'], ['Gómez', 'Gomez']))
         
     
 if __name__ == "__main__":
