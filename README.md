@@ -34,6 +34,7 @@ In order to use the tools you will need to install the following modules:
 * requests: http://docs.python-requests.org/en/master/ 
 * wxpython
 * metaphone: https://pypi.python.org/pypi/Metaphone/0.4 
+* openpyxl
 
 Concerning testing, the repository if configured to use nose, coverage, nose-htmloutput, so you will need to install in your local installation as well.
 
