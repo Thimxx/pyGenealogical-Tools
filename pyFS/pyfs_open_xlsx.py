@@ -3,7 +3,7 @@ Created on 15 ago. 2017
 
 @author: Val
 '''
-import logging
+import logging, pyexcel
 from openpyxl import load_workbook
 from openpyxl.utils import  column_index_from_string
 from pyGenealogy.common_profile import gen_profile
@@ -28,6 +28,10 @@ class getFSfamily(object):
         '''
         This contructor reads the output file from FS in xlsx format
         '''
+        if (not ".xlsx" in filename):
+            #This file is not in xlsx format, we change it:
+            pyexcel.save_book_as(file_name=filename, dest_file_name=filename + "x")
+            filename = filename + "x"
         #TODO: include further naming conventions
         self.correct_execution = True
         self.language = language

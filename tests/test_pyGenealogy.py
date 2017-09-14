@@ -162,6 +162,7 @@ class Test(unittest.TestCase):
         profile.returnFullName()
         profile.setComments("TEST COMMENT")
         profile.set_surname("TEST SURNAME")
+        assert(profile.gen_data["name_to_show"] == profile.nameLifespan())
     
     def test_web_reference_adding(self):
         '''

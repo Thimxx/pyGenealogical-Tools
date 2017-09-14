@@ -90,7 +90,7 @@ class Test(unittest.TestCase):
         '''
         Test composed names
         '''
-        input_file = os.path.join(self.filelocation, "fs-MolpecerezGomez.xlsx")
+        input_file = os.path.join(self.filelocation, "fs-MolpecerezGomez.xls")
         fsclass = getFSfamily(input_file, naming_convention = "spanish_surname")
         for profile in fsclass.profiles:
             assert(profile.gen_data["name"] in ["Eusebio", "Petra", "Román", "Gila", "Segunda", "Julián", "Petra Regalada"]) 
