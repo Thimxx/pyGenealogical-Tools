@@ -9,9 +9,10 @@ from openpyxl.utils import  column_index_from_string
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import is_year, naming_conventions, get_children_surname, get_name_from_fullname, get_partner_gender
 from datetime import datetime
-from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED, NO_VALID_FILE
+from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED, NO_VALID_FILE, NOT_EXISTING_FILE
 from pyGeni import profile
 from pyGenealogy import NOT_KNOWN_VALUE
+import os
 
 
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name"]
@@ -27,31 +28,37 @@ class getFSfamily(object):
     def __init__(self, filename, naming_convention = "father_surname", language = "en"):
         '''
         This contructor reads the output file from FS in xlsx format
-        '''
-        if (not ".xlsx" in filename):
-            #This file is not in xlsx format, we change it:
-            pyexcel.save_book_as(file_name=filename, dest_file_name=filename + "x")
-            filename = filename + "x"
-        #TODO: include further naming conventions
+        ''' #TODO: include further naming conventions
         self.correct_execution = True
         self.language = language
+        if os.path.exists(filename):
+            if (not ".xlsx" in filename):
+                #This file is not in xlsx format, we change it:
+                pyexcel.save_book_as(file_name=filename, dest_file_name=filename + "x")
+                filename = filename + "x"
+        else:
+            #The file does not exists, we create an error!
+            logging.error(NOT_EXISTING_FILE + filename)
+            self.correct_execution = False
         if (not naming_convention in naming_conventions):
             logging.error(NO_VALID_NAMING_CONVENTION) 
             self.correct_execution = False
         self.naming_convention = naming_convention
-        self.loaded_data = load_workbook(filename, data_only=True)
-        if (self.__locate_key_fields__()):
-            self.profiles = []
-            self.geni_profiles = []
-            self.related_profiles = {}
-            self.related_geni_profiles = []
-            self.parents_profiles = {}
-            self.parents_geni_profiles = []
-            self.__get_profiles__()
-        else:
-            #If no we do not locate the key files we continue
-            self.correct_execution = False
-            logging.error(NO_VALID_FILE)
+        
+        if self.correct_execution:
+            self.loaded_data = load_workbook(filename, data_only=True)
+            if (self.__locate_key_fields__()):
+                self.profiles = []
+                self.geni_profiles = []
+                self.related_profiles = {}
+                self.related_geni_profiles = []
+                self.parents_profiles = {}
+                self.parents_geni_profiles = []
+                self.__get_profiles__()
+            else:
+                #If no we do not locate the key files we continue
+                self.correct_execution = False
+                logging.error(NO_VALID_FILE)
     def __locate_key_fields__(self):
         '''
         This function is used to locate the key areas within the file in order to later
@@ -205,9 +212,9 @@ class getFSfamily(object):
                 #It is a partner so we add as opposite sex!
                 partner.setCheckedGender(get_partner_gender(profile_obtained.gen_data["gender"]))
                 partner.setWebReference(profile_obtained.gen_data["web_ref"])
+                partner.setCheckedDate("marriage_date", profile_obtained.gen_data["marriage_date"], profile_obtained.gen_data["accuracy_marriage_date"]  )
                 profile.profile.create_as_a_partner(partner, token, geni_input=profile_obtained.geni_specific_data["id"],
                                                     type_geni="" )
-                partner.setCheckedDate("marriage_date", profile_obtained.gen_data["marriage_date"], profile_obtained.gen_data["accuracy_marriage_date"]  )
                 self.related_geni_profiles.append(partner)
                 logging.info(partner.geni_specific_data["url"])
                 if id_of_marriage in self.parents_profiles.keys():

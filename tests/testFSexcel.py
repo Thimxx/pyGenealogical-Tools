@@ -66,6 +66,7 @@ class Test(unittest.TestCase):
         for parent_profile in fsclass.parents_geni_profiles:
             assert(parent_profile.delete_profile())
         for partner_profile in fsclass.related_geni_profiles:
+            assert(testing_date == partner_profile.gen_data["marriage_date"])
             assert(partner_profile.delete_profile())
         for data_profile in fsclass.geni_profiles:
             assert(data_profile.delete_profile())
@@ -94,7 +95,14 @@ class Test(unittest.TestCase):
         fsclass = getFSfamily(input_file, naming_convention = "spanish_surname")
         for profile in fsclass.profiles:
             assert(profile.gen_data["name"] in ["Eusebio", "Petra", "Román", "Gila", "Segunda", "Julián", "Petra Regalada"]) 
-        
+    
+    def test_not_existing_file(self):
+        '''
+        Test file not existing
+        '''
+        input_file = os.path.join(self.filelocation, "fs-DOESNOTEXIST.xls")
+        fsclass = getFSfamily(input_file, naming_convention = "spanish_surname")
+        self.assertFalse(fsclass.correct_execution)
     
     def test_fs_reader_single_person(self):
         '''

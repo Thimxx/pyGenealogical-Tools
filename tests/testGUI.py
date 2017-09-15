@@ -5,12 +5,22 @@ Created on 13 ago. 2017
 '''
 import unittest
 from gui_genitools.gui_frame.geni_key_frame import GeniKeyInput
+from gui_genitools.mainApp import AppGeni
+from gui_genitools.gui_frame.main_frame import MainMenu
 import wx
 import os
 
 class Test(unittest.TestCase):
 
 
+    def test_main_app(self):
+        '''
+        Test Main app opening
+        '''
+        new_env = dict(os.environ)
+        new_env['DISPLAY'] = '0.0'
+        app = AppGeni(False)
+        frame = MainMenu(None)
     def testGUIAPP(self):
         '''
         Simply test of opening the main App
@@ -19,7 +29,6 @@ class Test(unittest.TestCase):
         new_env['DISPLAY'] = '0.0'
         app = wx.App(False)
         geniKey = GeniKeyInput(None)
-        
 
 
 if __name__ == "__main__":
