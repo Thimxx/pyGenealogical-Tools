@@ -182,3 +182,18 @@ def get_partner_gender(gender):
     if ( gender == "M"): return "F"
     elif( gender == "F"): return "M"
     else: return None
+    
+def get_name_surname_from_complete_name(complete_name, convention="father_surname"):
+    '''
+    This function provides name and surname from a given name
+    '''
+    if convention in naming_conventions:
+        name_split = complete_name.rstrip().split()
+        surnames = -1
+        if ( convention == "spanish_surname"): surnames = -2
+        name = " ".join(name_split[:surnames])
+        surname = " ".join(name_split[surnames:])
+        return name,surname
+    else: return None, None
+        
+    

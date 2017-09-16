@@ -213,6 +213,7 @@ class getFSfamily(object):
                 partner.setCheckedGender(get_partner_gender(profile_obtained.gen_data["gender"]))
                 partner.setWebReference(profile_obtained.gen_data["web_ref"])
                 partner.setCheckedDate("marriage_date", profile_obtained.gen_data["marriage_date"], profile_obtained.gen_data["accuracy_marriage_date"]  )
+                partner.setPlaces("marriage_place", profile_obtained.gen_data["marriage_place"]["raw"], language=self.language )
                 profile.profile.create_as_a_partner(partner, token, geni_input=profile_obtained.geni_specific_data["id"],
                                                     type_geni="" )
                 self.related_geni_profiles.append(partner)

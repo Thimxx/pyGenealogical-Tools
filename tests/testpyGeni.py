@@ -26,16 +26,7 @@ class testpyGeni(unittest.TestCase):
         token = os.environ['GENI_KEY']
         philip_bis = profile.profile(PHILIPIVget, token , "")
         assert( philip_bis.get_id() == self.philip.get_id())
-
-    def testRelationsInfo(self):
-        '''
-        This test checks that all relationships of the profile are correct
-        '''
-        assert (len(self.philip.parents) == 2)
-        assert(len(self.philip.sibligns) == 7)
-        assert(len(self.philip.partner) == 3)
-        assert(len(self.philip.children) == 16)
-    
+   
     def testgetrightid(self):
         '''
         Confirms that the id output is correct
