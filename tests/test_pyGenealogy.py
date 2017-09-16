@@ -152,6 +152,9 @@ class Test(unittest.TestCase):
         assert(profile.setPlaces("birth_place", GENERIC_PLACE_STRING))
         self.assertFalse("death_place" in profile.gen_data.keys())
         assert("birth_place" in profile.gen_data.keys())
+        
+        #Test wrong introduction of a place to be used in google places.
+        self.assertFalse(profile.setPlaces("marriage_place", ""))
            
         
     def test_other_functions(self):

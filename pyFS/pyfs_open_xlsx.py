@@ -8,6 +8,7 @@ from openpyxl import load_workbook
 from openpyxl.utils import  column_index_from_string
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import is_year, naming_conventions, get_children_surname, get_name_from_fullname, get_partner_gender
+from pyGenealogy.gen_utils import get_name_surname_from_complete_name
 from datetime import datetime
 from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED, NO_VALID_FILE, NOT_EXISTING_FILE
 from pyGeni import profile
@@ -98,12 +99,9 @@ class getFSfamily(object):
                 column_criteria = current_sheet.cell(row=self.initial_row, column=column_index).value
                 cell_value = current_sheet.cell(row=row, column=column_index).value
                 cell_value_splitted = []
-                surname = ""
-                if (isinstance(cell_value,str)):
+                if (column_criteria in ["father_full_name", "mother_full_name"]  ):
                     cell_value_splitted = cell_value.split(" ")
-                    surname = cell_value_splitted[-1]
-                if ( len(cell_value_splitted) > 1 ): 
-                    #We are only interested in the 
+                    name, surname = get_name_surname_from_complete_name(cell_value, convention=self.naming_convention, language=self.language)
                     if(column_criteria == "father_full_name"):
                         if (not surname in potential_father_surname):
                             potential_father_surname.append(surname)
@@ -149,7 +147,7 @@ class getFSfamily(object):
                             this_introduction = self.__include_a_date__(column_criteria, included_profile, datetime.strptime(cell_value, "%d %b %Y").date(), "EXACT")
                     elif(column_criteria == "full_name"):
                         #TODO:Better replace by a method call
-                        included_profile.set_name(get_name_from_fullname(cell_value,potential_father_surname, potential_mother_surname))
+                        included_profile.set_name(get_name_from_fullname(cell_value,potential_father_surname, potential_mother_surname, language=self.language))
                         #In the case the name if not the same, we create it as nickname
                         if (cell_value != included_profile.returnFullName()): included_profile.add_nickname(cell_value)
                     elif (column_criteria == "spouse_full_name"):

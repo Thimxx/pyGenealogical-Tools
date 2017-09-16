@@ -15,6 +15,8 @@ GOOGLE_GEOLOCATION_ADDRESS = "https://maps.googleapis.com/maps/api/geocode/json?
 
 naming_conventions = ["father_surname", "spanish_surname"]
 
+LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del"]}
+
 def is_year(my_potential_year):
     '''
     A simple module to detect if a given string is a year. Notice than when using
@@ -41,7 +43,7 @@ def get_children_surname(father_surname, mother_surname, selected_convention):
     else:
         logging.error(NO_VALID_CONVENTION) 
         return ""
-def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames):
+def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames, language="en"):
     '''
     Given a full name, including surname, this function will provide out the first name of
     the person removing the surname of the person
@@ -52,7 +54,7 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
         if doublemetaphone(data) not in merged_metaphore:
             merged_metaphore.append(doublemetaphone(data))
     
-    full_name_list = full_name.split(" ")
+    full_name_list = get_splitted_name_from_complete_name(full_name, language)
     for i, value in enumerate(full_name_list):
         if (doublemetaphone(value) in merged_metaphore):
             full_name_list[i] = ""
@@ -183,17 +185,38 @@ def get_partner_gender(gender):
     elif( gender == "F"): return "M"
     else: return None
     
-def get_name_surname_from_complete_name(complete_name, convention="father_surname"):
+def get_name_surname_from_complete_name(complete_name, convention="father_surname", language="en"):
     '''
     This function provides name and surname from a given name
     '''
     if convention in naming_conventions:
-        name_split = complete_name.rstrip().split()
+        name_split = get_splitted_name_from_complete_name(complete_name, language=language)
         surnames = -1
-        if ( convention == "spanish_surname"): surnames = -2
+        #We might receive a spanish surname wihtout 2 surnames!
+        if ( convention == "spanish_surname" and len(name_split) > 2): surnames = -2
         name = " ".join(name_split[:surnames])
         surname = " ".join(name_split[surnames:])
         return name,surname
     else: return None, None
+
+def get_splitted_name_from_complete_name(complete_name, language="en"):
+    '''
+    This functions will take an string with the complete name and will
+    break it into a list grouping name, surname(s).
+    '''
+    name_split = complete_name.rstrip().split()
+    places_2_join = []
+    for i, particle in enumerate(name_split):
+        #Let's check if the particle is containing data for next
+        if particle.lower() in LANGUAGES_ADDS.get(language, []):
+            name_split[i] = particle.lower()
+            places_2_join.append(i)
+        else:
+            #Secure the data is correct
+            name_split[i] = particle.lower().title()
+    #name_split[i:i+2] = [" ".join(name_split[i:i+2])]
+    for i in reversed(places_2_join):
+        name_split[i:i+2] = [" ".join(name_split[i:i+2])]
+    return name_split
         
     

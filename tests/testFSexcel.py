@@ -40,37 +40,7 @@ class Test(unittest.TestCase):
         assert(fsclass.initial_column == "A")
         assert(fsclass.initial_row == 6)
         assert(fsclass.sheet_title == "Sheet0")
-    
-    def test_fs_with_a_marriage(self):
-        '''
-        Test a FS file with marriage
-        '''
-        input_file = os.path.join(self.filelocation, "fs-MartinPerez.xlsx")
-        fsclass = getFSfamily(input_file)
-        assert(fsclass.correct_execution)
-        first_profile = fsclass.profiles[0]
-        assert(first_profile.gen_data["name"] == "Tiburcio")
-        second_profile = fsclass.profiles[1]
-        assert(second_profile.gen_data["name"] == "Lucia")
-        married_profile = fsclass.profiles[2]
-        assert(married_profile.gen_data["name"] == "Nicasia")
-        assert(married_profile.gen_data["marriage_place"]["city"] == "Tudela de Duero")
-        testing_date = datetime.date(1841, 11, 30)
-        assert(married_profile.gen_data["marriage_date"] == testing_date)
-        
-        fsclass.create_profiles_in_Geni(self.stoken, SANDBOX_MAIN_ADDRESS)
-        
-        #We check the partner
-        fsclass.related_geni_profiles[0].get_relations()
-        #TODO: add checking when marriage is available in relations
-        for parent_profile in fsclass.parents_geni_profiles:
-            assert(parent_profile.delete_profile())
-        for partner_profile in fsclass.related_geni_profiles:
-            assert(testing_date == partner_profile.gen_data["marriage_date"])
-            assert(partner_profile.delete_profile())
-        for data_profile in fsclass.geni_profiles:
-            assert(data_profile.delete_profile())
-        
+
     def test_wrong_inputs(self):
         '''
         Test FS reader wrong inputs are detected
@@ -133,6 +103,21 @@ class Test(unittest.TestCase):
         assert(this_profile.gen_data["baptism_place"]["place_name"] == 'Nuestra Señora de los Remedios')
         assert(len(this_profile.gen_data["nicknames"]))
         assert("Wenceslao Potente" in this_profile.gen_data["nicknames"])
+    
+    def test_name_with_particle(self):
+        '''
+        Test bug of names with particle
+        '''
+        input_file = os.path.join(self.filelocation, "fs-CaballeroBargas.xlsx")
+        fsclass = getFSfamily(input_file, "spanish_surname", language = "es")
+        
+        juan_in = False
+        
+        for prof in fsclass.profiles:
+            if ("juan de" in prof.gen_data["name"].lower()): juan_in = True
+        
+        self.assertFalse(juan_in)
+        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_fs_reader']
     unittest.main()

@@ -18,9 +18,12 @@ It is mainly offering the following capabilities:
 * Get children surname based on several naming conventions
 * Get name removing surnames
 * Check dates consistency in profiles
+* Guess the names and surnames from a complete surname (beta)
 4) A common base profile for any genealogical input
 5) A tool for parsing FamilySearch excel outputs of sons in a family.
 * Import to Geni an excel output of children from FamilySearch records
+6) Interface with several online registers:
+* Rememori: https://www.rememori.com 
 
 Notice that this import is intended to import registers from FamilySearch, is you are interested in importing profiles from a family tree located in FamilySearch to Geni use this tool: https://github.com/jeffg2k/SmartCopy, which is a pretty nice piece of software and very helpful.
 

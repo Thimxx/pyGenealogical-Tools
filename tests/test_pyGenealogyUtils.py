@@ -6,7 +6,7 @@ Created on 26 ago. 2017
 import unittest
 from datetime import date
 from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_fullname, checkDateConsistency, getBestDate, get_partner_gender
-from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name
+from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name, get_splitted_name_from_complete_name
 from tests.FIXTURES import RIGHT_YEAR, RIGHT_YEAR_IN_A_TEXT, WRONG_YEAR, JUST_TEXT, RIGHT_YEAR_IN_A_DATE
 from tests.FIXTURES import FATHER_SURNAME, MOTHER_SURNAME, SPANISH_CHILD_SURNAME
 from tests.FIXTURES import FULL_NAME, FULL_NAME_SPANISH, ACTUAL_NAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
@@ -156,6 +156,29 @@ class Test(unittest.TestCase):
         name, surname = get_name_surname_from_complete_name(name2, convention="wrong_convention")
         assert(name == None)
         assert(surname == None)
+        
+        #This one makes sure that having a spanish naming convention with only one surname will work.
+        name3 = "Benito Molpecérez"
+        name, surname = get_name_surname_from_complete_name(name3, convention = "spanish_surname")
+        assert(name == "Benito")
+        assert(surname == "Molpecérez")
+    def test_name_splitted(self):
+        '''
+        Test the split of names function
+        '''
+        c_name1 = "Juan  Martínez "
+        s_name = get_splitted_name_from_complete_name(c_name1)
+        assert(s_name[0] == "Juan")
+        assert(s_name[1] == "Martínez")
+        
+        c_name2 = "Juan   DE la MANcha del luGAR "
+        s_name = get_splitted_name_from_complete_name(c_name2, language="es")
+        assert(s_name[0] == "Juan")
+        assert(s_name[1] == "de la Mancha")
+        assert(s_name[2] == "del Lugar")
+        
+        
+        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
