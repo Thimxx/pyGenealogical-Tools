@@ -134,11 +134,14 @@ class Test(unittest.TestCase):
     
     def test_wrong_inputs(self):
         '''
-        Test wrong inputs to get_name
+        Test metaphone differences
         '''
         assert("Petra Regalada" == get_name_from_fullname("Petra Regalada Molpezérez Gómez", ['Molpecérez', 'Molpezerez'], ['Gómez', 'Gomez']))
         assert("Segunda" == get_name_from_fullname("Segunda Molpécerez Gómez", ['Molpecérez', 'Molpezerez'], ['Gómez', 'Gomez']))
-    
+        
+        #Secure the updated version of metaphone takes into account b/v
+        assert("Francisco" == get_name_from_fullname("Francisco Vaca Gomez", ['Baca'], ['Gómez', 'Gomez'], language="es"))
+        
     def test_get_name_from_complete_name(self):
         '''
         Test get name from complete name

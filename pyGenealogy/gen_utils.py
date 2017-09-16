@@ -51,15 +51,24 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
     merged_list = list_father_surnames + list_mother_surnames
     merged_metaphore = []
     for data in merged_list:
-        if doublemetaphone(data) not in merged_metaphore:
-            merged_metaphore.append(doublemetaphone(data))
+        if adapted_doublemetaphone(data, language) not in merged_metaphore:
+            merged_metaphore.append(adapted_doublemetaphone(data, language))
     
     full_name_list = get_splitted_name_from_complete_name(full_name, language)
     for i, value in enumerate(full_name_list):
-        if (doublemetaphone(value) in merged_metaphore):
+        if (adapted_doublemetaphone(value, language) in merged_metaphore):
             full_name_list[i] = ""
     
     return " ".join(full_name_list).rstrip() 
+
+def adapted_doublemetaphone(data, language="en"):
+    '''
+    Adapted function to take into account specific topics not considered in original version
+    '''
+    if (language == "es"):
+        #In spanish b and v are pronunced equally, if we know the language is spanish we shall remove!
+        return  doublemetaphone(data.lower().replace("v", "b"))
+    return doublemetaphone(data)
     
 def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date, death_date, burial_date,
                          accuracy_birth = "EXACT", accuracy_residence = "EXACT", accuracy_baptism = "EXACT", 

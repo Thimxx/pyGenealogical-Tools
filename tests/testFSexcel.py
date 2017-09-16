@@ -64,7 +64,8 @@ class Test(unittest.TestCase):
         input_file = os.path.join(self.filelocation, "fs-MolpecerezGomez.xls")
         fsclass = getFSfamily(input_file, naming_convention = "spanish_surname")
         for profile in fsclass.profiles:
-            assert(profile.gen_data["name"] in ["Eusebio", "Petra", "Román", "Gila", "Segunda", "Julián", "Petra Regalada"]) 
+            assert(profile.gen_data["name"] in ["Eusebio", "Petra", "Román", "Gila", "Segunda", "Julián", "Petra Regalada"])
+        os.remove(os.path.join(self.filelocation, "fs-MolpecerezGomez.xlsx")) 
     
     def test_not_existing_file(self):
         '''
