@@ -20,6 +20,7 @@ It is mainly offering the following capabilities:
 * Check dates consistency in profiles
 * Guess the names and surnames from a complete surname (beta)
 4) A common base profile for any genealogical input
+* Merging profile algorithm (basic)
 5) A tool for parsing FamilySearch excel outputs of sons in a family.
 * Import to Geni an excel output of children from FamilySearch records
 6) Interface with several online registers:
@@ -39,6 +40,7 @@ In order to use the tools you will need to install the following modules:
 * metaphone: https://pypi.python.org/pypi/Metaphone/0.4 
 * openpyxl
 * pyexcel pyexcel-xls pyexcel-xlsx (only used for transforming xls into xlsx)
+* python-Levenshtein
 
 Concerning testing, the repository if configured to use nose, coverage, nose-htmloutput, so you will need to install in your local installation as well.
 

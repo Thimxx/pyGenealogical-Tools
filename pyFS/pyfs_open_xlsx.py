@@ -98,9 +98,7 @@ class getFSfamily(object):
             for column_index in range(column_index_from_string(self.initial_column),self.loaded_data[self.sheet_title].max_column):
                 column_criteria = current_sheet.cell(row=self.initial_row, column=column_index).value
                 cell_value = current_sheet.cell(row=row, column=column_index).value
-                cell_value_splitted = []
                 if (column_criteria in ["father_full_name", "mother_full_name"]  ):
-                    cell_value_splitted = cell_value.split(" ")
                     name, surname = get_name_surname_from_complete_name(cell_value, convention=self.naming_convention, language=self.language)
                     if(column_criteria == "father_full_name"):
                         if (not surname in potential_father_surname):

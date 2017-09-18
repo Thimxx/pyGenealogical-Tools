@@ -7,6 +7,7 @@ import unittest
 from datetime import date
 from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_fullname, checkDateConsistency, getBestDate, get_partner_gender
 from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name, get_splitted_name_from_complete_name
+from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates
 from tests.FIXTURES import RIGHT_YEAR, RIGHT_YEAR_IN_A_TEXT, WRONG_YEAR, JUST_TEXT, RIGHT_YEAR_IN_A_DATE
 from tests.FIXTURES import FATHER_SURNAME, MOTHER_SURNAME, SPANISH_CHILD_SURNAME
 from tests.FIXTURES import FULL_NAME, FULL_NAME_SPANISH, ACTUAL_NAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
@@ -180,8 +181,60 @@ class Test(unittest.TestCase):
         assert(s_name[1] == "de la Mancha")
         assert(s_name[2] == "del Lugar")
         
+    def test_compare_names(self):
+        '''
+        Test comparison and score of names
+        '''
+        score, factor = get_score_compare_names("Juan", "Fernandez", "Macias", "García")
+        assert(score + factor == 0.0)
+        score, factor = get_score_compare_names("Juan", "Gomez", "Juan", "Gómez")
+        assert(score == 4.0)
+        assert(factor == 1.0)
+        score, factor = get_score_compare_names("Juan Antonio", "Gomez Perez", "Juan", "Gómez")
+        assert(score > 3.0)
+        assert(factor > 0.8)
+        score, factor = get_score_compare_names("Juan José Fernando", "Gomez Perez", "Agustín Juan", "Gómez")
+        assert(score > 2.0)
+        assert(factor > 0.1)
+        score, factor = get_score_compare_names("Juan", "de la Fuente", "Juan", "Fuente", language="es")
+        assert(score == 4.0)
+        assert(factor == 1.0)
+    
+    def test_compare_date(self):
+        '''
+        Test comparison of dates with scoring
+        '''
+        date1 = date(2018,1,1)
+        date2 = date(2018,2,6)
         
-        
+        score, factor = get_score_compare_dates(date1, "EXACT", date1, "EXACT")
+        assert(score == 2.0)
+        assert(factor == 1.0)
+        score, factor = get_score_compare_dates(date1, "EXACT", date(2018,1,2), "EXACT")
+        assert(score >1.8)
+        assert(factor > 0.9)
+        score, factor = get_score_compare_dates(date1, "EXACT", date(2018,1,8), "EXACT")
+        assert(score >1.4)
+        assert(factor > 0.7)
+        score, factor = get_score_compare_dates(date1, "EXACT", date(2018,2,6), "EXACT")
+        assert(score >0.8)
+        assert(factor > 0.4)
+        score, factor = get_score_compare_dates(date1, "EXACT", date(2019,1,1), "EXACT")
+        assert(score >0.08)
+        assert(factor > 0.04)
+        #About parameters
+        score, factor = get_score_compare_dates(date2, "EXACT", date(2017,1,1), "ABOUT")
+        assert(score == 1.0)
+        assert(factor == 1.0)
+        score, factor = get_score_compare_dates(date2, "EXACT", date(2016,1,1), "ABOUT")
+        assert(score >0.95)
+        assert(factor == 1.0)
+        score, factor = get_score_compare_dates(date2, "ABOUT", date(2013,1,1), "EXACT")
+        assert(score >0.2)
+        assert(factor > 0.4)
+        score, factor = get_score_compare_dates(date2, "EXACT", date(2010,1,1), "ABOUT")
+        assert(score < 0.1)
+        assert(factor > 0.1)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

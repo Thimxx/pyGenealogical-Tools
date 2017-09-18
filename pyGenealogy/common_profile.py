@@ -3,15 +3,28 @@ Created on 13 ago. 2017
 
 @author: Val
 '''
-from pyGenealogy.gen_utils import checkDateConsistency, get_formatted_location
+from pyGenealogy.gen_utils import checkDateConsistency, get_formatted_location, get_score_compare_names, get_score_compare_dates
 from pyGenealogy import VALUES_ACCURACY
+from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS
 
 TOOL_ID = "PY-GENEALOGY"
-DATA_STRING = ["name", "surname", "name_to_show", "gender", "comment"]
+DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments"]
 DATA_DATES = ["birth_date", "death_date", "baptism_date", "residence_date", "burial_date", "marriage_date"]
 DATA_ACCURACY = ["accuracy_birth_date", "accuracy_death_date", "accuracy_baptism_date", "accuracy_residence_date", "accuracy_burial_date", "accuracy_marriage_date"]
 DATA_PLACES = ["birth_place", "death_place", "baptism_place", "residence_place", "burial_place", "marriage_place"]
 DATA_LISTS = ["web_ref", "nickname"]
+
+EVENT_DATA = {"birth" : {"date":"birth_date", "accuracy": "accuracy_birth_date", "location": "birth_place" },
+                   "death" : {"date":"death_date", "accuracy": "accuracy_death_date", "location": "death_place" },
+                   "baptism" : {"date":"baptism_date", "accuracy": "accuracy_baptism_date", "location": "baptism_place" },
+                   "burial" : {"date":"burial_date", "accuracy": "accuracy_burial_date", "location": "burial_place"}
+                   }
+
+EVENT_MARRIAGE = {"marriage" : {"date":"marriage_date", "accuracy": "accuracy_marriage_date", "location": "marriage_place" }}
+ALL_EVENT_DATA = dict(EVENT_DATA)
+ALL_EVENT_DATA.update(EVENT_MARRIAGE)
+
+ALL_DATA = DATA_STRING + DATA_DATES + DATA_ACCURACY + DATA_PLACES + DATA_LISTS
 
 class gen_profile(object):
     '''
@@ -72,7 +85,6 @@ class gen_profile(object):
         are available:
         M = Male
         F = Female
-        
         Returns a True if the value has been properly introduced, and False if the value
         is not correct
         '''
@@ -150,3 +162,54 @@ class gen_profile(object):
                          marriage_date, death_date, burial_date,
                          accuracy_birth, accuracy_residence, accuracy_baptism , 
                          accuracy_marriage , accuracy_death, accuracy_burial)
+    
+    def merge_profile(self, profile, language="en", convention="father_surname"):
+        '''
+        This will merge into this profile the information from the attached profile
+        it will return True if information is mixed and False if merge is not DivisionImpossible
+        '''
+        score, factor = get_score_compare_names(self.gen_data["name"], self.gen_data["surname"], 
+                        profile.gen_data["name"], profile.gen_data["surname"], language=language, convention=convention)
+        
+        if ("birth_date" in self.gen_data.keys()) and ("birth_date" in profile.gen_data.keys()):
+            score_temp, factor_temp = get_score_compare_dates(self.gen_data["birth_date"], self.gen_data["accuracy_birth_date"],
+                                                               profile.gen_data["birth_date"], profile.gen_data["accuracy_birth_date"])
+            score += score_temp
+            factor = factor*factor_temp
+        if (score*factor > 2.0):
+            #Ok, we consider the size big enough
+            #TBD: improve the algorithm
+            
+            for key_data in ALL_DATA:
+                if(profile.gen_data.get(key_data, None) != None):
+                    #That means we have some data!, exists in the other?
+                    if(self.gen_data.get(key_data, None) == None):
+                        #So is a new data!
+                        self.gen_data[key_data] = profile.gen_data[key_data]
+                    else:
+                        #We have data in both!
+                        if (key_data == "name"):
+                            name1 = get_splitted_name_from_complete_name(self.gen_data["name"], language=language)
+                            name2 = get_splitted_name_from_complete_name(profile.gen_data["name"], language=language)
+                            if (len(name2) > len(name1)): self.gen_data["name"] = profile.gen_data["name"]
+                        elif (key_data == "surname"):
+                            surname1 = get_splitted_name_from_complete_name(self.gen_data["surname"], language=language)
+                            surname2 = get_splitted_name_from_complete_name(profile.gen_data["surname"], language=language)
+                            if (len(surname2) > len(surname1)): self.gen_data["surname"] = profile.gen_data["surname"]
+                        elif (key_data == "comments"):
+                            self.gen_data["comments"] += "\n" + profile.gen_data["comments"]
+                        elif (key_data in DATA_LISTS):
+                            for info in profile.gen_data[key_data]:
+                                if info not in self.gen_data[key_data] : self.gen_data[key_data].append(info)
+                        elif (key_data in DATA_DATES):
+                            if profile.gen_data[EVENT_DATA[key_data.replace("_date","")]["accuracy"]] == "EXACT":
+                                self.gen_data[EVENT_DATA[key_data.replace("_date","")]["accuracy"]] = "EXACT"
+                                self.gen_data[EVENT_DATA[key_data.replace("_date","")]["date"]] = profile.gen_data[EVENT_DATA[key_data.replace("_date","")]["date"]]
+                        elif (key_data in DATA_PLACES):
+                            for key_location in LOCATION_KEYS:
+                                if profile.gen_data[key_data].get(key_location, None) != None:
+                                    if self.gen_data[key_data].get(key_location, None) == None:
+                                        self.gen_data[key_data][key_location] = profile.gen_data[key_data][key_location]
+            return True
+        else:
+            return False

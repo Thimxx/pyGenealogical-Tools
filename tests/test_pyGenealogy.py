@@ -6,7 +6,7 @@ Created on 13 ago. 2017
 import unittest
 from datetime import date
 from pyGenealogy.common_profile import gen_profile
-from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, GENERIC_PLACE_STRING
+from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
 
 
 class Test(unittest.TestCase):
@@ -21,6 +21,47 @@ class Test(unittest.TestCase):
         assert(profile.setCheckedGender("M"))
         assert(profile.gen_data["name_to_show"] == ACTUAL_NAME + " " + FATHER_SURNAME)
         self.assertFalse(profile.setCheckedGender("J"))
+    
+    def test_merge_profile(self):
+        '''
+        Test merge of profiles
+        '''
+        profile = gen_profile("Juana", "Bargas")
+        profile2 = gen_profile("Juana", "de Bargas Gómez")
+        profile.setCheckedDate("birth_date", date(2016,4,23), "EXACT")
+        profile2.setCheckedDate("birth_date", date(2016,1,1), "ABOUT")
+        profile.setCheckedDate("death_date", date(2018,1,1), "ABOUT")
+        profile2.setCheckedDate("death_date", date(2018,8,24), "EXACT")
+        profile2.setCheckedDate("baptism_date", date(2017,1,1), "ABOUT")
+        profile.setComments("comment1")
+        profile2.setComments("comment2")
+        profile.setWebReference("THIS")
+        profile2.setWebReference("OTHER")
+        profile.gen_data["birth_place"] = {}
+        profile.gen_data["birth_place"]["raw"] = "a"
+        profile2.setPlaces("birth_place", GENERIC_PLACE_WITH_PLACE)
+        
+        result = profile.merge_profile(profile2, language="es", convention="spanish_surname")
+        
+        assert(result)
+        assert(profile.gen_data["name"] == "Juana")
+        assert(profile.gen_data["surname"] == "de Bargas Gómez")
+        assert(profile.gen_data["birth_date"] == date(2016,4,23))
+        assert(profile.gen_data["accuracy_birth_date"] == "EXACT")
+        assert(profile.gen_data["comments"] == "comment1\ncomment2")
+        assert("THIS" in profile.gen_data["web_ref"] )
+        assert("OTHER" in profile.gen_data["web_ref"] )
+        assert(profile.gen_data["death_date"] ==  date(2018,8,24))
+        assert(profile.gen_data["accuracy_death_date"] == "EXACT")
+        assert(profile.gen_data["baptism_date"] ==  date(2017,1,1))
+        assert(profile.gen_data["accuracy_baptism_date"] == "ABOUT")
+        assert(profile.gen_data["birth_place"]["city"] == "La Parrilla")
+    
+        profile3 = gen_profile("Juana", "Bargas")
+        profile4 = gen_profile("Facundo", "Smith")
+        result2 = profile3.merge_profile(profile4, language="es", convention="spanish_surname")
+        self.assertFalse(result2)
+    
     def test_introducing_birth_date(self):
         '''
         Testing right introduction of birth date in common_profile
