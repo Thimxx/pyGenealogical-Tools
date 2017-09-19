@@ -1,4 +1,4 @@
-__all__ = ["profile", "data_models", "immediate_family", "geniapi_common"]
+__all__ = ["profile", "data_models", "immediate_family", "geniapi_common", "union"]
 
 import requests, logging
 from messages.pygeni_messages import ERROR_REQUESTS
@@ -24,6 +24,22 @@ GENI_PEOPLE = GENI_ADDRESS + "/people/"
 GENI_PROFILE =  GENI_API + "profile-"
 
 VERIFY_INPUT="standard"
+
+#The toke data
+TOKEN = None
+
+def get_token():
+    '''
+    Function to get the token value
+    '''
+    return TOKEN
+
+def set_token(token_value):
+    '''
+    Function to set-up the token
+    '''
+    global TOKEN
+    TOKEN = token_value
 
 def update_geni_address(new_geni_address):
     '''

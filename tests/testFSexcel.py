@@ -8,7 +8,6 @@ from pyFS.pyfs_open_xlsx import getFSfamily
 import os
 from pyGeni import profile
 import datetime
-from tests.FIXTURES import SANDBOX_MAIN_ADDRESS
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -118,6 +117,7 @@ class Test(unittest.TestCase):
             if ("juan de" in prof.gen_data["name"].lower()): juan_in = True
         
         self.assertFalse(juan_in)
+  
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_fs_reader']

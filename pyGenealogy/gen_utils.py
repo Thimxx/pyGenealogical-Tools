@@ -19,7 +19,7 @@ LOCATION_KEYS = ["place_name", "city", "county", "state", "country"]
 
 naming_conventions = ["father_surname", "spanish_surname"]
 
-LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del"]}
+LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del", "y"]}
 
 def is_year(my_potential_year):
     '''
