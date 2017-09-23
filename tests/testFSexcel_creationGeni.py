@@ -34,7 +34,7 @@ class Test(unittest.TestCase):
         Test a FS file with marriage
         '''
         input_file = os.path.join(self.filelocation, "fs-MartinPerez.xlsx")
-        fsclass = getFSfamily(input_file)
+        fsclass = getFSfamily(input_file, naming_convention="spanish_surname", language = "es")
         assert(fsclass.correct_execution)
         first_profile = fsclass.profiles[0]
         assert(first_profile.gen_data["name"] == "Tiburcio")
@@ -55,6 +55,7 @@ class Test(unittest.TestCase):
             assert(parent_profile.delete_profile())
         for partner_profile in fsclass.related_geni_profiles:
             assert(testing_date == partner_profile.gen_data["marriage_date"])
+            assert(partner_profile.gen_data["surname"] == "Gonzalez Ruiz")
             assert(partner_profile.delete_profile())
         for data_profile in fsclass.geni_profiles:
             assert(data_profile.delete_profile())

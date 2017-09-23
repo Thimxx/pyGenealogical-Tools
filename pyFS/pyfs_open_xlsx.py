@@ -8,7 +8,7 @@ from openpyxl import load_workbook
 from openpyxl.utils import  column_index_from_string
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import is_year, naming_conventions, get_children_surname, get_name_from_fullname, get_partner_gender
-from pyGenealogy.gen_utils import get_name_surname_from_complete_name
+from pyGenealogy.gen_utils import get_name_surname_from_complete_name, get_splitted_name_from_complete_name
 from datetime import datetime
 from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED, NO_VALID_FILE, NOT_EXISTING_FILE
 from pyGeni import profile
@@ -150,8 +150,8 @@ class getFSfamily(object):
                         if (cell_value != included_profile.returnFullName()): included_profile.add_nickname(cell_value)
                     elif (column_criteria == "spouse_full_name"):
                         #Here we create a new profile using the surname of the guy
-                        names = cell_value.split(" ")
-                        partner = gen_profile(" ".join(names[:-1]), names[-1])
+                        names = get_name_surname_from_complete_name(cell_value, convention=self.naming_convention, language=self.language)
+                        partner = gen_profile(names[0], names[1])
                         partner.set_id(id_profiles)
                         included_profile.set_marriage_id_link(id_profiles)
                         self.related_profiles[id_profiles] = partner
@@ -182,6 +182,35 @@ class getFSfamily(object):
             id_profiles += 1
             if(not included_right) : correct_introduction = False
             self.profiles.append(included_profile)
+        #Now we know the data we fix soem with the proper logic
+        for profile_obtained in self.profiles:
+            if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
+                id_of_marriage = profile_obtained.gen_data["marriage_link"]
+                partner = self.related_profiles[id_of_marriage]
+                partner.setWebReference(profile_obtained.gen_data["web_ref"])
+                #It is a partner so we add as opposite sex!
+                partner.setCheckedGender(get_partner_gender(profile_obtained.gen_data["gender"]))
+                partner.setCheckedDate("marriage_date", profile_obtained.gen_data["marriage_date"], profile_obtained.gen_data["accuracy_marriage_date"]  )
+                partner.setPlaces("marriage_place", profile_obtained.gen_data["marriage_place"]["raw"], language=self.language )
+                if id_of_marriage in self.parents_profiles.keys():
+                    father = self.parents_profiles[id_of_marriage][0]
+                    mother = self.parents_profiles[id_of_marriage][1]
+                    father.setWebReference(profile_obtained.gen_data["web_ref"])
+                    mother.setWebReference(profile_obtained.gen_data["web_ref"])
+                    surnames = get_splitted_name_from_complete_name(partner.gen_data["surname"], language=self.language)
+                    if (father.gen_data["surname"] == NOT_KNOWN_VALUE):
+                        #Ok the data was not including the right data, but we know the surname
+                        if (self.naming_convention == "spanish_surname"):
+                            father.gen_data["surname"] = surnames[0]
+                        else:
+                            father.gen_data["surname"] = partner.gen_data["surname"]
+                    if (mother.gen_data["surname"] == NOT_KNOWN_VALUE) and (self.naming_convention == "spanish_surname") and (len(surnames) == 2):
+                        mother.gen_data["surname"] = surnames[1]
+                    if (self.naming_convention == "spanish_surname"):
+                        #We need to ensure 2 surnames in spanish naming conventions
+                        if not (mother.gen_data["surname"] in partner.gen_data["surname"]):
+                            partner.gen_data["surname"] = " ".join([partner.gen_data["surname"], mother.gen_data["surname"]])
+            
         return correct_introduction
     def __include_a_date__(self, column_criteria, profile, date_object, accuracy ):
         '''
@@ -205,11 +234,6 @@ class getFSfamily(object):
             if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
                 id_of_marriage = profile_obtained.gen_data["marriage_link"]
                 partner = self.related_profiles[id_of_marriage]
-                #It is a partner so we add as opposite sex!
-                partner.setCheckedGender(get_partner_gender(profile_obtained.gen_data["gender"]))
-                partner.setWebReference(profile_obtained.gen_data["web_ref"])
-                partner.setCheckedDate("marriage_date", profile_obtained.gen_data["marriage_date"], profile_obtained.gen_data["accuracy_marriage_date"]  )
-                partner.setPlaces("marriage_place", profile_obtained.gen_data["marriage_place"]["raw"], language=self.language )
                 profile.profile.create_as_a_partner(partner, token, geni_input=profile_obtained.geni_specific_data["id"],
                                                     type_geni="" )
                 self.related_geni_profiles.append(partner)
@@ -217,11 +241,6 @@ class getFSfamily(object):
                 if id_of_marriage in self.parents_profiles.keys():
                     father = self.parents_profiles[id_of_marriage][0]
                     mother = self.parents_profiles[id_of_marriage][1]
-                    father.setWebReference(profile_obtained.gen_data["web_ref"])
-                    mother.setWebReference(profile_obtained.gen_data["web_ref"])
-                    if (father.gen_data["surname"] == NOT_KNOWN_VALUE):
-                        #Ok the data was not including the right data, but we know the surname
-                        father.gen_data["surname"] = partner.gen_data["surname"]
                     profile.profile.create_as_a_parent(father, token, geni_input=partner.geni_specific_data["id"], type_geni="" )
                     profile.profile.create_as_a_parent(mother, token, geni_input=partner.geni_specific_data["id"], type_geni="" )
                     self.parents_geni_profiles.append(father)

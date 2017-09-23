@@ -100,7 +100,7 @@ class Test(unittest.TestCase):
         assert(this_profile.gen_data["death_place"]["city"] == 'La Parrilla')
         assert(this_profile.gen_data["birth_place"]["city"] == 'La Parrilla')
         assert(this_profile.gen_data["residence_place"]["state"] == 'Castile and León')
-        assert(this_profile.gen_data["baptism_place"]["place_name"] == 'Nuestra Señora de los Remedios')
+        assert(this_profile.gen_data["baptism_place"]["place_name"] == 'Nuestra Señora De Los Remedios')
         assert(len(this_profile.gen_data["nicknames"]))
         assert("Wenceslao Potente" in this_profile.gen_data["nicknames"])
     
@@ -117,6 +117,19 @@ class Test(unittest.TestCase):
             if ("juan de" in prof.gen_data["name"].lower()): juan_in = True
         
         self.assertFalse(juan_in)
+    
+    def test_bug_not_identifying_surname_of_partner(self):
+        '''
+        Test missing surname of partner
+        '''
+        input_file = os.path.join(self.filelocation, "fs-ZamoraEsteban.xlsx")
+        fsclass = getFSfamily(input_file, "spanish_surname", language = "es")
+        assert(fsclass.related_profiles[0].gen_data["surname"] == "Recio de Diego")
+        assert(fsclass.related_profiles[1].gen_data["surname"] == "Toral Martin")
+        assert(fsclass.parents_profiles[0][0].gen_data["surname"] =="Recio")
+        assert(fsclass.parents_profiles[0][1].gen_data["surname"] =="de Diego")
+        assert(fsclass.parents_profiles[1][0].gen_data["surname"] =="Toral")
+        assert(fsclass.parents_profiles[1][1].gen_data["surname"] =="Martin")
   
         
 if __name__ == "__main__":

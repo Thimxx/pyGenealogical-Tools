@@ -14,6 +14,7 @@ It is mainly offering the following capabilities:
 * Build a map of cousins of a given profile in Geni.
 * Create a child, parents or partner in geni
 * Delete a profile in geni
+* Get profile, relations and union data.
 3) Several genealogical functions.
 * Get children surname based on several naming conventions
 * Get name removing surnames

@@ -19,7 +19,7 @@ LOCATION_KEYS = ["place_name", "city", "county", "state", "country"]
 
 naming_conventions = ["father_surname", "spanish_surname"]
 
-LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del", "y"]}
+LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del", "y", "los"]}
 
 def is_year(my_potential_year):
     '''
@@ -196,7 +196,13 @@ def get_formatted_location(location_string, language="en"):
     else:
         return None 
     if (not location_string.split(",")[0] in output.values()):
-        output["place_name"] = location_string.split(",")[0]
+        final_input = []
+        for particle in location_string.split(",")[0].split(" "):
+            if (particle.lower() in LANGUAGES_ADDS[language]):
+                final_input.append(particle.lower())
+            else:
+                final_input.append(particle.lower().title())
+        output["place_name"] = " ".join(final_input).rstrip()
     return output
 def get_partner_gender(gender):
     '''
