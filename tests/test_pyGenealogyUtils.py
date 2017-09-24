@@ -235,6 +235,19 @@ class Test(unittest.TestCase):
         score, factor = get_score_compare_dates(date2, "EXACT", date(2010,1,1), "ABOUT")
         assert(score < 0.1)
         assert(factor > 0.1)
+        #Let's check the dates
+        score, factor = get_score_compare_dates(date(2010,1,1), "ABOUT", date(2010,1,1), "ABOUT")
+        assert(score == 1.0)
+        assert(factor == 1.0)
+        score, factor = get_score_compare_dates(date(2014,1,1), "ABOUT", date(2010,1,1), "ABOUT")
+        assert(score > 0.499)
+        assert(factor > 0.799)
+        score, factor = get_score_compare_dates(date(2017,1,1), "ABOUT", date(2010,1,1), "ABOUT")
+        assert(score > 0.37999)
+        assert(factor > 0.41999)
+        score, factor = get_score_compare_dates(date(2030,1,1), "ABOUT", date(2010,1,1), "ABOUT")
+        assert(score > 0.04999)
+        assert(factor > 0.074999)
     def test_bug_capital_letters(self):
         '''
         Test Capital Letters are fixed

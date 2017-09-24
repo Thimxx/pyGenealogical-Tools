@@ -23,7 +23,7 @@ It is mainly offering the following capabilities:
 4) A common base profile for any genealogical input
 * Merging profile algorithm (basic)
 5) A tool for parsing FamilySearch excel outputs of sons in a family.
-* Import to Geni an excel output of children from FamilySearch records
+* Import to Geni an excel output of children from FamilySearch records, it will merge common profiles
 6) Interface with several online registers:
 * Rememori: https://www.rememori.com 
 

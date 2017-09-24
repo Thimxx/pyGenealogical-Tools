@@ -182,7 +182,7 @@ class getFSfamily(object):
             id_profiles += 1
             if(not included_right) : correct_introduction = False
             self.profiles.append(included_profile)
-        #Now we know the data we fix soem with the proper logic
+        #Now we know the data we fix some with the proper logic
         for profile_obtained in self.profiles:
             if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
                 id_of_marriage = profile_obtained.gen_data["marriage_link"]
@@ -210,7 +210,19 @@ class getFSfamily(object):
                         #We need to ensure 2 surnames in spanish naming conventions
                         if not (mother.gen_data["surname"] in partner.gen_data["surname"]):
                             partner.gen_data["surname"] = " ".join([partner.gen_data["surname"], mother.gen_data["surname"]])
-            
+        #Finally, let's merge those profiles that are the same!
+        indexes_to_remove = []
+        iterating_list = list(self.profiles)
+        for i,prof in enumerate(iterating_list):
+            #We are going one by one all the different profiles
+            if not i in indexes_to_remove:
+                for j, other_prof in enumerate(iterating_list[i+1:]):
+                    merged = self.profiles[i].merge_profile(other_prof, language=self.language, convention=self.naming_convention)
+                    if merged:
+                        indexes_to_remove.append(i+j+1)
+        indexes_to_remove.sort()
+        for deletion in reversed(indexes_to_remove):
+            del self.profiles[deletion]
         return correct_introduction
     def __include_a_date__(self, column_criteria, profile, date_object, accuracy ):
         '''

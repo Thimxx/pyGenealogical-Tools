@@ -8,8 +8,9 @@ from pyGenealogy import VALUES_ACCURACY
 from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS
 
 TOOL_ID = "PY-GENEALOGY"
-DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments"]
-DATA_DATES = ["birth_date", "death_date", "baptism_date", "residence_date", "burial_date", "marriage_date"]
+DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments", "id", "marriage_link"]
+MERGE_DATES = ["birth_date", "death_date", "baptism_date",  "burial_date", "marriage_date"]
+DATA_DATES = MERGE_DATES + ["residence_date"]
 DATA_ACCURACY = ["accuracy_birth_date", "accuracy_death_date", "accuracy_baptism_date", "accuracy_residence_date", "accuracy_burial_date", "accuracy_marriage_date"]
 DATA_PLACES = ["birth_place", "death_place", "baptism_place", "residence_place", "burial_place", "marriage_place"]
 DATA_LISTS = ["web_ref", "nickname"]
@@ -163,19 +164,30 @@ class gen_profile(object):
                          accuracy_birth, accuracy_residence, accuracy_baptism , 
                          accuracy_marriage , accuracy_death, accuracy_burial)
     
+    def comparison_score(self, profile, data_language="en", name_convention="father_surname"):
+        '''
+        Get the score value in comparison
+        '''
+        score, factor = get_score_compare_names(self.gen_data["name"], self.gen_data["surname"], 
+                        profile.gen_data["name"], profile.gen_data["surname"], language=data_language, convention=name_convention)
+        
+        for date_id in MERGE_DATES:
+            if (date_id in self.gen_data.keys()) and (date_id in profile.gen_data.keys()):
+                score_temp, factor_temp = get_score_compare_dates(self.gen_data[date_id], 
+                                                              self.gen_data["accuracy_" + date_id],
+                                                              profile.gen_data[date_id], 
+                                                              profile.gen_data["accuracy_" + date_id])
+                score += score_temp
+                factor = factor*factor_temp
+        
+        return score, factor
+        
     def merge_profile(self, profile, language="en", convention="father_surname"):
         '''
         This will merge into this profile the information from the attached profile
         it will return True if information is mixed and False if merge is not DivisionImpossible
         '''
-        score, factor = get_score_compare_names(self.gen_data["name"], self.gen_data["surname"], 
-                        profile.gen_data["name"], profile.gen_data["surname"], language=language, convention=convention)
-        
-        if ("birth_date" in self.gen_data.keys()) and ("birth_date" in profile.gen_data.keys()):
-            score_temp, factor_temp = get_score_compare_dates(self.gen_data["birth_date"], self.gen_data["accuracy_birth_date"],
-                                                               profile.gen_data["birth_date"], profile.gen_data["accuracy_birth_date"])
-            score += score_temp
-            factor = factor*factor_temp
+        score, factor = self.comparison_score(profile, data_language = language,  name_convention = convention)
         if (score*factor > 2.0):
             #Ok, we consider the size big enough
             #TBD: improve the algorithm
@@ -201,7 +213,7 @@ class gen_profile(object):
                         elif (key_data in DATA_LISTS):
                             for info in profile.gen_data[key_data]:
                                 if info not in self.gen_data[key_data] : self.gen_data[key_data].append(info)
-                        elif (key_data in DATA_DATES):
+                        elif (key_data in MERGE_DATES):
                             if profile.gen_data[EVENT_DATA[key_data.replace("_date","")]["accuracy"]] == "EXACT":
                                 self.gen_data[EVENT_DATA[key_data.replace("_date","")]["accuracy"]] = "EXACT"
                                 self.gen_data[EVENT_DATA[key_data.replace("_date","")]["date"]] = profile.gen_data[EVENT_DATA[key_data.replace("_date","")]["date"]]

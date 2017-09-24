@@ -315,9 +315,19 @@ def get_score_compare_dates(date1, accuracy1, date2, accuracy2):
         elif (diff <720):
             return 1.0- 0.25*(diff-360)/360, 1.0
         elif (diff <1440):
-            return 0.75 -0.5*(diff-720)/720, 1.0 -0,5*(diff-720)/720
+            return 0.75 -0.5*(diff-720)/720, 1.0 -0.5*(diff-720)/720
         else:
             return 0.25*math.pow(1440/diff,2), 0.5*math.pow(1440/diff,2)
+    elif (accuracy1 == "ABOUT") and (accuracy2 == "ABOUT"):
+        diff_years= abs((date1.year-date2.year))
+        if (diff_years < 2):
+            return 1.0, 1.0
+        elif (diff_years < 5):
+            return 0.5, 0.7 + (5-diff_years)/10
+        elif (diff_years < 10):
+            return 0.2 + 0.06*(10 - diff_years), 0.3 + 0.04*(10 -diff_years)
+        else:
+            return 20/(diff_years*diff_years), 30/(diff_years*diff_years)
     
 
     

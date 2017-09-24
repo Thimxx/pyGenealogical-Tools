@@ -34,12 +34,44 @@ class Test(unittest.TestCase):
         Test reading an input file
         '''
         input_file = os.path.join(self.filelocation, "fs-PotenteAsegurado.xlsx")
-        fsclass = getFSfamily(input_file)
+        fsclass = getFSfamily(input_file, naming_convention="spanish_surname", language="es")
         assert(fsclass.correct_execution)
         assert(fsclass.initial_column == "A")
         assert(fsclass.initial_row == 6)
         assert(fsclass.sheet_title == "Sheet0")
-
+         
+        #Maria Potente Asegurado
+        assert(fsclass.profiles[0].gen_data["birth_date"] == datetime.date(1853,9,8))
+        assert(fsclass.profiles[0].gen_data["baptism_date"] == datetime.date(1853,9,13))
+        assert(fsclass.profiles[0].gen_data["burial_date"] == datetime.date(1853,9,30))
+        assert(fsclass.profiles[0].gen_data["baptism_place"]["city"] == "La Parrilla")
+        assert(fsclass.profiles[0].gen_data["death_place"]["city"] == "La Parrilla")
+        assert(len(fsclass.profiles[0].gen_data["web_ref"]) == 3)
+        assert(fsclass.profiles[0].gen_data["residence_date"] == datetime.date(1853,1,1))
+        #Wenceslao Potente Asegurado
+        assert(fsclass.profiles[2].gen_data["birth_date"] == datetime.date(1862,9,28))
+        assert(fsclass.profiles[2].gen_data["baptism_date"] == datetime.date(1862,10,2))
+        assert(fsclass.profiles[2].gen_data["death_date"] == datetime.date(1863,6,28))
+        assert(fsclass.profiles[2].gen_data["burial_date"] == datetime.date(1863,6,28))
+        assert(fsclass.profiles[2].gen_data["baptism_place"]["city"] == "La Parrilla")
+        assert(fsclass.profiles[2].gen_data["death_place"]["city"] == "La Parrilla")
+        assert(len(fsclass.profiles[2].gen_data["web_ref"]) == 2)
+        assert(fsclass.profiles[2].gen_data["residence_date"] == datetime.date(1862,1,1))
+        #Evarista Potente Asegurado
+        assert(fsclass.profiles[4].gen_data["birth_date"] == datetime.date(1857,10,26))
+        assert(fsclass.profiles[4].gen_data["baptism_date"] == datetime.date(1857,11,1))
+        assert(fsclass.profiles[4].gen_data["burial_date"] == datetime.date(1858,2,25))
+        assert(fsclass.profiles[4].gen_data["baptism_place"]["city"] == "La Parrilla")
+        assert(fsclass.profiles[4].gen_data["death_place"]["city"] == "La Parrilla")
+        assert(len(fsclass.profiles[4].gen_data["web_ref"]) == 2)
+        assert(fsclass.profiles[4].gen_data["residence_date"] == datetime.date(1857,1,1))
+    def test_merged_marriages(self):
+        '''
+        Tests that the marriages are merged properly
+        '''
+        input_file = os.path.join(self.filelocation, "fs-MartinezLeon.xlsx")
+        
+    
     def test_wrong_inputs(self):
         '''
         Test FS reader wrong inputs are detected
