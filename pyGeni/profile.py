@@ -47,7 +47,6 @@ class profile(geni_calls, gen_profile):
         if (not "first_name" in data.keys()): data["first_name"] = NOT_KNOWN_VALUE
         if (not "last_name" in data.keys()): data["last_name"] = NOT_KNOWN_VALUE
         gen_profile.__init__(self, data["first_name"], data["last_name"], )
-        self.transfer_to_base(data)
         if not "error" in data.keys():
             self.existing_in_geni = True
             self.fulldata = data
@@ -75,19 +74,6 @@ class profile(geni_calls, gen_profile):
         Simple function to get Geni ID
         '''
         return self.data['id']
-    def transfer_to_base(self, data):
-        '''
-        This function translates to the base class the data extracted from geni
-        '''
-        #TODO: we need a complete review of this profile, on demand to be created
-        data.get("birth", {}).get("date", {}).get("year", "?")
-        if (data.get("birth", {}).get("date", {}) != {}): 
-            format_date, accuracy_geni = self.get_date(data.get("birth", {}).get("date", {}))
-            self.setCheckedDate("birth_date", format_date, accuracy=accuracy_geni)
-        if (data.get("death", {}).get("date", {}) != {}):  
-            format_date, accuracy_geni = self.get_date(data.get("death", {}).get("date", {}))
-            self.setCheckedDate("death_date", format_date, accuracy=accuracy_geni)
-        #TODO: introduce further parameters
     def get_date(self, data_dict):
         '''
         Get date from the Geni standard
@@ -128,6 +114,10 @@ class profile(geni_calls, gen_profile):
                 data_location = list(DATA_LIST_IN_GENI.values()).index(value_geni)
                 value_profile = list(DATA_LIST_IN_GENI.keys())[data_location]
                 self.gen_data[value_geni] = data[value_geni]
+            elif value_geni in EVENT_DATA.keys():
+                format_date, accuracy_geni = self.get_date(data.get(value_geni, {}).get("date", {}))
+                self.setCheckedDate(EVENT_DATA[value_geni]["date"], format_date, accuracy=accuracy_geni)
+                self.gen_data[EVENT_DATA[value_geni]["location"]] = data.get(value_geni, {}).get("location", {})
     def add_marriage_in_geni(self, union = None):
         '''
         This method add marriage data in geni, add union if there is no unique

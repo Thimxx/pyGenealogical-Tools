@@ -79,6 +79,7 @@ class Test(unittest.TestCase):
         input_file = os.path.join(self.filelocation, "fs-PotenteAsegurado.xlsx")
         fsclass = getFSfamily(input_file, naming_convention = "wrong_input")
         self.assertFalse(fsclass.correct_execution)
+        self.assertFalse(fsclass.create_profiles_in_Geni("None", "data"))
     
     def test_empty_excel(self):
         '''

@@ -10,7 +10,7 @@ from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import is_year, naming_conventions, get_children_surname, get_name_from_fullname, get_partner_gender
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name, get_splitted_name_from_complete_name
 from datetime import datetime
-from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED, NO_VALID_FILE, NOT_EXISTING_FILE
+from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED, NO_VALID_FILE, NOT_EXISTING_FILE, NO_GENI_EXECUTION
 from pyGeni import profile
 from pyGenealogy import NOT_KNOWN_VALUE
 import os
@@ -238,6 +238,9 @@ class getFSfamily(object):
         '''
         This method will create the needed profiles directly in Geni
         '''
+        if not self.correct_execution: 
+            logging.error(NO_GENI_EXECUTION)
+            return False
         for profile_obtained in self.profiles:
             logging.info(profile_obtained.returnFullName())
             profile.profile.create_as_a_child(profile_obtained, token, geni_input=geni_data )

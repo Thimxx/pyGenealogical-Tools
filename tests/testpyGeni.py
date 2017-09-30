@@ -2,6 +2,7 @@ import unittest
 import os
 from pyGeni import profile
 from tests.FIXTURES import PHILIPIVid, PHILIPIVg, PHILIPIVget
+from datetime import date
 
 
 class testpyGeni(unittest.TestCase):
@@ -18,6 +19,14 @@ class testpyGeni(unittest.TestCase):
         assert( "Felipe" in self.philip.nameLifespan())
         assert( "1605" in self.philip.nameLifespan())
         assert( "1665" in self.philip.nameLifespan())
+        assert(self.philip.gen_data["birth_date"] == date(1605,4,8))
+        assert(self.philip.gen_data["baptism_date"] == date(1605,5,1))
+        assert(self.philip.gen_data["death_date"] == date(1665,9,17))
+        assert(self.philip.gen_data["burial_date"] == date(1665,9,20))
+        assert(self.philip.gen_data["birth_place"]["city"] == 'Valladolid')
+        assert(self.philip.gen_data["baptism_place"]["place_name"] == 'Iglesia Conventual San Pablo')
+        assert(self.philip.gen_data["death_place"]["city"] == 'El Escorial' )
+        assert(self.philip.gen_data["burial_place"]["place_name"] == 'San Lorenzo de El Escorial')
         
     def testUsingIdProfile(self):
         '''
