@@ -12,6 +12,10 @@ from metaphone import doublemetaphone
 from Levenshtein import jaro
 import math
 import requests
+import pyGenealogy, os
+
+DATA_FOLDER = os.path.join(os.path.dirname(pyGenealogy.__file__), "data")
+
 
 GOOGLE_GEOLOCATION_ADDRESS = "https://maps.googleapis.com/maps/api/geocode/json?"
 
@@ -20,6 +24,8 @@ LOCATION_KEYS = ["place_name", "city", "county", "state", "country"]
 naming_conventions = ["father_surname", "spanish_surname"]
 
 LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del", "y", "los"]}
+
+LANGUAGES_FILES = { "es" : {"surname" : "surname_es.txt", "normalize" : {"á" : "a", "é" : "e", "í" : "i", "ó" : "o", "ú" : "u", "ñ": "n", "b":"v"}}}
 
 def is_year(my_potential_year):
     '''
@@ -246,6 +252,42 @@ def get_splitted_name_from_complete_name(complete_name, language="en", include_p
     for i in reversed(places_2_join):
         name_split[i:i+2] = [" ".join(name_split[i:i+2])]
     return name_split
+
+def get_compared_data_file(data, language="en", data_kind = "surname"):
+    '''
+    This function will compare the given name with the current data input
+    '''
+    if language in LANGUAGES_FILES.keys():
+        if data_kind in LANGUAGES_FILES[language].keys():
+            file2use = os.path.join(DATA_FOLDER, LANGUAGES_FILES[language][data_kind])
+            openedfile = open(file2use, "r")
+            data_in_met = adapted_doublemetaphone(data, language=language)
+            total_data = []
+            for line_file in openedfile:
+                value = line_file.replace("\n", "").rstrip()
+                met_changed = adapted_doublemetaphone(value, language=language)
+                if met_changed == data_in_met:
+                    total_data.append(value)
+            #If the value is already available, we just return it
+            if data in total_data:
+                return data
+            else:
+                data_temp = data.lower()
+                norm = LANGUAGES_FILES[language]["normalize"]
+                for notnorm in norm.keys():
+                    data_temp = data_temp.replace(notnorm, norm[notnorm])
+                results = {}
+                for candidate in total_data:
+                    candidate_temp = candidate.lower()
+                    for notnorm in norm.keys():
+                        candidate_temp = candidate_temp.replace(notnorm, norm[notnorm])
+                    results[candidate] = jaro(candidate_temp, data_temp)
+                return max(results, key=results.get)
+                    
+            return data
+    
+    return data
+    
 
 def get_score_compare_names(name1, surname1, name2, surname2, language="en", convention="father_surname"):
     '''

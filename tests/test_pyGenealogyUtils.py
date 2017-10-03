@@ -7,7 +7,7 @@ import unittest
 from datetime import date
 from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_fullname, checkDateConsistency, getBestDate, get_partner_gender
 from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name, get_splitted_name_from_complete_name
-from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates
+from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates, get_compared_data_file
 from tests.FIXTURES import RIGHT_YEAR, RIGHT_YEAR_IN_A_TEXT, WRONG_YEAR, JUST_TEXT, RIGHT_YEAR_IN_A_DATE
 from tests.FIXTURES import FATHER_SURNAME, MOTHER_SURNAME, SPANISH_CHILD_SURNAME, GENERIC_PLACE_CAPITALS
 from tests.FIXTURES import FULL_NAME, FULL_NAME_SPANISH, ACTUAL_NAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
@@ -255,6 +255,18 @@ class Test(unittest.TestCase):
         output = get_formatted_location(GENERIC_PLACE_CAPITALS, language="es")
         assert(output["place_name"] == "San Juan Evangelista del Arrabal")
         assert(output["country"] == "España")
+    
+    def test_compare_with_files(self):
+        '''
+        Test comparing surnames and names with files
+        '''
+        assert("data" == get_compared_data_file("data", language="jp"))
+        
+        assert("García" == get_compared_data_file("Garcia", language="es", data_kind="surname"))
+        assert("Martín" == get_compared_data_file("Martin", language="es", data_kind="surname"))
+        assert("Martínez" == get_compared_data_file("Martines", language="es", data_kind="surname"))
+        assert("Álvarez" == get_compared_data_file("albares", language="es", data_kind="surname"))
+        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

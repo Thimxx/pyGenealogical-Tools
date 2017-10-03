@@ -19,8 +19,7 @@ class Test(unittest.TestCase):
     def setUp(self):
         #We used the sandbox here
         self.stoken = os.environ['SANDBOX_KEY']
-        profile.s.update_geni_address("https://www.sandbox.geni.com")
-        profile.s.VERIFY_INPUT = False
+        profile.s.update_geni_address("https://sandbox.geni.com")
 
     def test_reading_sandbox_profile(self):
         '''
@@ -181,7 +180,7 @@ class Test(unittest.TestCase):
         '''
         data = profile.process_geni_input(GENI_INPUT_THROUGH, "g") 
         assert(data == GENI_INPUT_THROUGH_API)
-        
+     
     def test_error_adding_marriage(self):
         '''
         Test no adding marriage data due to error

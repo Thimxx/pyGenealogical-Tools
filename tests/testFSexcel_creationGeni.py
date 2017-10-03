@@ -18,8 +18,7 @@ class Test(unittest.TestCase):
         '''
         #We used the sandbox here
         self.stoken = os.environ['SANDBOX_KEY']
-        profile.s.update_geni_address("https://www.sandbox.geni.com")
-        profile.s.VERIFY_INPUT = False
+        profile.s.update_geni_address("https://sandbox.geni.com")
         #We locate the folder here
         location1 = os.path.join(os.getcwd(), "fixtures_files")
         location2 = os.path.join(os.getcwd(), "tests", "fixtures_files")
