@@ -260,7 +260,7 @@ def get_compared_data_file(data, language="en", data_kind = "surname"):
     if language in LANGUAGES_FILES.keys():
         if data_kind in LANGUAGES_FILES[language].keys():
             file2use = os.path.join(DATA_FOLDER, LANGUAGES_FILES[language][data_kind])
-            openedfile = open(file2use, "r")
+            openedfile = open(file2use, "r", encoding = "ISO-8859-1")
             data_in_met = adapted_doublemetaphone(data, language=language)
             total_data = []
             for line_file in openedfile:
