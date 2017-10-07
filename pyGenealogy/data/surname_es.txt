@@ -1356,9 +1356,10 @@ Madrid
 Madrigal 
 Maestas 
 Magaña 
-Malave 
-Maldonado 
-Manzanares 
+Malave
+Maldonado
+Mancha
+Manzanares
 Mares 
 Marín 
 Márquez 
@@ -1599,7 +1600,8 @@ Terán
 Terrazas 
 Tijerina 
 Tirado 
-Toledo 
+Toledo
+Toral
 Toro 
 Torres 
 Tórrez 

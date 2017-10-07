@@ -207,7 +207,7 @@ class gen_profile(object):
                         elif (key_data == "surname"):
                             surname1 = get_splitted_name_from_complete_name(self.gen_data["surname"], language=language)
                             surname2 = get_splitted_name_from_complete_name(profile.gen_data["surname"], language=language)
-                            if (len(surname2) > len(surname1)): self.gen_data["surname"] = profile.gen_data["surname"]
+                            if (len(surname2[0]) > len(surname1[0])): self.gen_data["surname"] = profile.gen_data["surname"]
                         elif (key_data == "comments"):
                             self.gen_data["comments"] += "\n" + profile.gen_data["comments"]
                         elif (key_data in DATA_LISTS):

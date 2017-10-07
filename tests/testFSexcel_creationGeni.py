@@ -54,7 +54,7 @@ class Test(unittest.TestCase):
             assert(parent_profile.delete_profile())
         for partner_profile in fsclass.related_geni_profiles:
             assert(testing_date == partner_profile.gen_data["marriage_date"])
-            assert(partner_profile.gen_data["surname"] == "Gonzalez Ruiz")
+            assert(partner_profile.gen_data["surname"] == "González Ruiz")
             assert(partner_profile.delete_profile())
         for data_profile in fsclass.geni_profiles:
             assert(data_profile.delete_profile())

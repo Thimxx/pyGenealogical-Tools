@@ -166,20 +166,31 @@ class Test(unittest.TestCase):
         name, surname = get_name_surname_from_complete_name(name3, convention = "spanish_surname")
         assert(name == "Benito")
         assert(surname == "Molpecérez")
+        
+        name4 = "Valentín Lupicino"
+        name, surname = get_name_surname_from_complete_name(name4, convention = "spanish_surname", language="es")
+        assert(name == name4)
+        assert(surname == "")
+        
+        name5 = "Valentin Lupicino Martin"
+        name, surname = get_name_surname_from_complete_name(name5, convention = "spanish_surname", language="es")
+        assert(name == "Valentín Lupicino")
+        assert(surname == "Martin")
+        
     def test_name_splitted(self):
         '''
         Test the split of names function
         '''
         c_name1 = "Juan  Martínez "
         s_name = get_splitted_name_from_complete_name(c_name1)
-        assert(s_name[0] == "Juan")
-        assert(s_name[1] == "Martínez")
+        assert(s_name[0][0] == "Juan")
+        assert(s_name[0][1] == "Martínez")
         
-        c_name2 = "Juan   DE la MANcha del luGAR "
+        c_name2 = "Juan   DE la MANcha del chaCON "
         s_name = get_splitted_name_from_complete_name(c_name2, language="es")
-        assert(s_name[0] == "Juan")
-        assert(s_name[1] == "de la Mancha")
-        assert(s_name[2] == "del Lugar")
+        assert(s_name[0][0] == "Juan")
+        assert(s_name[0][1] == "de la Mancha")
+        assert(s_name[0][2] == "del Chacón")
         
     def test_compare_names(self):
         '''
@@ -260,13 +271,25 @@ class Test(unittest.TestCase):
         '''
         Test comparing surnames and names with files
         '''
-        assert("data" == get_compared_data_file("data", language="jp"))
+        assert("data" == get_compared_data_file("data", language="jp")[0])
+        result, value = get_compared_data_file("Garcia", language="es", data_kind="surname")
+        assert(result == "García")
+        assert(value == 1.0)
+        result2, value2 = get_compared_data_file("Martin", language="es", data_kind="surname")
+        assert(result2 == "Martín")
+        assert(value2 == 1.0)
+        result3 = get_compared_data_file("Martines", language="es", data_kind="surname")
+        assert(result3[0] == "Martínez")
+        result4 = get_compared_data_file("albares", language="es", data_kind="surname")
+        assert(result4[0] == "Álvarez")
         
-        assert("García" == get_compared_data_file("Garcia", language="es", data_kind="surname"))
-        assert("Martín" == get_compared_data_file("Martin", language="es", data_kind="surname"))
-        assert("Martínez" == get_compared_data_file("Martines", language="es", data_kind="surname"))
-        assert("Álvarez" == get_compared_data_file("albares", language="es", data_kind="surname"))
         
+        result5 = get_compared_data_file("jesus", language="es", data_kind="name")
+        assert(result5[0] == "Jesús")
+        result6 =  get_compared_data_file("jesuz", language="es", data_kind="name")
+        assert(result6[0] == "Jesús")
+        result7 =  get_compared_data_file("balentin", language="es", data_kind="name")
+        assert(result7[0] == "Valentín")
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

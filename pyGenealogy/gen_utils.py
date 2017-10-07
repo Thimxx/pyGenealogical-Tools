@@ -13,9 +13,10 @@ from Levenshtein import jaro
 import math
 import requests
 import pyGenealogy, os
+from ctypes.test.test_pickling import name
+
 
 DATA_FOLDER = os.path.join(os.path.dirname(pyGenealogy.__file__), "data")
-
 
 GOOGLE_GEOLOCATION_ADDRESS = "https://maps.googleapis.com/maps/api/geocode/json?"
 
@@ -25,7 +26,9 @@ naming_conventions = ["father_surname", "spanish_surname"]
 
 LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del", "y", "los"]}
 
-LANGUAGES_FILES = { "es" : {"surname" : "surname_es.txt", "normalize" : {"á" : "a", "é" : "e", "í" : "i", "ó" : "o", "ú" : "u", "ñ": "n", "b":"v"}}}
+LANGUAGES_FILES = { "es" : {"surname" : "surname_es.txt", "name" : "names_es.txt", "normalize" : {"á" : "a", "é" : "e", "í" : "i", "ó" : "o", "ú" : "u", "ñ": "n", "b":"v"}}}
+
+LANGUAGES_DATA = {}
 
 def is_year(my_potential_year):
     '''
@@ -64,11 +67,10 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
             merged_metaphore.append(adapted_doublemetaphone(data, language))
     
     full_name_list = get_splitted_name_from_complete_name(full_name, language)
-    for i, value in enumerate(full_name_list):
+    for i, value in enumerate(full_name_list[0]):
         if (adapted_doublemetaphone(value, language) in merged_metaphore):
-            full_name_list[i] = ""
-    
-    return " ".join(full_name_list).rstrip()
+            full_name_list[0][i] = ""
+    return " ".join(full_name_list[0]).rstrip()
 def adapted_doublemetaphone(data, language="en"):
     '''
     Adapted function to take into account specific topics not considered in original version
@@ -222,12 +224,21 @@ def get_name_surname_from_complete_name(complete_name, convention="father_surnam
     This function provides name and surname from a given name
     '''
     if convention in naming_conventions:
-        name_split = get_splitted_name_from_complete_name(complete_name, language=language)
+        name_split, data_identified = get_splitted_name_from_complete_name(complete_name, language=language)
         surnames = -1
         #We might receive a spanish surname wihtout 2 surnames!
         if ( convention == "spanish_surname" and len(name_split) > 2): surnames = -2
-        name = " ".join(name_split[:surnames])
-        surname = " ".join(name_split[surnames:])
+        if ("S" in data_identified) or ("N" in data_identified) or ("NS" in data_identified):
+            if data_identified[-1] in ["N", "U"]:
+                surnames = 0
+            elif (surnames == -2) and (data_identified[-2] in ["N", "U"]):
+                surnames = -1
+        if (surnames == 0):
+            name = " ".join(name_split).rstrip()
+            surname = ""
+        else:    
+            name = " ".join(name_split[:surnames]).rstrip()
+            surname = " ".join(name_split[surnames:]).rstrip()
         return name,surname
     else: return None, None
 def get_splitted_name_from_complete_name(complete_name, language="en", include_particle=True):
@@ -237,6 +248,7 @@ def get_splitted_name_from_complete_name(complete_name, language="en", include_p
     '''
     name_split = complete_name.rstrip().split()
     places_2_join = []
+    name_category = []
     for i, particle in enumerate(name_split):
         #Let's check if the particle is containing data for next
         if particle.lower() in LANGUAGES_ADDS.get(language, []):
@@ -245,13 +257,29 @@ def get_splitted_name_from_complete_name(complete_name, language="en", include_p
             else:
                 name_split[i] = ""
             places_2_join.append(i)
+            name_category.append("")
         else:
             #Secure the data is correct
-            name_split[i] = particle.lower().title()
+            name = get_compared_data_file(particle, language=language, data_kind = "name")
+            surname = get_compared_data_file(particle, language=language, data_kind = "surname")
+            if (name[1] + surname[1] == -2):
+                #The data is not found in any of the lists
+                name_split[i] = particle.lower().title()
+                name_category.append("U")
+            elif (name[1] > surname[1]): 
+                name_split[i] = name[0].rstrip()
+                name_category.append("N")
+            elif (surname[1] > name[1]): 
+                name_split[i] = surname[0].rstrip()
+                name_category.append("S")
+            else:
+                name_split[i] = name[0].rstrip()
+                name_category.append("NS")
     #name_split[i:i+2] = [" ".join(name_split[i:i+2])]
     for i in reversed(places_2_join):
         name_split[i:i+2] = [" ".join(name_split[i:i+2])]
-    return name_split
+        name_category[i:i+2] = ["".join(name_category[i:i+2])]
+    return name_split, name_category
 
 def get_compared_data_file(data, language="en", data_kind = "surname"):
     '''
@@ -259,18 +287,14 @@ def get_compared_data_file(data, language="en", data_kind = "surname"):
     '''
     if language in LANGUAGES_FILES.keys():
         if data_kind in LANGUAGES_FILES[language].keys():
-            file2use = os.path.join(DATA_FOLDER, LANGUAGES_FILES[language][data_kind])
-            openedfile = open(file2use, "r", encoding = "ISO-8859-1")
             data_in_met = adapted_doublemetaphone(data, language=language)
             total_data = []
-            for line_file in openedfile:
-                value = line_file.replace("\n", "").rstrip()
-                met_changed = adapted_doublemetaphone(value, language=language)
-                if met_changed == data_in_met:
-                    total_data.append(value)
+            for word, met_value in LANGUAGES_DATA[language][data_kind].items():
+                if met_value == data_in_met:
+                    total_data.append(word)
             #If the value is already available, we just return it
-            if data in total_data:
-                return data
+            if data in LANGUAGES_DATA[language][data_kind].keys():
+                return data, 1.0
             else:
                 data_temp = data.lower()
                 norm = LANGUAGES_FILES[language]["normalize"]
@@ -282,11 +306,14 @@ def get_compared_data_file(data, language="en", data_kind = "surname"):
                     for notnorm in norm.keys():
                         candidate_temp = candidate_temp.replace(notnorm, norm[notnorm])
                     results[candidate] = jaro(candidate_temp, data_temp)
-                return max(results, key=results.get)
+                if (any(results)):
+                    return max(results, key=results.get), max(results.values())
+                else:
+                    return data, -1.0
                     
-            return data
+            return data, 0.0
     
-    return data
+    return data, -1.0
     
 
 def get_score_compare_names(name1, surname1, name2, surname2, language="en", convention="father_surname"):
@@ -299,10 +326,10 @@ def get_score_compare_names(name1, surname1, name2, surname2, language="en", con
     splitted_name2 = get_splitted_name_from_complete_name(name2, language=language, include_particle=False)
     splitted_surname1 = get_splitted_name_from_complete_name(surname1, language=language, include_particle=False)
     splitted_surname2 = get_splitted_name_from_complete_name(surname2, language=language, include_particle=False)
-    met_name1 = adapted_doublemetaphone(splitted_name1, language=language)
-    met_name2 = adapted_doublemetaphone(splitted_name2, language=language)
-    met_surname1 = adapted_doublemetaphone(splitted_surname1, language=language)
-    met_surname2 = adapted_doublemetaphone(splitted_surname2, language=language)
+    met_name1 = adapted_doublemetaphone(splitted_name1[0], language=language)
+    met_name2 = adapted_doublemetaphone(splitted_name2[0], language=language)
+    met_surname1 = adapted_doublemetaphone(splitted_surname1[0], language=language)
+    met_surname2 = adapted_doublemetaphone(splitted_surname2[0], language=language)
     
     factor1 = get_jaro_to_list(met_name1, met_name2)
     factor2 = get_jaro_to_list(met_surname1, met_surname2, factor=0.95)
@@ -372,4 +399,19 @@ def get_score_compare_dates(date1, accuracy1, date2, accuracy2):
             return 20/(diff_years*diff_years), 30/(diff_years*diff_years)
     
 
+
+for language in LANGUAGES_FILES.keys():
+    if not language in LANGUAGES_DATA.keys(): LANGUAGES_DATA[language] = {}
+    for data_kind in LANGUAGES_FILES[language].keys():
+        if data_kind != "normalize":
+            if not data_kind in LANGUAGES_DATA[language].keys(): LANGUAGES_DATA[language][data_kind] = {}
+            file2use = os.path.join(DATA_FOLDER, LANGUAGES_FILES[language][data_kind])
+            openedfile = open(file2use, "r", encoding = "ISO-8859-1")
+            total_data = []
+            for line_file in openedfile:
+                value = line_file.replace("\n", "").rstrip()
+                met_changed = adapted_doublemetaphone(value, language=language)
+                LANGUAGES_DATA[language][data_kind][value] =  met_changed
+            
+ 
     

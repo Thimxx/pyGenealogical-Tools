@@ -99,20 +99,20 @@ class getFSfamily(object):
                 column_criteria = current_sheet.cell(row=self.initial_row, column=column_index).value
                 cell_value = current_sheet.cell(row=row, column=column_index).value
                 if (column_criteria in ["father_full_name", "mother_full_name"]  ):
-                    name, surname = get_name_surname_from_complete_name(cell_value, convention=self.naming_convention, language=self.language)
+                    name_data = get_name_surname_from_complete_name(cell_value, convention=self.naming_convention, language=self.language)
                     if(column_criteria == "father_full_name"):
-                        if (not surname in potential_father_surname):
-                            potential_father_surname.append(surname)
+                        if (not name_data[1] in potential_father_surname):
+                            potential_father_surname.append(name_data[1])
                             potential_father_surname_repetitions.append(1)
                         else:
-                            index = potential_father_surname.index(surname)
+                            index = potential_father_surname.index(name_data[1])
                             potential_father_surname_repetitions[index] = potential_father_surname_repetitions[index] + 1
                     elif(column_criteria == "mother_full_name"):
-                        if (not surname in potential_mother_surname):
-                            potential_mother_surname.append(surname)
+                        if (not name_data[1] in potential_mother_surname):
+                            potential_mother_surname.append(name_data[1])
                             potential_mother_surname_repetitions.append(1)
                         else:
-                            index = potential_mother_surname.index(surname)
+                            index = potential_mother_surname.index(name_data[1])
                             potential_mother_surname_repetitions[index] = potential_mother_surname_repetitions[index] + 1
         index_father_surname = potential_father_surname_repetitions.index(max(potential_father_surname_repetitions))
         index_mother_surname = potential_mother_surname_repetitions.index(max(potential_mother_surname_repetitions))
@@ -197,7 +197,7 @@ class getFSfamily(object):
                     mother = self.parents_profiles[id_of_marriage][1]
                     father.setWebReference(profile_obtained.gen_data["web_ref"])
                     mother.setWebReference(profile_obtained.gen_data["web_ref"])
-                    surnames = get_splitted_name_from_complete_name(partner.gen_data["surname"], language=self.language)
+                    surnames = get_splitted_name_from_complete_name(partner.gen_data["surname"], language=self.language)[0]
                     if (father.gen_data["surname"] == NOT_KNOWN_VALUE):
                         #Ok the data was not including the right data, but we know the surname
                         if (self.naming_convention == "spanish_surname"):
