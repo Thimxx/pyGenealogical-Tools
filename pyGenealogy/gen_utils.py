@@ -24,7 +24,9 @@ LOCATION_KEYS = ["place_name", "city", "county", "state", "country"]
 
 naming_conventions = ["father_surname", "spanish_surname"]
 
-LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del", "y", "los"]}
+LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del",  "los"]}
+
+LANGUAGES_NEXUS = {"en" : ["and"], "es" : ["y"]}
 
 LANGUAGES_FILES = { "es" : {"surname" : "surname_es.txt", "name" : "names_es.txt", "normalize" : {"á" : "a", "é" : "e", "í" : "i", "ó" : "o", "ú" : "u", "ñ": "n", "b":"v"}}}
 
@@ -256,6 +258,10 @@ def get_splitted_name_from_complete_name(complete_name, language="en", include_p
                 name_split[i] = particle.lower()
             else:
                 name_split[i] = ""
+            places_2_join.append(i)
+            name_category.append("")
+        elif particle.lower() in LANGUAGES_NEXUS.get(language, []):
+            name_split[i] = ""
             places_2_join.append(i)
             name_category.append("")
         else:
