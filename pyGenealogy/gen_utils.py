@@ -70,7 +70,15 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
     
     full_name_list = get_splitted_name_from_complete_name(full_name, language)
     for i, value in enumerate(full_name_list[0]):
-        if (adapted_doublemetaphone(value, language) in merged_metaphore):
+        #We remove from the specific particle the particles from each language that are used inside surnames
+        #to connect
+        check_surname = value.split(" ")
+        if len(check_surname) > 1:
+            for j, value in enumerate(check_surname):
+                if (check_surname[j].lower() in LANGUAGES_ADDS[language]):
+                    check_surname[j] = ""
+        adapted_surname = "".join(check_surname).rstrip()
+        if (adapted_doublemetaphone(value, language) in merged_metaphore) or (adapted_doublemetaphone(adapted_surname, language) in merged_metaphore):
             full_name_list[0][i] = ""
     return " ".join(full_name_list[0]).rstrip()
 def adapted_doublemetaphone(data, language="en"):

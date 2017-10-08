@@ -48,6 +48,7 @@ class Test(unittest.TestCase):
         child_profile.set_name_2_show(ACTUAL_NAME)
         child_profile.setCheckedDate("birth_date", date(2017,11,20), "ABOUT")
         child_profile.setCheckedDate("death_date", date(2017,12,1), "EXACT")
+        child_profile.add_nickname("my_nickname")
         profile.profile.create_as_a_child(child_profile, self.stoken, union = UNION_MAIN_PROFILE )
         
         data_id = child_profile.geni_specific_data['guid']
@@ -64,6 +65,7 @@ class Test(unittest.TestCase):
         assert(child_profile.data["death"]["date"]["month"] == 12)
         assert(child_profile.data["death"]["date"]["day"] == 1)
         assert(child_profile.data["public"] == False)
+        assert("my_nickname" in child_profile.data["nicknames"] )
         prof_relations = profile.profile(MAIN_SANDBOX_PROFILE, self.stoken, type_geni="")
         
         assert(len(prof_relations.marriage_union) == 1)

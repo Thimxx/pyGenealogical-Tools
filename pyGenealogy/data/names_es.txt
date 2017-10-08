@@ -4794,9 +4794,8 @@ Germano
 Germidina
 Geroldo
 Geroncio
-Geronima
 Gerónima
-Geronimo
+Gerónimo
 Gerson
 Gertrude
 Gertrudis
@@ -7356,7 +7355,7 @@ Margonda
 Margot
 Marguerite
 Mari
-Maria
+María
 Mariah
 Marialis
 Mariam

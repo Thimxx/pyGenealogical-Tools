@@ -213,7 +213,7 @@ class getFSfamily(object):
         #Finally, let's merge those profiles that are the same!
         indexes_to_remove = []
         iterating_list = list(self.profiles)
-        for i,prof in enumerate(iterating_list):
+        for i in range(len(iterating_list)):
             #We are going one by one all the different profiles
             if not i in indexes_to_remove:
                 for j, other_prof in enumerate(iterating_list[i+1:]):

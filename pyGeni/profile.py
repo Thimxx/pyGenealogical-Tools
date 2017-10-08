@@ -244,6 +244,10 @@ class profile(geni_calls, gen_profile):
         for profile_value in DATA_STRING_IN_GENI.keys():
             if (self.gen_data.get(profile_value, None) != None):
                 data[DATA_STRING_IN_GENI[profile_value]] = self.gen_data[profile_value]
+        for list_data in DATA_LIST_IN_GENI:
+            if (self.gen_data.get(list_data, None) != None):
+                #Needs to be converted in a comman separated list
+                data[DATA_LIST_IN_GENI[list_data]] = ",".join(self.gen_data[list_data])
         if [self.gen_data["web_ref"] != []]:
             msg = ABOUT_ME_MESSAGE
             for value in self.gen_data["web_ref"]:

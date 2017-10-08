@@ -48,6 +48,8 @@ class Test(unittest.TestCase):
         assert(get_name_from_fullname(FULL_NAME_SPANISH, list_father, list_mother) == ACTUAL_NAME)
         
         assert(get_name_from_fullname("Eusebio Masa Y Viloria", ['Masa'], ['Viloria'], language="es") == "Eusebio")
+        #This one checks the bug of "de Bargas" issue
+        assert(get_name_from_fullname("Geronima De Bargas Albarez", ['Vargas'], ['Álvarez'], language="es") == "Gerónima")
     
     def test_date_check(self):
         '''
