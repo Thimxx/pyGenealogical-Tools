@@ -50,3 +50,14 @@ Concerning testing, the repository if configured to use nose, coverage, nose-htm
 The file GeniTools is the one I am using as main programme. It is not yet very stable, but the libraries are getting. Just use the input file "INPUT_TEMPLATE" and select as input inside the script GeniTools.py, the input file needs to include the Geni token and the starting profile.
 
 In order to get the token just go here: https://www.geni.com/platform/developer/api_explorer and introduce it in the input file as GENIKEY. Notice that the key gets updated almost everyday... so everytime you are using this script you will need to do it.
+
+
+# Interested in helping?
+
+There are several areas where you can collaborate:
+
+* Report any wrong behaviour as an issue
+* Comment the code where it is not properly commented
+* Provide naming and surname conventions for other languages
+* Support on documentation development or examples
+* Solve an specific issue
