@@ -13,7 +13,7 @@ MERGE_DATES = ["birth_date", "death_date", "baptism_date",  "burial_date", "marr
 DATA_DATES = MERGE_DATES + ["residence_date"]
 DATA_ACCURACY = ["accuracy_birth_date", "accuracy_death_date", "accuracy_baptism_date", "accuracy_residence_date", "accuracy_burial_date", "accuracy_marriage_date"]
 DATA_PLACES = ["birth_place", "death_place", "baptism_place", "residence_place", "burial_place", "marriage_place"]
-DATA_LISTS = ["web_ref", "nickname"]
+DATA_LISTS = ["web_ref", "nicknames"]
 
 EVENT_DATA = {"birth" : {"date":"birth_date", "accuracy": "accuracy_birth_date", "location": "birth_place" },
                    "death" : {"date":"death_date", "accuracy": "accuracy_death_date", "location": "death_place" },

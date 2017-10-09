@@ -2169,14 +2169,12 @@ Briccio
 Brice
 Bricia
 Bricio
-Bridget
 Brie
 Brieg
 Brielle
 Brietta
 Brigham
 Brighton
-Brigida
 Brígida
 Brigido
 Brigit
@@ -4119,7 +4117,7 @@ Estanislao
 Estanislava
 Esteban
 Estefan
-Estefania
+Estefanía
 Estefanis
 Estefano
 Estela
@@ -7462,7 +7460,7 @@ Marta
 Martha
 Marthina
 Marti
-Martin
+Martín
 Martina
 Martiniana
 Martiniano

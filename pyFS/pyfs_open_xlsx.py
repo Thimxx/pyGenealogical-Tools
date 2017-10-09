@@ -158,18 +158,16 @@ class getFSfamily(object):
                     elif (column_criteria == "other_full_names"):
                         #The separator provided by family search is semicolumn
                         parents = cell_value.split(";")
-                        #We go for the father
-                        if (len(parents[0].split(" ")) > 1):
-                            #Ok, we have 2 surnames
-                            father = gen_profile(" ".join(parents[0].split(" ")[:-1]), parents[0].split(" ")[-1])
-                        else:
-                            father = gen_profile(parents[0], NOT_KNOWN_VALUE)
-                        #Now, the mother
-                        if (len(parents[1].split(" ")) > 1):
-                            #Ok, we have 2 surnames
-                            mother = gen_profile(" ".join(parents[1].split(" ")[:-1]), parents[1].split(" ")[-1])
-                        else:
-                            mother = gen_profile(parents[1], NOT_KNOWN_VALUE)
+                        #We obtain firstly the different names
+                        father_name, father_surname = get_name_surname_from_complete_name(parents[0], convention=self.naming_convention, language=self.language)
+                        mother_name, mother_surname = get_name_surname_from_complete_name(parents[1], convention=self.naming_convention, language=self.language)
+                        #The algorithm provides an empty surname, we fill it with not known
+                        if (father_surname == ""): father_surname = NOT_KNOWN_VALUE
+                        if (mother_surname == ""): mother_surname = NOT_KNOWN_VALUE
+                        #Create the standard profiles
+                        father = gen_profile(father_name, father_surname)
+                        mother = gen_profile(mother_name, mother_surname)
+                        #add gender
                         father.setCheckedGender("M")
                         mother.setCheckedGender("F")
                         self.parents_profiles[id_profiles] = [father, mother]

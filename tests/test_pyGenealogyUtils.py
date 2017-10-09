@@ -179,7 +179,7 @@ class Test(unittest.TestCase):
         name5 = "Valentin Lupicino Martin"
         name, surname = get_name_surname_from_complete_name(name5, convention = "spanish_surname", language="es")
         assert(name == "Valentín Lupicino")
-        assert(surname == "Martin")
+        assert(surname == "Martín")
         
     def test_name_splitted(self):
         '''
