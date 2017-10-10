@@ -50,6 +50,8 @@ class Test(unittest.TestCase):
         assert(get_name_from_fullname("Eusebio Masa Y Viloria", ['Masa'], ['Viloria'], language="es") == "Eusebio")
         #This one checks the bug of "de Bargas" issue
         assert(get_name_from_fullname("Geronima De Bargas Albarez", ['Vargas'], ['Álvarez'], language="es") == "Gerónima")
+        #The bug with the "de" particle
+        assert(get_name_from_fullname("Florentina Montemayor Leon", ['Montemayor'], ['de Leon'], language="es") == "Florentina")
     
     def test_date_check(self):
         '''

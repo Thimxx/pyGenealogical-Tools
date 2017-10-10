@@ -24,7 +24,7 @@ LOCATION_KEYS = ["place_name", "city", "county", "state", "country"]
 
 naming_conventions = ["father_surname", "spanish_surname"]
 
-LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del",  "los"]}
+LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del",  "los", "las"]}
 
 LANGUAGES_NEXUS = {"en" : ["and"], "es" : ["y"]}
 
@@ -63,6 +63,16 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
     the person removing the surname of the person
     '''
     merged_list = list_father_surnames + list_mother_surnames
+    for surname in merged_list:
+        temp_surname = surname.split(" ")
+        if len(temp_surname) > 1:
+            for i in range(len(temp_surname)):
+                if temp_surname[i] in LANGUAGES_ADDS[language]:
+                    temp_surname[i] = ""
+            
+            new_surname = " ".join(temp_surname).rstrip().strip()
+            if (not new_surname in merged_list): merged_list.append(new_surname)
+                
     merged_metaphore = []
     for data in merged_list:
         if adapted_doublemetaphone(data, language) not in merged_metaphore:
