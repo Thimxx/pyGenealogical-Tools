@@ -158,6 +158,7 @@ class Test(unittest.TestCase):
         assert(fsclass.parents_profiles[0][1].gen_data["surname"] =="de Diego")
         assert(fsclass.parents_profiles[1][0].gen_data["surname"] =="Toral")
         assert(fsclass.parents_profiles[1][1].gen_data["surname"] =="Martín")
+
        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_fs_reader']
