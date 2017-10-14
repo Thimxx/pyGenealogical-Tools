@@ -248,11 +248,13 @@ def get_name_surname_from_complete_name(complete_name, convention="father_surnam
         surnames = -1
         #We might receive a spanish surname wihtout 2 surnames!
         if ( convention == "spanish_surname" and len(name_split) > 2): surnames = -2
-        if ("S" in data_identified) or ("N" in data_identified) or ("NS" in data_identified):
+        if ("S" in data_identified) or ("N" in data_identified):
             if data_identified[-1] in ["N", "U"]:
                 surnames = 0
             elif (surnames == -2) and (data_identified[-2] in ["N", "U"]):
                 surnames = -1
+        if (("NS" in data_identified) or ("N" in data_identified) or ("U" in data_identified)) and (len(name_split) == 1):
+            surnames = 0
         if (surnames == 0):
             name = " ".join(name_split).rstrip()
             surname = ""
