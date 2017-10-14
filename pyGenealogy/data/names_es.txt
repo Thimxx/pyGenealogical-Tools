@@ -7508,7 +7508,6 @@ Mathieu
 Mathilda
 Mathilde
 Mati
-Matias
 Matías
 Matilda
 Matilde
@@ -7901,8 +7900,7 @@ Mona
 Monas
 Moneguindis
 Moneta
-Monica
-Monika
+Mónica
 Monique
 Monitor
 Monon
@@ -11154,7 +11152,6 @@ Vicente
 Vicentino
 Vicitacion
 Vicky
-Victor
 Víctor
 Victoria
 Victoriana

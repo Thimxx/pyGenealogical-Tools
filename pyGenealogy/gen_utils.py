@@ -334,9 +334,6 @@ def get_compared_data_file(data, language="en", data_kind = "surname"):
                     return max(results, key=results.get), max(results.values())
                 else:
                     return data, -1.0
-                    
-            return data, 0.0
-    
     return data, -1.0
     
 

@@ -22,8 +22,10 @@ EVENT_DATA = {"birth" : {"date":"birth_date", "accuracy": "accuracy_birth_date",
                    }
 
 EVENT_MARRIAGE = {"marriage" : {"date":"marriage_date", "accuracy": "accuracy_marriage_date", "location": "marriage_place" }}
+EVENT_RESIDENCE = {"residence" : {"date":"residence_date", "accuracy": "accuracy_residence_date", "location": "residence_place" }}
 ALL_EVENT_DATA = dict(EVENT_DATA)
 ALL_EVENT_DATA.update(EVENT_MARRIAGE)
+ALL_EVENT_DATA.update(EVENT_RESIDENCE)
 
 ALL_DATA = DATA_STRING + DATA_DATES + DATA_ACCURACY + DATA_PLACES + DATA_LISTS
 

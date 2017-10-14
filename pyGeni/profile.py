@@ -9,7 +9,7 @@ from pyGeni.geniapi_common import geni_calls
 from pyGeni.immediate_family import immediate_family
 from pyGenealogy.common_profile import gen_profile, EVENT_DATA, ALL_EVENT_DATA
 from pyGenealogy import NOT_KNOWN_VALUE
-from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS
+from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS, RESIDENCE_MESSAGE
 from datetime import date
 import logging
 
@@ -256,6 +256,19 @@ class profile(geni_calls, gen_profile):
         for event_geni in EVENT_DATA:
             event_value = self.event_value(event_geni)
             if (event_value): data[event_geni] = event_value
+        event_residence = self.event_value("residence")
+        if (event_residence):
+            msg = RESIDENCE_MESSAGE 
+            if event_residence.get("date", {}).get("year", None):
+                msg += " Year = " + str(event_residence.get("date", {}).get("year", None))
+            if event_residence.get("date", {}).get("month", None):
+                msg += " Month = " + str(event_residence.get("date", {}).get("month", None))
+            if event_residence.get("date", {}).get("day", None):
+                msg += " Day = " + str(event_residence.get("date", {}).get("day", None))
+            if self.gen_data.get("residence_place", {}).get("raw", None):
+                msg += " Location = " + self.gen_data.get("residence_place", {}).get("raw", None)
+            data["about_me"] += msg
+            
         return data
     def event_value(self, event_geni):
         '''
