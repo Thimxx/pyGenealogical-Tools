@@ -45,10 +45,10 @@ class testpyGeniNoProfile(unittest.TestCase):
         This test confirms that the immediate family gets the right values
         '''
         philip_family = immediate_family(self.token, FIXTURES.PHILIPIVid)
-        assert (len(philip_family.parents) == 3)
+        assert (len(philip_family.parents) == 2)
         assert(len(philip_family.sibligns) == 7)
-        assert(len(philip_family.partner) == 4)
-        assert(len(philip_family.children) == 17)
+        assert(len(philip_family.partner) == 3)
+        assert(len(philip_family.children) == 16)
         assert(philip_family.union_extracted)
         
     def test_immediatefamily_not_operational(self):

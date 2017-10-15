@@ -72,6 +72,9 @@ class Test(unittest.TestCase):
         assert(not checkDateConsistency(date1,None, date4,None,None,None))
         #Checking that about dates are ok although the date2b is later than date4
         assert(checkDateConsistency(date2b, None, None, None, date4, date4, accuracy_death = "ABOUT", accuracy_burial = "ABOUT"))
+        
+        #Test bug of burial and death
+        assert(checkDateConsistency(None,None, None, None,date4,date2b, accuracy_death = "ABOUT", accuracy_burial = "BEFORE"))
     
     def test_getting_a_date(self):
         '''

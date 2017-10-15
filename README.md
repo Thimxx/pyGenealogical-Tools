@@ -26,6 +26,8 @@ It is mainly offering the following capabilities:
 * Import to Geni an excel output of children from FamilySearch records, it will merge common profiles
 6) Interface with several online registers:
 * Rememori: https://www.rememori.com 
+7) Transformation to GEDCOM profile
+* Transforms profile into elements of GEDCOM, allows to create a GEDCOM
 
 Notice that this import is intended to import registers from FamilySearch, is you are interested in importing profiles from a family tree located in FamilySearch to Geni use this tool: https://github.com/jeffg2k/SmartCopy, which is a pretty nice piece of software and very helpful.
 
@@ -42,6 +44,7 @@ In order to use the tools you will need to install the following modules:
 * openpyxl
 * pyexcel pyexcel-xls pyexcel-xlsx (only used for transforming xls into xlsx)
 * python-Levenshtein
+* gedcompy https://pypi.python.org/pypi/gedcompy | https://github.com/rory/gedcompy/
 
 Concerning testing, the repository if configured to use nose, coverage, nose-htmloutput, so you will need to install in your local installation as well.
 

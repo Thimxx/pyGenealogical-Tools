@@ -129,9 +129,9 @@ class gen_profile(object):
         '''
         Includes web references for the profile.
         '''
-        if type(address) is list:
+        if isinstance(address, list):
             self.gen_data["web_ref"] += address
-        elif type(address) is str:
+        elif isinstance(address, str):
             self.gen_data["web_ref"].append(address)
     def setPlaces(self, event_place, location, language="en" ):
         '''

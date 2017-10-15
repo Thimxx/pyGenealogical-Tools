@@ -13,7 +13,6 @@ from Levenshtein import jaro
 import math
 import requests
 import pyGenealogy, os
-from ctypes.test.test_pickling import name
 
 
 DATA_FOLDER = os.path.join(os.path.dirname(pyGenealogy.__file__), "data")
@@ -38,7 +37,7 @@ def is_year(my_potential_year):
     datetime module is not possible to make the difference and detect if 1894 is just
     a year compared to 1st Jan 1894 when using strptime
     '''
-    try: 
+    try:
         year = int(my_potential_year)
         if year > 2990: return False
         return True
@@ -47,7 +46,7 @@ def is_year(my_potential_year):
 #TODO: include further naming conventions
 def get_children_surname(father_surname, mother_surname, selected_convention):
     '''
-    Simple function that provides the surname of children given the surname of 
+    Simple function that provides the surname of children given the surname of
     both parents
     '''
     if (selected_convention == "father_surname"):
@@ -55,7 +54,7 @@ def get_children_surname(father_surname, mother_surname, selected_convention):
     elif (selected_convention == "spanish_surname"):
         return father_surname + " " + mother_surname
     else:
-        logging.error(NO_VALID_CONVENTION) 
+        logging.error(NO_VALID_CONVENTION)
         return ""
 def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames, language="en"):
     '''
@@ -69,10 +68,8 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
             for i in range(len(temp_surname)):
                 if temp_surname[i] in LANGUAGES_ADDS[language]:
                     temp_surname[i] = ""
-            
             new_surname = " ".join(temp_surname).rstrip().strip()
             if (not new_surname in merged_list): merged_list.append(new_surname)
-                
     merged_metaphore = []
     for data in merged_list:
         if adapted_doublemetaphone(data, language) not in merged_metaphore:
@@ -149,11 +146,11 @@ def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date
     if (death_date != None):
         intermediate_death = death_date  
         if (accuracy_death == "ABOUT"):
-            intermediate_death = date(death_date.year,12,31)
+            intermediate_death = date(death_date.year,1,1)
         burial_death.append(intermediate_death)
         #Burial is never before than death date... unless in vampires, but out of scope
         if (intermediate_death > min(burial_death)):
-            logging.error(NO_VALID_DEATH_AND_BURIAL) 
+            logging.error(NO_VALID_DEATH_AND_BURIAL)
             return False
     if ( len(burial_death) > 0):
         check_dates_in_db = [residence_date, baptism_date, marriage_date]
