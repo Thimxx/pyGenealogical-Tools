@@ -104,7 +104,7 @@ def adapted_doublemetaphone(data, language="en"):
     for data2met in list_data:
         if (language == "es"):
             #In spanish b and v are pronunced equally, if we know the language is spanish we shall remove!
-            result.append(doublemetaphone(data2met.lower().replace("v", "b")))
+            result.append(doublemetaphone(data2met.lower().replace("v", "b").replace("gi","ji").replace("ge","je")))
         result.append(doublemetaphone(data2met))
     if using_string:
         return result[0]

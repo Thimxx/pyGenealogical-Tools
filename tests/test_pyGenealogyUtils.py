@@ -191,6 +191,11 @@ class Test(unittest.TestCase):
         assert(name == "Pedro")
         assert(surname == "")
         
+        name7 = "Hijinia"
+        name, surname = get_name_surname_from_complete_name(name7, convention = "spanish_surname", language="es")
+        assert(name == "Higinia")
+        assert(surname == "")
+        
     def test_name_splitted(self):
         '''
         Test the split of names function
