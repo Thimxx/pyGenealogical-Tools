@@ -16,9 +16,9 @@ class Test(unittest.TestCase):
         be in another!
         '''
         #We used the sandbox here
-        self.stoken = os.environ['SANDBOX_KEY']
+        self.stoken = os.environ['GENI_KEY']
         profile.s.update_geni_address("https://www.sandbox.geni.com")
-        profile.s.VERIFY_INPUT = False
+        #profile.s.VERIFY_INPUT = False
         #We locate the folder here
         location1 = os.path.join(os.getcwd(), "fixtures_files")
         location2 = os.path.join(os.getcwd(), "tests", "fixtures_files")
@@ -75,6 +75,7 @@ class Test(unittest.TestCase):
         fsclass = getFSfamily(input_file, naming_convention = "wrong_input")
         self.assertFalse(fsclass.correct_execution)
         self.assertFalse(fsclass.create_profiles_in_Geni("None", "data"))
+        self.assertFalse(fsclass.create_gedcom_file("myoutput"))
     
     def test_empty_excel(self):
         '''
@@ -93,7 +94,12 @@ class Test(unittest.TestCase):
         for profile in fsclass.profiles:
             assert(profile.gen_data["name"] in ["Eusebio", "Petra", "Román", "Gila", "Segunda", "Julián", "Petra Regalada"])
         os.remove(os.path.join(self.filelocation, "fs-MolpecerezGomez.xlsx")) 
-    
+        
+        file_ged = os.path.join(self.filelocation, "fs-MolpecerezGomez.ged")
+        if os.path.exists(file_ged): os.remove(file_ged)
+        #This one will create the gedcomfile
+        fsclass.create_gedcom_file(file_ged)
+        if os.path.exists(file_ged): os.remove(file_ged)
     def test_not_existing_file(self):
         '''
         Test file not existing

@@ -42,5 +42,16 @@ class gedcom_file(gedcom.GedcomFile):
         
         include_marr, ged_marr = husband.get_event_element("marriage")
         if include_marr: ged_family.add_child_element(ged_marr)
-            
+    
+    def save(self, fileout):
+        """
+        Save the contents of this GEDCOM file to specified filename or file-like object.
+        :param fileout: Filename or open file-like object to save this to.
+        :raises Exception: if the filename exists
+        """
+        file = open(fileout, "wb") 
+
+        for line in self.gedcom_lines():
+            file.write(line.encode("iso-8859-1"))
+            file.write("\n".encode("iso-8859-1"))        
         

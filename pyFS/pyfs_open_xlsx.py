@@ -15,6 +15,9 @@ from pyGeni import profile
 from pyGenealogy import NOT_KNOWN_VALUE
 import os
 
+from pyGedcom.gedcom_profile import gedcom_profile
+from pyGedcom.gedcompy_wrapper import gedcom_file
+
 
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name"]
 date_fields = {"birth_date" : "birth_date" , "burial_date" : "burial_date", "chr_date" : "baptism_date", 
@@ -87,11 +90,16 @@ class getFSfamily(object):
         id_profiles = 0
         #Temporal variable checking the correct reading
         correct_introduction = True
-        #Intermediate variables for potential surnames in the input file
+        #Intermediate variables for potential parent surnames in the input file
         potential_father_surname = []
         potential_father_surname_repetitions = []
         potential_mother_surname = []
         potential_mother_surname_repetitions = []
+        #Intermediate variables for potential parent names in the input file
+        potential_father_name = []
+        potential_father_name_repetitions = []
+        potential_mother_name = []
+        potential_mother_name_repetitions = []
         #We firstly detect the surnames of the parents of the profile,we cannot avoid the double
         #iteration
         for row in range(self.initial_row+1, self.loaded_data[self.sheet_title].max_row+1):
@@ -107,6 +115,12 @@ class getFSfamily(object):
                         else:
                             index = potential_father_surname.index(name_data[1])
                             potential_father_surname_repetitions[index] = potential_father_surname_repetitions[index] + 1
+                        if (not name_data[0] in potential_father_name):
+                            potential_father_name.append(name_data[0])
+                            potential_father_name_repetitions.append(1)
+                        else:
+                            index = potential_father_name.index(name_data[0])
+                            potential_father_name_repetitions[index] = potential_father_name_repetitions[index] + 1
                     elif(column_criteria == "mother_full_name"):
                         if (not name_data[1] in potential_mother_surname):
                             potential_mother_surname.append(name_data[1])
@@ -114,10 +128,22 @@ class getFSfamily(object):
                         else:
                             index = potential_mother_surname.index(name_data[1])
                             potential_mother_surname_repetitions[index] = potential_mother_surname_repetitions[index] + 1
+                        if (not name_data[0] in potential_mother_name):
+                            potential_mother_name.append(name_data[0])
+                            potential_mother_name_repetitions.append(1)
+                        else:
+                            index = potential_mother_name.index(name_data[0])
+                            potential_mother_name_repetitions[index] = potential_mother_name_repetitions[index] + 1
         index_father_surname = potential_father_surname_repetitions.index(max(potential_father_surname_repetitions))
         index_mother_surname = potential_mother_surname_repetitions.index(max(potential_mother_surname_repetitions))
         father_surname = potential_father_surname[index_father_surname]
         mother_surname = potential_mother_surname[index_mother_surname]
+        index_father_name = potential_father_name_repetitions.index(max(potential_father_name_repetitions))
+        index_mother_name = potential_mother_name_repetitions.index(max(potential_mother_name_repetitions))
+        father_name = potential_father_name[index_father_name]
+        mother_name = potential_mother_name[index_mother_name]
+        self.father_profile = gen_profile(father_name, father_surname)
+        self.mother_profile = gen_profile(mother_name, mother_surname)
         children_surname = get_children_surname(father_surname, mother_surname, self.naming_convention)
         #Now we read the complete file
         for row in range(self.initial_row+1, self.loaded_data[self.sheet_title].max_row+1):
@@ -239,23 +265,75 @@ class getFSfamily(object):
         if not self.correct_execution: 
             logging.error(NO_GENI_EXECUTION)
             return False
-        for profile_obtained in self.profiles:
-            logging.info(profile_obtained.returnFullName())
-            profile.profile.create_as_a_child(profile_obtained, token, geni_input=geni_data )
-            self.geni_profiles.append(profile_obtained)
-            logging.info(profile_obtained.geni_specific_data["url"])
-            if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
-                id_of_marriage = profile_obtained.gen_data["marriage_link"]
-                partner = self.related_profiles[id_of_marriage]
-                profile.profile.create_as_a_partner(partner, token, geni_input=profile_obtained.geni_specific_data["id"],
+        else:
+            for profile_obtained in self.profiles:
+                logging.info(profile_obtained.returnFullName())
+                profile.profile.create_as_a_child(profile_obtained, token, geni_input=geni_data )
+                self.geni_profiles.append(profile_obtained)
+                logging.info(profile_obtained.geni_specific_data["url"])
+                if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
+                    id_of_marriage = profile_obtained.gen_data["marriage_link"]
+                    partner = self.related_profiles[id_of_marriage]
+                    profile.profile.create_as_a_partner(partner, token, geni_input=profile_obtained.geni_specific_data["id"],
                                                     type_geni="" )
-                self.related_geni_profiles.append(partner)
-                logging.info(partner.geni_specific_data["url"])
-                if id_of_marriage in self.parents_profiles.keys():
-                    father = self.parents_profiles[id_of_marriage][0]
-                    mother = self.parents_profiles[id_of_marriage][1]
-                    profile.profile.create_as_a_parent(father, token, geni_input=partner.geni_specific_data["id"], type_geni="" )
-                    profile.profile.create_as_a_parent(mother, token, geni_input=partner.geni_specific_data["id"], type_geni="" )
-                    self.parents_geni_profiles.append(father)
-                    self.parents_geni_profiles.append(mother)
+                    self.related_geni_profiles.append(partner)
+                    logging.info(partner.geni_specific_data["url"])
+                    if id_of_marriage in self.parents_profiles.keys():
+                        father = self.parents_profiles[id_of_marriage][0]
+                        mother = self.parents_profiles[id_of_marriage][1]
+                        profile.profile.create_as_a_parent(father, token, geni_input=partner.geni_specific_data["id"], type_geni="" )
+                        profile.profile.create_as_a_parent(mother, token, geni_input=partner.geni_specific_data["id"], type_geni="" )
+                        self.parents_geni_profiles.append(father)
+                        self.parents_geni_profiles.append(mother)
         logging.info(ENDED)
+        return True
+    def create_gedcom_file(self, output):
+        '''
+        This function will create the gedcom file that can be read by other genealogical tools
+        '''
+        if not self.correct_execution: 
+            logging.error(NO_GENI_EXECUTION)
+            return False
+        else:
+            new_gedcom = gedcom_file()
+            #We make father and mother a profile
+            gedcom_profile.convert_gedcom(self.father_profile)
+            gedcom_profile.convert_gedcom(self.mother_profile)
+            #We add now the father and mother
+            new_gedcom.add_element(self.father_profile.individual)
+            new_gedcom.add_element(self.mother_profile.individual)
+            #We prepara the children one
+            children_ged = []
+            for profile_obtained in self.profiles:
+                #We convert the profile into the gedcom profile
+                profile_temp = profile_obtained
+                gedcom_profile.convert_gedcom(profile_temp)
+                new_gedcom.add_element(profile_temp.individual)
+                children_ged.append(profile_temp)
+                if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
+                    id_of_marriage = profile_obtained.gen_data["marriage_link"]
+                    #We capture the partner
+                    partner = self.related_profiles[id_of_marriage]
+                    gedcom_profile.convert_gedcom(partner)
+                    #We add the partner
+                    new_gedcom.add_element(partner.individual)
+                    #We need to create a family here of both partners
+                    if profile_obtained.gen_data["gender"] == "M":
+                        new_gedcom.create_family(profile_temp, partner, [])
+                    else:
+                        new_gedcom.create_family(partner, profile_temp, [])
+                    if id_of_marriage in self.parents_profiles.keys():
+                        father = self.parents_profiles[id_of_marriage][0]
+                        mother = self.parents_profiles[id_of_marriage][1]
+                        #We now convert the profiles into the profile
+                        gedcom_profile.convert_gedcom(father)
+                        gedcom_profile.convert_gedcom(mother)
+                        #We add them to the file
+                        new_gedcom.add_element(father.individual)
+                        new_gedcom.add_element(mother.individual)
+                        #And the family!!!
+                        new_gedcom.create_family(father, mother, [partner])
+            #We create here the family
+            new_gedcom.create_family(self.father_profile, self.mother_profile, children_ged)
+            new_gedcom.save(output)
+            
