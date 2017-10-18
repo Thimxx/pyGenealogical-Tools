@@ -23,7 +23,6 @@ GENI_API = GENI_ADDRESS + "/api/"
 GENI_PEOPLE = GENI_ADDRESS + "/people/"
 GENI_PROFILE =  GENI_API + "profile-"
 
-VERIFY_INPUT="standard"
 
 #The toke data
 TOKEN = None
@@ -62,25 +61,18 @@ def geni_request_get(url):
     '''
     Function to perform get calls.
     '''
-    global VERIFY_INPUT
-    if (VERIFY_INPUT == "standard"):
-        data = requests.get(url)
-    else:
-        data = requests.get(url, verify=VERIFY_INPUT)
+    data = requests.get(url)
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!
         logging.error(ERROR_REQUESTS + str(data.json()))
     return data 
     
-def geni_request_post(url, data_input={}):
+def geni_request_post(url, data_input=None):
     '''
     Function to perform post calls.
     '''
-    global VERIFY_INPUT
-    if (VERIFY_INPUT == "standard"):
-        data = requests.post(url, json=data_input)
-    else:
-        data = requests.post(url, verify=VERIFY_INPUT, json=data_input)
+    if (data_input == None): data_input={}
+    data = requests.post(url, json=data_input)
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!
         logging.error(ERROR_REQUESTS + str(data.json()))

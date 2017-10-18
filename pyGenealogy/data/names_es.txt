@@ -110,7 +110,6 @@ Adam
 Adamina
 Adamnan
 Adamo
-Adan
 Adán
 Adaobi
 Adara
@@ -193,7 +192,6 @@ Adrea
 Adrew
 Adria
 Adriadna
-Adrian
 Adrián
 Adriana
 Adriano
@@ -274,7 +272,6 @@ Agripa
 Agripina
 Agripino
 Aguaclara
-Agueda
 Águeda
 Aguri
 Agusti
@@ -318,7 +315,6 @@ Ailish
 Ailla
 Ailsa
 Aimar
-Aimara
 Aimará
 Aimará-Aimara
 Aimardo
@@ -762,7 +758,6 @@ Amiel
 Amiela
 Amijay
 Amilcar
-Amilcár
 Amin
 Amín
 Amina
@@ -900,7 +895,7 @@ Andrei
 Andreina
 Andreína
 Andreolo
-Andres
+Andrés
 Andresa
 Andretta
 Andreus
@@ -943,7 +938,6 @@ Anezka
 Anfiloquio
 Anfion
 Angel
-Angela
 Ángela
 Ángeles
 Angelia
@@ -1198,7 +1192,6 @@ Arbogasto
 Arcadia
 Arcadio
 Arcana
-Arcangel
 Arcángel
 Arcángela
 Arcelia
@@ -1556,7 +1549,6 @@ Aunario
 Aura
 Aurco
 Aure
-Aurea
 Áurea
 Auree
 Aurek
@@ -5572,7 +5564,6 @@ Indiana
 Indigo
 Indira
 Indra
-Ines
 Inés
 Inez
 Inga
@@ -9532,7 +9523,6 @@ Roldan
 Rolf
 Roma
 Romaine
-Roman
 Román
 Romana
 Romane
@@ -11593,7 +11583,6 @@ Yvonne
 Yvu
 Yyaron
 Zabad
-Zacarias
 Zacarías
 Zachary
 Zaci
