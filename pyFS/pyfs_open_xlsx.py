@@ -224,8 +224,9 @@ class getFSfamily(object):
                     mother.setWebReference(profile_obtained.gen_data["web_ref"])
                     surnames = get_splitted_name_from_complete_name(partner.gen_data["surname"], language=self.language)[0]
                     if (father.gen_data["surname"] == NOT_KNOWN_VALUE):
+                        #It might be the case that the surname is empty
                         #Ok the data was not including the right data, but we know the surname
-                        if (self.naming_convention == "spanish_surname"):
+                        if (self.naming_convention == "spanish_surname" and len(surnames) != 0):
                             father.gen_data["surname"] = surnames[0]
                         else:
                             father.gen_data["surname"] = partner.gen_data["surname"]

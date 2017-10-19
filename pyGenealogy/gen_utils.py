@@ -12,7 +12,7 @@ from metaphone import doublemetaphone
 from Levenshtein import jaro
 import math
 import requests
-import pyGenealogy, os
+import pyGenealogy, os, re
 
 
 DATA_FOLDER = os.path.join(os.path.dirname(pyGenealogy.__file__), "data")
@@ -103,6 +103,8 @@ def adapted_doublemetaphone(data, language="en"):
     result = []
     for data2met in list_data:
         if (language == "es"):
+            if not re.match(r"[Cc]h", data2met):
+                data2met = re.sub(r"h", "", data2met)
             #In spanish b and v are pronunced equally, if we know the language is spanish we shall remove!
             result.append(doublemetaphone(data2met.lower().replace("v", "b").replace("gi","ji").replace("ge","je")))
         result.append(doublemetaphone(data2met))

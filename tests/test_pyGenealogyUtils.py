@@ -7,7 +7,7 @@ import unittest
 from datetime import date
 from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_fullname, checkDateConsistency, getBestDate, get_partner_gender
 from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name, get_splitted_name_from_complete_name
-from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates, get_compared_data_file
+from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates, get_compared_data_file, adapted_doublemetaphone
 from tests.FIXTURES import RIGHT_YEAR, RIGHT_YEAR_IN_A_TEXT, WRONG_YEAR, JUST_TEXT, RIGHT_YEAR_IN_A_DATE
 from tests.FIXTURES import FATHER_SURNAME, MOTHER_SURNAME, SPANISH_CHILD_SURNAME, GENERIC_PLACE_CAPITALS
 from tests.FIXTURES import FULL_NAME, FULL_NAME_SPANISH, ACTUAL_NAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
@@ -309,6 +309,14 @@ class Test(unittest.TestCase):
         assert(result6[0] == "Jesús")
         result7 =  get_compared_data_file("balentin", language="es", data_kind="name")
         assert(result7[0] == "Valentín")
+    
+    def test_adapted_metaphone(self):
+        '''
+        Test adapted metaphone
+        '''
+        assert(adapted_doublemetaphone("Mathea", language="es") == adapted_doublemetaphone("Matea", language="es"))
+        assert(adapted_doublemetaphone("Catalina", language="es") == adapted_doublemetaphone("Cathalina", language="es"))
+        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

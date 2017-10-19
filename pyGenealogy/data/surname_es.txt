@@ -415,6 +415,7 @@ Fuentes
 Fuertes
 Fuster
 Gabaldón
+Gabana
 Galán
 Galiano
 Galindo
@@ -433,6 +434,7 @@ Gargallo
 Garmendia
 Garrido
 Garriga
+Garrote
 Garzón
 Gascón
 Gaya
@@ -649,6 +651,7 @@ Morera
 Morillo
 Mosquera
 Moya
+Mozún
 Múgica
 Mulet
 Múñiz
@@ -718,6 +721,7 @@ Pareja
 Parejo
 Parra
 Pascual
+Pasalodos
 Pastor
 Patiño
 Pavón
@@ -812,6 +816,7 @@ Redondo
 Reguera
 Reig
 Reina
+Remondo
 Requena
 Revilla
 Rey
@@ -992,6 +997,7 @@ Varela
 Vargas
 Vázquez
 Vega
+Vela
 Velasco
 Velázquez
 Vélez
@@ -1563,7 +1569,8 @@ Salinas
 Samaniego 
 Sanabria 
 Sanches 
-Sánchez 
+Sánchez
+Sancho
 Sandoval 
 Santacruz 
 Santana 

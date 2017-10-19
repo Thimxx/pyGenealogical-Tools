@@ -1700,8 +1700,7 @@ Baliwani
 Ballard
 Baltar
 Baltasar
-Baltazar
-Balthazar
+Baltasara
 Baltilde
 Bambu
 Banbury
@@ -2344,7 +2343,7 @@ Candelario
 Candelas
 Candi
 Candice
-Candida
+Cándida
 Candide
 Candidiano
 Candido
@@ -4076,7 +4075,7 @@ Eryx
 Esau
 Escandar
 Escipion
-Escolastica
+Escolástica
 Escubiculo
 Esculapio
 Esdras
@@ -4395,7 +4394,6 @@ Felip
 Felipa
 Felipe
 Felisa
-Felix
 Félix
 Felizitas
 Fenicia
@@ -10704,7 +10702,6 @@ Theron
 Thiago
 Thierry
 Thirza
-Thomas
 Thomasina
 Thor
 Thora
@@ -10783,7 +10780,6 @@ Toichi
 Tolomeo
 Tom
 Tomaida
-Tomas
 Tomás
 Tomasa
 Tome
