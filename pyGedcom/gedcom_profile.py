@@ -42,8 +42,13 @@ class gedcom_profile(common_profile.gen_profile):
         Simply converts into this profile type
         '''
         #Calling essentially the constructors
-        base_profile.__class__ = cls
-        base_profile.individual = cls.return_individual_gedcom(base_profile)
+        if isinstance(base_profile, list):
+            for profile in base_profile:
+                profile.__class__ = cls
+                profile.individual = cls.return_individual_gedcom(profile)
+        else:
+            base_profile.__class__ = cls
+            base_profile.individual = cls.return_individual_gedcom(base_profile)
     
     def return_id(self):
         '''

@@ -55,7 +55,17 @@ class Test(unittest.TestCase):
                     if (member.tag == "MARR"):
                         marr=member.__dict__['child_elements'][0]
                         assert(marr.value == "01 JAN 2015")
-        
+    
+    def test_list_profile(self):
+        '''
+        Test converting a list of profiles into gedcom
+        '''    
+        child1 = gen_profile("Francisco", "Vargas Sanz")
+        child2 = gen_profile("Roberto", "Vargas Sanz")
+        array = [child1, child2]
+        gedcom_profile.convert_gedcom(array)
+        for prof in array:
+            assert(hasattr(prof, 'individual'))
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

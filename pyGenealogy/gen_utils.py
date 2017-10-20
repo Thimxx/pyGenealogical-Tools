@@ -74,7 +74,6 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
     for data in merged_list:
         if adapted_doublemetaphone(data, language) not in merged_metaphore:
             merged_metaphore.append(adapted_doublemetaphone(data, language))
-    
     full_name_list = get_splitted_name_from_complete_name(full_name, language)
     for i, value in enumerate(full_name_list[0]):
         #We remove from the specific particle the particles from each language that are used inside surnames
@@ -93,7 +92,7 @@ def adapted_doublemetaphone(data, language="en"):
     Adapted function to take into account specific topics not considered in original version
     it accepts both strings and lists of strings
     '''
-    if (type(data) == str):
+    if (isinstance(data, str)):
         list_data = [data]
         using_string = True
     else:
@@ -137,16 +136,16 @@ def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date
                     dates_birth_check.append(check_dates_in_birth[index])
         #Now we check here the data consistency
         if(min(dates_birth_check) < birth_date):
-            logging.error(NO_VALID_BIRTH_DATE) 
+            logging.error(NO_VALID_BIRTH_DATE)
             return False
     #Burial and Death dates are the latests ones
-    if (burial_date != None): 
+    if (burial_date != None):
         if (accuracy_burial == "ABOUT"):
             burial_death.append(date(burial_date.year,12,31))
         else:
             burial_death.append(burial_date)
     if (death_date != None):
-        intermediate_death = death_date  
+        intermediate_death = death_date
         if (accuracy_death == "ABOUT"):
             intermediate_death = date(death_date.year,1,1)
         burial_death.append(intermediate_death)
