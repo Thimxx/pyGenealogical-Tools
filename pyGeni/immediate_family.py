@@ -12,13 +12,13 @@ class immediate_family(geni_calls):
     '''
     This function is used to call the immediate family api from Geni.
     '''
-    def __init__(self, token, myid):
+    def __init__(self, myid):
         '''
         The constructor will also make the call to the web to get the right
         string
         '''
         #Initiating base class
-        geni_calls.__init__(self, token)
+        geni_calls.__init__(self)
         self.union_url = self.get_profile_url(myid) + s.GENI_FAMILY + self.token_string()
         r = s.geni_request_get(self.union_url)
         self.data = r.json()

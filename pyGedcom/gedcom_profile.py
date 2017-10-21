@@ -25,7 +25,6 @@ class gedcom_profile(common_profile.gen_profile):
         '''
         name = ""
         surname = ""
-        
         self.individual = individual
         
         for data in individual.get_list("NAME"):
@@ -61,7 +60,7 @@ class gedcom_profile(common_profile.gen_profile):
         This function will return the gedcom type individual
         '''
         individual = gedcom.Individual()
-        if "gender" in self.gen_data.keys(): 
+        if "gender" in self.gen_data.keys():
             sex = gedcom.Element(tag="SEX", value=self.gen_data["gender"])
             individual.add_child_element(sex)
         name = gedcom.Element(tag="NAME", value=(self.gen_data["name"] + "/" + self.gen_data["surname"] + "/"))
@@ -92,17 +91,17 @@ class gedcom_profile(common_profile.gen_profile):
         include_date = False
         ged_event = gedcom.Element(tag=EQUIVALENCE[date_key], value="")
         #Ok, we have a date defined, let's create the relevant element
-        if (date): 
+        if (date):
             include_date = True
             ged_date_string = ""
             full_date =  date.strftime("%d %b %Y").upper()
-            if accuracy == "ABOUT": 
+            if accuracy == "ABOUT":
                 ged_date_string = "ABT " + str(date.year)
-            elif accuracy == "EXACT": 
+            elif accuracy == "EXACT":
                 ged_date_string = full_date
-            elif accuracy == "BEFORE" : 
+            elif accuracy == "BEFORE" :
                 ged_date_string = "BEF " + full_date
-            elif accuracy == "AFTER" : 
+            elif accuracy == "AFTER" :
                 ged_date_string = "AFT " + full_date
             ged_date = gedcom.Element(tag="DATE", value=ged_date_string)
             ged_event.add_child_element(ged_date)

@@ -6,14 +6,14 @@ Created on 8 ago. 2017
 import unittest, os
 from pyGeni.data_models import geni_union
 from pyGeni.immediate_family import immediate_family
-from pyGeni import  geniapi_common
+from pyGeni import  geniapi_common, set_token
 from tests import FIXTURES 
 
 
 class testpyGeniNoProfile(unittest.TestCase):
  
     def setUp(self):
-        self.token = os.environ['GENI_KEY']
+        set_token(os.environ['GENI_KEY'])
         geniapi_common.s.update_geni_address("https://www.geni.com")
         geniapi_common.s.VERIFY_INPUT = "standard"
         
@@ -44,7 +44,7 @@ class testpyGeniNoProfile(unittest.TestCase):
         '''
         This test confirms that the immediate family gets the right values
         '''
-        philip_family = immediate_family(self.token, FIXTURES.PHILIPIVid)
+        philip_family = immediate_family(FIXTURES.PHILIPIVid)
         assert (len(philip_family.parents) == 2)
         assert(len(philip_family.sibligns) == 7)
         assert(len(philip_family.partner) == 3)
@@ -56,7 +56,7 @@ class testpyGeniNoProfile(unittest.TestCase):
         I do not know why, but this profile is failing when providing
         the immediate family
         '''
-        failing_family = immediate_family(self.token, FIXTURES.PROFILE_NOT_WORKING)
+        failing_family = immediate_family(FIXTURES.PROFILE_NOT_WORKING)
         
         assert (len(failing_family.parents) == 0)
         assert(len(failing_family.sibligns) == 0)
@@ -68,15 +68,8 @@ class testpyGeniNoProfile(unittest.TestCase):
         '''
         Secure that we are using a valid token
         '''
-        base_geni = geniapi_common.geni_calls(self.token)
+        base_geni = geniapi_common.geni_calls()
         assert(base_geni.check_valid_genikey())
-    
-    def test_no_valid_token(self):
-        '''
-        Secure no valid token is found
-        '''
-        base_geni2 = geniapi_common.geni_calls("")
-        self.assertFalse(base_geni2.check_valid_genikey())
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

@@ -8,7 +8,7 @@ from openpyxl import load_workbook
 from openpyxl.utils import  column_index_from_string
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import is_year, naming_conventions, get_children_surname, get_name_from_fullname, get_partner_gender
-from pyGenealogy.gen_utils import get_name_surname_from_complete_name, get_splitted_name_from_complete_name
+from pyGenealogy.gen_utils import get_name_surname_from_complete_name, get_splitted_name_from_complete_name, get_location_standard
 from datetime import datetime
 from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED, NO_VALID_FILE, NOT_EXISTING_FILE, NO_GENI_EXECUTION, NO_GENI_KEY
 from pyGeni import profile
@@ -19,7 +19,7 @@ from pyGedcom.gedcom_profile import gedcom_profile
 from pyGedcom.gedcompy_wrapper import gedcom_file
 from pyGeni.geniapi_common import geni_calls
 
-
+DIFFERNCE_BIRTH_BAPT = 90
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name"]
 date_fields = {"birth_date" : "birth_date" , "burial_date" : "burial_date", "chr_date" : "baptism_date", 
                "residence_date" : "residence_date", "death_date" : "death_date", "marriage_date" : "marriage_date"}
@@ -209,6 +209,16 @@ class getFSfamily(object):
             self.profiles.append(included_profile)
         #Now we know the data we fix some with the proper logic
         for profile_obtained in self.profiles:
+            #If the baptism and birth are close enough we assign the birth place to the baptism place
+            birth_d = profile_obtained.gen_data.get("birth_date", None)
+            bapt_d = profile_obtained.gen_data.get("baptism_date", None)
+            if birth_d and bapt_d:
+                difference = bapt_d - birth_d 
+                if abs(difference.days) < DIFFERNCE_BIRTH_BAPT:
+                    place_birth = profile_obtained.gen_data.get("birth_place", {}).get("raw", None)
+                    place_baptism = profile_obtained.gen_data.get("baptism_place", {}).get("raw", None)
+                    if place_baptism and not place_birth:
+                        profile_obtained.setPlaces("birth_place",get_location_standard(profile_obtained.gen_data["baptism_place"]), self.language)
             if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
                 id_of_marriage = profile_obtained.gen_data["marriage_link"]
                 partner = self.related_profiles[id_of_marriage]
@@ -260,7 +270,7 @@ class getFSfamily(object):
             logging.error(NO_VALID_DATA_FIELD + column_criteria)
             return False
     
-    def create_profiles_in_Geni(self, token, geni_data):
+    def create_profiles_in_Geni(self, geni_data):
         '''
         This method will create the needed profiles directly in Geni
         '''
@@ -268,7 +278,7 @@ class getFSfamily(object):
             logging.error(NO_GENI_EXECUTION)
             return False
         else:
-            connector = geni_calls(token)
+            connector = geni_calls()
             valid = connector.check_valid_genikey()
             if not valid:
                 #Ok, it appears the call is not correct and we are getting an error message
@@ -277,21 +287,21 @@ class getFSfamily(object):
             else:
                 for profile_obtained in self.profiles:
                     logging.info(profile_obtained.returnFullName())
-                    profile.profile.create_as_a_child(profile_obtained, token, geni_input=geni_data )
+                    profile.profile.create_as_a_child(profile_obtained, geni_input=geni_data )
                     self.geni_profiles.append(profile_obtained)
                     logging.info(profile_obtained.geni_specific_data["url"])
                     if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
                         id_of_marriage = profile_obtained.gen_data["marriage_link"]
                         partner = self.related_profiles[id_of_marriage]
-                        profile.profile.create_as_a_partner(partner, token, geni_input=profile_obtained.geni_specific_data["id"],
+                        profile.profile.create_as_a_partner(partner, geni_input=profile_obtained.geni_specific_data["id"],
                                                     type_geni="" )
                         self.related_geni_profiles.append(partner)
                         logging.info(partner.geni_specific_data["url"])
                         if id_of_marriage in self.parents_profiles.keys():
                             father = self.parents_profiles[id_of_marriage][0]
                             mother = self.parents_profiles[id_of_marriage][1]
-                            profile.profile.create_as_a_parent(father, token, geni_input=partner.geni_specific_data["id"], type_geni="" )
-                            profile.profile.create_as_a_parent(mother, token, geni_input=partner.geni_specific_data["id"], type_geni="" )
+                            profile.profile.create_as_a_parent(father, geni_input=partner.geni_specific_data["id"], type_geni="" )
+                            profile.profile.create_as_a_parent(mother, geni_input=partner.geni_specific_data["id"], type_geni="" )
                             self.parents_geni_profiles.append(father)
                             self.parents_geni_profiles.append(mother)
         logging.info(ENDED)

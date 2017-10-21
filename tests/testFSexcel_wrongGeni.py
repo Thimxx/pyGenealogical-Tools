@@ -6,8 +6,8 @@ Created on 18 oct. 2017
 import unittest
 from pyFS.pyfs_open_xlsx import getFSfamily
 import os
-from pyGeni import profile
-from tests.FIXTURES import SANDBOX_MAIN_ADDRESS
+from pyGeni import profile, set_token
+from tests.FIXTURES import SANDBOX_MAIN_ADDRESS, WRONG_TOKEN
 
 
 class Test(unittest.TestCase):
@@ -18,7 +18,7 @@ class Test(unittest.TestCase):
         be in another!
         '''
         #We used the sandbox here, this token is wrong...
-        self.stoken = 'iSNPWCfIVKI2vH2HQLUnYppCssIMVN17kpno9ZTe'
+        set_token(WRONG_TOKEN)
         profile.s.update_geni_address("https://sandbox.geni.com")
         #We locate the folder here
         location1 = os.path.join(os.getcwd(), "fixtures_files")
@@ -37,7 +37,7 @@ class Test(unittest.TestCase):
         fsclass = getFSfamily(input_file, naming_convention="spanish_surname", language = "es")
         
         
-        execution = fsclass.create_profiles_in_Geni(self.stoken, SANDBOX_MAIN_ADDRESS)
+        execution = fsclass.create_profiles_in_Geni(SANDBOX_MAIN_ADDRESS)
         self.assertFalse(execution)
 
 

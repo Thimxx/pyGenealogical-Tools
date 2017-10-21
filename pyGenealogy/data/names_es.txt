@@ -388,7 +388,7 @@ Alair
 Alala
 Alan
 Alana
-Alán-Alan
+Alán
 Alani
 Alanis
 Alanna
@@ -409,7 +409,7 @@ Alazne
 Alba
 Alban
 Albana
-Albán-Alban
+Albán
 Albano
 Albar
 Alben
@@ -937,7 +937,7 @@ Anette
 Anezka
 Anfiloquio
 Anfion
-Angel
+Ángel
 Ángela
 Ángeles
 Angelia
@@ -1147,7 +1147,6 @@ Aquiles
 Aquilesia
 Aquilina
 Aquilino
-Ara
 Ará
 Arabela
 Arabia
@@ -1172,7 +1171,6 @@ Aramis
 Aramís
 Aramita
 Arán
-Aran
 Arandu
 Arantxa
 Arantya
@@ -1550,8 +1548,6 @@ Aura
 Aurco
 Aure
 Áurea
-Auree
-Aurek
 Aurelia
 Aureliana
 Aureliano
@@ -1624,7 +1620,6 @@ Ayla
 Aylen
 Aylén
 Aylin
-Aymara
 Aymará
 Aymee
 Aynay
@@ -1708,7 +1703,6 @@ Bancroft
 Baptiste
 Baraquisio
 Barbaciano
-Barbara
 Bárbara
 Barbarina
 Barbato
@@ -1848,7 +1842,6 @@ Belle
 Belona
 Belquis
 Belsy
-Beltran
 Beltrán
 Bem
 Ben
@@ -1949,7 +1942,6 @@ Bertolo
 Bertolda
 Bertoldo
 Berton
-Bertran
 Bertrán
 Bertrand
 Bertulfo
@@ -2344,10 +2336,8 @@ Candelas
 Candi
 Candice
 Cándida
-Candide
 Candidiano
-Candido
-Candiss
+Cándido
 Candra
 Candy
 Canela
@@ -2408,10 +2398,8 @@ Carmelo
 Carmen
 Carmiña
 Carmilla
-Carmin
+Carmín
 Carmina
-Carmine
-Cármine
 Carminia
 Carmino
 Carmiñia
@@ -2461,14 +2449,11 @@ Cassius
 Casta
 Castalia
 Casto
-Castor
 Cástor
 Castora
-Cástora
 Castorio
 Castrense
 Castriciano
-Castulo
 Cástulo
 Catalda
 Cataldo
@@ -2492,14 +2477,12 @@ Catrielcelis
 Catrina
 Catriona
 Catterina
-Catula
 Cátula
 Catulino
-Catulo
 Cátulo
 Cauciano
 Caupolican
-Cay
+Caya
 Cayetana
 Cayetano
 Cayo
@@ -2566,7 +2549,6 @@ Cesar
 César
 Cesaraugustanus
 Cesare
-Cesarea
 Cesárea
 Cesáreo
 Cesareo
@@ -2773,10 +2755,7 @@ Clency
 Cleo
 Cleodomira
 Cleofá
-Cleofa
-Cleofas
 Cleofás
-Cleofe
 Cleofé
 Cleon
 Cleone
@@ -2967,10 +2946,8 @@ Crisol
 Crisologo
 Crisólogo
 Crisorogo
-Crisostomo
 Crisóstomo
 Crisotelo
-Crispin
 Crispín
 Crispina
 Crispiniano
@@ -2988,7 +2965,6 @@ Cristeta
 Cristhall
 Cristhian
 Cristian
-Cristián
 Cristiana
 Cristiano
 Cristina
@@ -3101,15 +3077,12 @@ Damacia
 Damacio
 Damalis
 Damara
-Damaris
 Dámaris
 Damasa
 Damasia
-Damaso
 Dámaso
 Damek
 Damen
-Damian
 Damián
 Damiana
 Damiano
@@ -3281,7 +3254,6 @@ Demaris
 Demetria
 Demetrio
 Demetrius
-Demian
 Demián
 Demidio
 Demis
@@ -3777,9 +3749,7 @@ Elea
 Eleadora
 Eleana
 Eleanor
-Eleazar
 Eleázar
-Eleazaro
 Eleázaro
 Electo
 Electra
@@ -3806,7 +3776,6 @@ Elia
 Eliab
 Eliahu
 Eliam
-Elian
 Elián
 Eliana
 Eliane
@@ -4291,7 +4260,6 @@ Ezio
 Ezita
 Ezra
 Fabia
-Fabian
 Fabián
 Fabiana
 Fabiano
@@ -4349,7 +4317,6 @@ Faron
 Farrah
 Farrell
 Faten
-Fatima
 Fátima
 Fatin
 Fausta
@@ -4408,7 +4375,6 @@ Fergus
 Fermin
 Fermina
 Fern
-Fernan
 Fernán
 Fernanda
 Fernandina
@@ -4593,7 +4559,6 @@ Fritz
 Fritzi
 Froabuga
 Froberto
-Froilan
 Froilán
 Fronton
 Fructulo
@@ -5230,10 +5195,8 @@ Heridion
 Heripsime
 Heripsine
 Hermagoras
-Herman
 Hermán
 Hermann
-Hermánn
 Hermelando
 Hermelinda
 Hermelindo
@@ -5251,7 +5214,6 @@ Hermocrates
 Hermogenes
 Hermogio
 Hermosa
-Hernan
 Hernán
 Hernanda
 Hernando
@@ -5315,7 +5277,6 @@ Hiparco
 Hipatia
 Hipocrates
 Hipolita
-Hipolito
 Hipólito
 Hiram
 Hiran
@@ -5703,7 +5664,6 @@ Itzjok
 Iulia
 Iuri
 Ivalú
-Ivan
 Iván
 Ivana
 Ivanka
@@ -5973,13 +5933,11 @@ Jolie
 Joline
 Jon
 Jonah
-Jonas
 Jonás
 Jonatan
 Jonathan
 Jonina
 Jora
-Jordan
 Jordán
 Jordana
 Jordane
@@ -6048,12 +6006,9 @@ Jules
 Julia
 Julián
 Juliana
-Julianna
-Julianne
 Juliano
 Julie
 Julieta
-Juliette
 Julinka
 Julio
 Julisa
@@ -6583,10 +6538,8 @@ Lawler
 Lawrence
 Laya
 Layla
-Lazara
-Lazaro
+Lázara
 Lázaro
-Lazarus
 Lea
 Leah
 Leanan
@@ -7011,7 +6964,6 @@ Luisiana
 Luisina
 Luiz
 Luja
-Lujan
 Luján
 Lujana
 Luka
@@ -7175,7 +7127,6 @@ Mailin
 Maille
 Maillen
 Maimara
-Maimará
 Maimuna
 Mainque
 Mair
@@ -7296,7 +7247,7 @@ Mara
 Maral
 Marali
 Marana
-Marángeles
+Mariángeles
 Marat
 Maravillas
 Marbela
@@ -7549,7 +7500,6 @@ Maximiliano
 Maximina
 Maximiniana
 Maximino
-Maximo
 Máximo
 Maxine
 Maxwell
@@ -7779,9 +7729,8 @@ Militina
 Militza
 Milka
 Milla
-Millá
 Millacay
-Millan
+Millán
 Millante
 Millaray
 Millay
@@ -7959,7 +7908,6 @@ Musidora
 Muskaan
 Musono
 Mussa
-Mustafa
 Mustafá
 Mustiola
 Muti
@@ -8121,7 +8069,6 @@ Natalina
 Natalio
 Nataly
 Natalya
-Natan
 Natán
 Natana
 Natanael
@@ -8308,7 +8255,6 @@ Nickolas
 Nicodemo
 Nicola
 Nicolaos
-Nicolas
 Nicolás
 Nicolasa
 Nicolaza
@@ -8761,7 +8707,7 @@ Pancracio
 Pandita
 Pandora
 Pánfila
-Panfilo
+Pánfilo
 Pangui
 Panphila
 Pansalino
@@ -8889,15 +8835,6 @@ Pembroke
 Pemon
 Penelope
 Penélope
-Peninah
-Peninna
-Penley
-Penn
-Penney
-Pennie
-Penny
-Penthea
-Peony
 Pepino
 Perceval
 Percival
@@ -8985,7 +8922,6 @@ Pina
 Pincen
 Pindaro
 Pinito
-Pio
 Pío
 Pionio
 Piper
@@ -9682,7 +9618,6 @@ Ryuji
 Saagar
 Saba
 Sabacio
-Sabas
 Sabás
 Sabel
 Sabi
@@ -9824,7 +9759,6 @@ Sapphire
 Saquei
 Saquin
 Sara
-Sará
 Sarah
 Sarai
 Sardis
@@ -10819,7 +10753,7 @@ Traicy
 Tranquilina
 Tranquilino
 Tránsita
-Transito
+Tránsito
 Trapial
 Traseas
 Trason
@@ -10854,7 +10788,6 @@ Trinidad
 Tripode
 Triptolemo
 Trista
-Tristan
 Tristán
 Tristana
 Tristram
@@ -11057,7 +10990,7 @@ Vardon
 Varick
 Varico
 Varinia
-Vartán
+Vartan
 Varun
 Varuna
 Varvara
@@ -11426,7 +11359,7 @@ Yamilen
 Yamina
 Yamine
 Yamir
-Yán
+Yan
 Yancy
 Yandri
 Yanel
@@ -11485,9 +11418,7 @@ Yehuda
 Yehudi
 Yeji
 Yemba
-Yemina
 Yémina
-Yeminá
 Yenhy
 Yenien
 Yenina

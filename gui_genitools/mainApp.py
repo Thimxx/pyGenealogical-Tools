@@ -18,7 +18,7 @@ class AppGeni(wx.App):
     def provide_validation_key(self):
         return self.valid_key
     def __runvalidation(self):
-        validator = geni_calls(self.app_data.getGENIkey())
+        validator = geni_calls()
         self.valid_key = validator.check_valid_genikey()
 
     def __onGeniKeyUpdate(self, geni_key_updated):

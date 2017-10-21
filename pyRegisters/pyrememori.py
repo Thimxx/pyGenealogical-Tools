@@ -25,13 +25,12 @@ class rememori_reader(object):
         Constructor
         '''
         self.parser = RememoryParser()
-    
     def profile_is_matched(self, profile):
         '''
         This function will look in rememory trying to match a profile
         Input shall be a profile of common profile values
         '''
-        url = SEARCH_LOCATION + profile.gen_data["name"] + ADDING_CHAR 
+        url = SEARCH_LOCATION + profile.gen_data["name"] + ADDING_CHAR
         url += ADDING_CHAR.join(profile.gen_data["surname"].split(" "))
         data = requests.get(url)
         self.parser.feed(data.text)
@@ -63,7 +62,7 @@ class RememoryParser(HTMLParser):
         if self.inside_results:
             if (tag == "a"):
                 for attr in attrs:
-                    if "href" in attr: 
+                    if "href" in attr:
                         self.web_link = BASE_REMEMORY + attr[1]
                         self.at_name_location = True
             elif (tag == "span"):

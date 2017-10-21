@@ -4,7 +4,7 @@ Created on 29 ago. 2017
 @author: Val
 '''
 import unittest
-from pyGeni import profile
+from pyGeni import profile, set_token
 from datetime import date
 from pyGenealogy.common_profile import gen_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
@@ -18,26 +18,20 @@ class Test(unittest.TestCase):
 
     def setUp(self):
         #We used the sandbox here
-        self.stoken = os.environ['SANDBOX_KEY']
+        set_token(os.environ['SANDBOX_KEY'])
         profile.s.update_geni_address("https://sandbox.geni.com")
 
     def test_reading_sandbox_profile(self):
         '''
         Test reading a profile in sandbox
         '''
-        prof = profile.profile(MAIN_SANDBOX_PROFILE, self.stoken, type_geni="")
+        prof = profile.profile(MAIN_SANDBOX_PROFILE, type_geni="")
         assert( "Testing" in prof.nameLifespan())
         assert(prof.properly_executed)
         
         assert(prof.gen_data["gender"] == "M")
         assert(prof.gen_data["surname"] == "Profile")
         assert(prof.gen_data["name"] == "Testing")
-    def test_wrong_execution(self):
-        '''
-        Test error OAuth in Geni
-        '''
-        prof2 = profile.profile(MAIN_SANDBOX_PROFILE, "a")
-        self.assertFalse(prof2.properly_executed)
     
     def test_creating_a_child(self):
         '''
@@ -49,7 +43,7 @@ class Test(unittest.TestCase):
         child_profile.setCheckedDate("birth_date", date(2017,11,20), "ABOUT")
         child_profile.setCheckedDate("death_date", date(2017,12,1), "EXACT")
         child_profile.add_nickname("my_nickname")
-        profile.profile.create_as_a_child(child_profile, self.stoken, union = UNION_MAIN_PROFILE )
+        profile.profile.create_as_a_child(child_profile, union = UNION_MAIN_PROFILE )
         
         data_id = child_profile.geni_specific_data['guid']
         assert(child_profile.properly_executed)
@@ -66,7 +60,7 @@ class Test(unittest.TestCase):
         assert(child_profile.data["death"]["date"]["day"] == 1)
         assert(child_profile.data["public"] == False)
         assert("my_nickname" in child_profile.data["nicknames"] )
-        prof_relations = profile.profile(MAIN_SANDBOX_PROFILE, self.stoken, type_geni="")
+        prof_relations = profile.profile(MAIN_SANDBOX_PROFILE, type_geni="")
         
         assert(len(prof_relations.marriage_union) == 1)
         for dif_union in prof_relations.marriage_union:
@@ -76,9 +70,9 @@ class Test(unittest.TestCase):
         
         #We introduce other 2 childs using different methods
         second_profile = gen_profile(ACTUAL_SECOND, FATHER_SURNAME)
-        profile.profile.create_as_a_child(second_profile, self.stoken, profile = prof_relations )
+        profile.profile.create_as_a_child(second_profile, profile = prof_relations )
         third_profile = gen_profile(ACTUAL_THIRD, FATHER_SURNAME)
-        profile.profile.create_as_a_child(third_profile, self.stoken, geni_input = MAIN_SANDBOX_PROFILE, type_geni="" )
+        profile.profile.create_as_a_child(third_profile, geni_input = MAIN_SANDBOX_PROFILE, type_geni="" )
         assert(second_profile.properly_executed)
         assert(third_profile.properly_executed)
         
@@ -89,7 +83,7 @@ class Test(unittest.TestCase):
         self.assertFalse(child_profile.existing_in_geni)
         
         #We check is deleted
-        existing = profile.profile(data_id, self.stoken)
+        existing = profile.profile(data_id)
         
         assert(existing.geni_specific_data['deleted'])
     
@@ -97,7 +91,7 @@ class Test(unittest.TestCase):
         '''
         Test deleting a not existing profile
         '''
-        prof3 = profile.profile(OLD_DELETED_SON, self.stoken, type_geni="")
+        prof3 = profile.profile(OLD_DELETED_SON, type_geni="")
         assert(prof3.geni_specific_data['deleted'])
         
         assert(prof3.delete_profile())
@@ -141,9 +135,9 @@ class Test(unittest.TestCase):
         '''
         Test different Geni inputs to profile
         '''
-        prof = profile.profile(SANDBOX_MAIN_ADDRESS, self.stoken)
-        prof2 = profile.profile(SANDBOX_MAIN_API_G, self.stoken)
-        prof3 = profile.profile(SANDBOX_MAIN_API_NOG, self.stoken)
+        prof = profile.profile(SANDBOX_MAIN_ADDRESS)
+        prof2 = profile.profile(SANDBOX_MAIN_API_G)
+        prof3 = profile.profile(SANDBOX_MAIN_API_NOG)
         
         assert(prof.geni_specific_data["id"] == MAIN_SANDBOX_PROFILE_ID)
         assert(prof2.geni_specific_data["id"] == MAIN_SANDBOX_PROFILE_ID)
@@ -157,7 +151,7 @@ class Test(unittest.TestCase):
         partner_profile.setCheckedDate("marriage_date", date(2017,11,20) , "EXACT")
         partner_profile.setPlaces("marriage_place",GENERIC_PLACE_STRING , language="es")
         
-        profile.profile.create_as_a_partner(partner_profile, self.stoken, geni_input = BROTHER_PROFILE_SANDBOX)
+        profile.profile.create_as_a_partner(partner_profile, geni_input = BROTHER_PROFILE_SANDBOX)
         #TODO: add checking of marriage data once is included
         assert(partner_profile.properly_executed)
         assert(partner_profile.delete_profile())
@@ -170,9 +164,9 @@ class Test(unittest.TestCase):
         father_profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
         father_profile.setCheckedGender("M")
         
-        profile.profile.create_as_a_parent(father_profile, self.stoken, geni_input=FATHER_PROFILE_SANDBOX)
+        profile.profile.create_as_a_parent(father_profile, geni_input=FATHER_PROFILE_SANDBOX)
         
-        prof3 = profile.profile(FATHER_PROFILE_SANDBOX, self.stoken)
+        prof3 = profile.profile(FATHER_PROFILE_SANDBOX)
         assert(father_profile.geni_specific_data["id"] in prof3.parents)
         assert(father_profile.delete_profile())
         
@@ -187,7 +181,7 @@ class Test(unittest.TestCase):
         '''
         Test no adding marriage data due to error
         '''
-        prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, self.stoken, type_geni="")
+        prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, type_geni="")
         self.assertFalse(prof.add_marriage_in_geni())
         self.assertFalse(prof.delete_profile())
     
@@ -195,7 +189,7 @@ class Test(unittest.TestCase):
         '''
         Tests that a profile inputs provide the right result
         '''
-        prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, self.stoken, type_geni="")
+        prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, type_geni="")
         example = profile.process_profile_input(profile=prof)
         assert(example == GENI_TWO_MARRIAGES_PROFILE_LINK)
     
@@ -203,7 +197,7 @@ class Test(unittest.TestCase):
         '''
         Test other data in the profile
         '''
-        prof = profile.profile(BROTHER_PROFILE_SANDBOX, self.stoken)
+        prof = profile.profile(BROTHER_PROFILE_SANDBOX)
         assert(len(prof.gen_data["nicknames"]) == 2)
         assert("brother" in prof.gen_data["nicknames"])
         

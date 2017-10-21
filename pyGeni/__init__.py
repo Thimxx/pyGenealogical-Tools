@@ -24,7 +24,7 @@ GENI_PEOPLE = GENI_ADDRESS + "/people/"
 GENI_PROFILE =  GENI_API + "profile-"
 
 
-#The toke data
+#The token data
 TOKEN = None
 
 def get_token():
@@ -65,8 +65,7 @@ def geni_request_get(url):
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!
         logging.error(ERROR_REQUESTS + str(data.json()))
-    return data 
-    
+    return data
 def geni_request_post(url, data_input=None):
     '''
     Function to perform post calls.

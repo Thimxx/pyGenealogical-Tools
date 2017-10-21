@@ -111,14 +111,14 @@ class gen_profile(object):
         Comments are aditive on top of the preivous one
         '''
         if (not "comments" in self.gen_data.keys()):
-            self.gen_data["comments"] = "" 
+            self.gen_data["comments"] = ""
         self.gen_data["comments"] = self.gen_data["comments"] + comment
     def nameLifespan(self):
         '''
         Function for printing an standard format of naming
         '''
         year_birth = "?"
-        if("birth_date" in self.gen_data.keys()): year_birth = str(self.gen_data["birth_date"].year) 
+        if("birth_date" in self.gen_data.keys()): year_birth = str(self.gen_data["birth_date"].year)
         year_death = "?"
         if("death_date" in self.gen_data.keys()): year_death = str(self.gen_data["death_date"].year)
         if (year_birth == "?") and (year_death == "?"):
@@ -139,7 +139,7 @@ class gen_profile(object):
         '''
         if event_place in DATA_PLACES:
             location_data = get_formatted_location(location, language)
-            if (location_data == None): 
+            if (location_data == None):
                 return False
             else:
                 self.gen_data[event_place] = location_data
@@ -161,23 +161,23 @@ class gen_profile(object):
         accuracy_marriage = dict_accuracy.get("accuracy_marriage_date", self.gen_data.get("accuracy_marriage_date", None) )
         accuracy_death = dict_accuracy.get("accuracy_death_date", self.gen_data.get("accuracy_death_date", None) )
         accuracy_burial = dict_accuracy.get("accuracy_burial_date", self.gen_data.get("accuracy_burial_date", None) )
-        return checkDateConsistency(birth_date, residence_date, baptism_date, 
+        return checkDateConsistency(birth_date, residence_date, baptism_date,
                          marriage_date, death_date, burial_date,
-                         accuracy_birth, accuracy_residence, accuracy_baptism , 
+                         accuracy_birth, accuracy_residence, accuracy_baptism,
                          accuracy_marriage , accuracy_death, accuracy_burial)
     
     def comparison_score(self, profile, data_language="en", name_convention="father_surname"):
         '''
         Get the score value in comparison
         '''
-        score, factor = get_score_compare_names(self.gen_data["name"], self.gen_data["surname"], 
+        score, factor = get_score_compare_names(self.gen_data["name"], self.gen_data["surname"],
                         profile.gen_data["name"], profile.gen_data["surname"], language=data_language, convention=name_convention)
         
         for date_id in MERGE_DATES:
             if (date_id in self.gen_data.keys()) and (date_id in profile.gen_data.keys()):
-                score_temp, factor_temp = get_score_compare_dates(self.gen_data[date_id], 
+                score_temp, factor_temp = get_score_compare_dates(self.gen_data[date_id],
                                                               self.gen_data["accuracy_" + date_id],
-                                                              profile.gen_data[date_id], 
+                                                              profile.gen_data[date_id],
                                                               profile.gen_data["accuracy_" + date_id])
                 score += score_temp
                 factor = factor*factor_temp

@@ -16,9 +16,8 @@ class Test(unittest.TestCase):
         We introduce the data here
         '''
         #We used the sandbox here
-        self.stoken = os.environ['SANDBOX_KEY']
         geni.update_geni_address("https://sandbox.geni.com")
-        geni.set_token(self.stoken)
+        geni.set_token(os.environ['SANDBOX_KEY'])
     def test_union_geni_in_sandbox(self):
         '''
         Test union in sandbox

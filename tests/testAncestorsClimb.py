@@ -5,6 +5,7 @@ Created on 8 ago. 2017
 '''
 import unittest
 import os
+from pyGeni import set_token
 from pyGeni.profile import profile
 from tests.FIXTURES import PHILIPIVg, FLAVIAg, COUSIN_PROFILE
 from analyzefamily.ancerstors_climb import climb
@@ -13,7 +14,7 @@ from analyzefamily.ancerstors_climb import climb
 class testAncestorsClimb(unittest.TestCase):
 
     def setUp(self):
-        self.token = os.environ['GENI_KEY']
+        set_token(os.environ['GENI_KEY'])
  
     def testCountingOfAncestors(self):
         '''
@@ -21,7 +22,7 @@ class testAncestorsClimb(unittest.TestCase):
         having duplicated ancestors, so the number will be lower than the 
         generation count.
         '''
-        philip = profile(PHILIPIVg, self.token)
+        philip = profile(PHILIPIVg)
         
         climber = climb(philip)
         ancestors, profiles = climber.get_ancestors(4)
@@ -35,7 +36,7 @@ class testAncestorsClimb(unittest.TestCase):
         If there are no longer ancestors, the ancestor climb should stop.
         Checking if that works! This profile has only one generation available
         '''
-        flavia = profile(FLAVIAg, self.token)
+        flavia = profile(FLAVIAg)
         
         climber = climb(flavia)
         ancestors = climber.get_ancestors(6)
@@ -47,7 +48,7 @@ class testAncestorsClimb(unittest.TestCase):
         We will test the cousins execution in different way. Will be tested by
         number, not by person
         '''
-        philip = profile(COUSIN_PROFILE, self.token)
+        philip = profile(COUSIN_PROFILE)
         generations = 2
         
         climber = climb(philip)
@@ -69,9 +70,6 @@ class testAncestorsClimb(unittest.TestCase):
         assert(total_final == 38)
         assert(len(profiles) == 38)
         
-        
-        
-
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

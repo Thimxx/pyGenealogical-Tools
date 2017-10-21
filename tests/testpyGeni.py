@@ -1,16 +1,15 @@
-import unittest
-import os
-from pyGeni import profile
+import unittest, os
+from pyGeni import profile, set_token
 from tests.FIXTURES import PHILIPIVid, PHILIPIVg, PHILIPIVget
 from datetime import date
 
 
 class testpyGeni(unittest.TestCase):
     def setUp(self):
-        token = os.environ['GENI_KEY']
+        set_token(os.environ['GENI_KEY'])
         profile.s.update_geni_address("https://www.geni.com")
         profile.s.VERIFY_INPUT = "standard"
-        self.philip = profile.profile(PHILIPIVg, token)
+        self.philip = profile.profile(PHILIPIVg)
 
     def testGettingCorrectName(self):
         '''
@@ -32,8 +31,7 @@ class testpyGeni(unittest.TestCase):
         '''
         This test checks that using a different input id the id obtained is the same.
         '''
-        token = os.environ['GENI_KEY']
-        philip_bis = profile.profile(PHILIPIVget, token , "")
+        philip_bis = profile.profile(PHILIPIVget, "")
         assert( philip_bis.get_id() == self.philip.get_id())
    
     def testgetrightid(self):
@@ -42,8 +40,6 @@ class testpyGeni(unittest.TestCase):
         '''
         assert(self.philip.get_id() == PHILIPIVid)
 
-    
-        
 
 if __name__ == '__main__':
     unittest.main()

@@ -19,7 +19,7 @@ class union(geni_calls):
         Constructor
         '''
         #We initiate the base classes
-        geni_calls.__init__(self, geni.get_token())
+        geni_calls.__init__(self)
         url = geni.GENI_API + union_id + geni.GENI_SINGLE_TOKEN + geni.get_token()
         r = geni.geni_request_get(url)
         data = r.json()

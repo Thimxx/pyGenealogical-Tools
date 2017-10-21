@@ -27,7 +27,7 @@ EQUIVALENT_SEX = { "male" : "M", "female" : "F"}
 
 
 class profile(geni_calls, gen_profile):
-    def __init__(self, geni_input, token, type_geni="g"):  # id int or string
+    def __init__(self, geni_input, type_geni="g"):  # id int or string
         '''
         The geni input provided can be:
         - The id of the profile
@@ -39,7 +39,7 @@ class profile(geni_calls, gen_profile):
         self.existing_in_geni = False
         self.geni_specific_data = {}
         #We initiate the base classes
-        geni_calls.__init__(self, token)
+        geni_calls.__init__(self)
         url = process_geni_input(geni_input, type_geni) + self.token_string()
         r = s.geni_request_get(url)
         data = r.json()
@@ -61,7 +61,7 @@ class profile(geni_calls, gen_profile):
         '''
         Get relations by using the immediate family api
         '''
-        self.relations = immediate_family(self.token, self.geni_specific_data['id'])
+        self.relations = immediate_family(self.geni_specific_data['id'])
         
         self.parents = self.relations.parents
         self.sibligns = self.relations.sibligns
@@ -131,7 +131,7 @@ class profile(geni_calls, gen_profile):
                 #If we have more than one marriage we cannot proceed
                 return False
         #We create the url for creating the child
-        update_marriage = s.GENI_API + union + s.GENI_UPDATE + s.GENI_INITIATE_PARAMETER +  s.GENI_TOKEN + self.token
+        update_marriage = s.GENI_API + union + s.GENI_UPDATE + s.GENI_INITIATE_PARAMETER +  s.GENI_TOKEN + s.get_token()
         #We add the event data for marriage
         data_input={}
         event_value = self.event_value( "marriage")
@@ -143,8 +143,8 @@ class profile(geni_calls, gen_profile):
             logging.error(ERROR_REQUESTS + data["error"])
             #TODO: process the data creation and update relations
     @classmethod
-    def create_internally(cls, geni_input , token, type_geni): 
-        return cls(geni_input , token, type_geni)
+    def create_internally(cls, geni_input , type_geni): 
+        return cls(geni_input , type_geni)
     def creation_operations(self, adding_input):
         '''
         Common functions on creating profiles
@@ -166,7 +166,7 @@ class profile(geni_calls, gen_profile):
             self.guid = int(data["guid"])
             self.get_geni_data(data)
     @classmethod
-    def create_as_a_child(cls, base_profile, token, union = None, profile = None,
+    def create_as_a_child(cls, base_profile, union = None, profile = None,
                           geni_input = None, type_geni="g"):
         '''
         From a common profile from pyGenealogy library, a new profile will be created
@@ -179,19 +179,19 @@ class profile(geni_calls, gen_profile):
             if (len(profile.marriage_union) == 1):
                 union_to_use = profile.marriage_union[0].union_id
         elif (geni_input != None):
-            tmp_prof = cls.create_internally(geni_input ,token, type_geni)
+            tmp_prof = cls.create_internally(geni_input, type_geni)
             #TODO: add error checking if tmp_prof is not properly created.
             if (len(tmp_prof.marriage_union) == 1):
                 union_to_use = tmp_prof.marriage_union[0].union_id
         #Calling essentially the constructors
         base_profile.__class__ = cls
-        geni_calls.__init__(cls, token)
+        geni_calls.__init__(cls)
         #We create the url for creating the child
         add_child = s.GENI_API + union_to_use + s.GENI_ADD_CHILD + s.GENI_INITIATE_PARAMETER + "first_name="
-        add_child += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + cls.token
+        add_child += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + s.get_token()
         base_profile.creation_operations(add_child)
     @classmethod
-    def create_as_a_parent(cls, base_profile, token, profile = None,
+    def create_as_a_parent(cls, base_profile, profile = None,
                           geni_input = None, type_geni="g"):
         '''
         From a common profile from pyGenealogy library, a new profile will be created
@@ -200,13 +200,13 @@ class profile(geni_calls, gen_profile):
         child_to_use = process_profile_input(profile, geni_input, type_geni)
         #Calling essentially the constructors
         base_profile.__class__ = cls
-        geni_calls.__init__(cls, token)
+        geni_calls.__init__(cls)
         #We create the url for creating the child
-        add_parent = child_to_use + s.GENI_ADD_PARENT + s.GENI_INITIATE_PARAMETER  + s.GENI_TOKEN + cls.token
+        add_parent = child_to_use + s.GENI_ADD_PARENT + s.GENI_INITIATE_PARAMETER  + s.GENI_TOKEN + s.get_token()
         #We also add the needed data, that we take from the base profile directly
         base_profile.creation_operations(add_parent)
     @classmethod
-    def create_as_a_partner(cls, base_profile, token,  profile = None,
+    def create_as_a_partner(cls, base_profile, profile = None,
                           geni_input = None, type_geni="g"):
         '''
         From a common profile we take another profile and we create at parnter.
@@ -214,10 +214,10 @@ class profile(geni_calls, gen_profile):
         partner_to_use = process_profile_input(profile, geni_input, type_geni)
         #Calling essentially the constructors
         base_profile.__class__ = cls
-        geni_calls.__init__(cls, token)
+        geni_calls.__init__(cls)
         #We create the url for creating the child
         add_partner = partner_to_use + s.GENI_ADD_PARTNER + s.GENI_INITIATE_PARAMETER + "first_name="
-        add_partner += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + cls.token
+        add_partner += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + s.get_token()
         base_profile.creation_operations(add_partner)
         base_profile.add_marriage_in_geni()
     def delete_profile(self):

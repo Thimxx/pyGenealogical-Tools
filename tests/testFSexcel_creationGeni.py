@@ -6,7 +6,7 @@ Created on 17 sept. 2017
 import unittest
 from pyFS.pyfs_open_xlsx import getFSfamily
 import os
-from pyGeni import profile
+from pyGeni import profile, set_token
 import datetime
 from tests.FIXTURES import SANDBOX_MAIN_ADDRESS
 
@@ -17,7 +17,7 @@ class Test(unittest.TestCase):
         be in another!
         '''
         #We used the sandbox here
-        self.stoken = os.environ['SANDBOX_KEY']
+        set_token(os.environ['SANDBOX_KEY'])
         profile.s.update_geni_address("https://sandbox.geni.com")
         #We locate the folder here
         location1 = os.path.join(os.getcwd(), "fixtures_files")
@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
         testing_date = datetime.date(1841, 11, 30)
         assert(married_profile.gen_data["marriage_date"] == testing_date)
         
-        fsclass.create_profiles_in_Geni(self.stoken, SANDBOX_MAIN_ADDRESS)
+        fsclass.create_profiles_in_Geni(SANDBOX_MAIN_ADDRESS)
         
         #We check the partner
         fsclass.related_geni_profiles[0].get_relations()

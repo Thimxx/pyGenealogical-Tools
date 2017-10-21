@@ -21,6 +21,10 @@ class Test(unittest.TestCase):
         new_env['DISPLAY'] = '0.0'
         app = AppGeni(False)
         frame = MainMenu(None)
+        frame.get_validation_status(True)
+        assert(frame.validation_status)
+        frame.get_validation_status(False)
+        self.assertFalse(frame.validation_status)
     def testGUIAPP(self):
         '''
         Simply test of opening the main App

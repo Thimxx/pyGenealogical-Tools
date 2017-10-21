@@ -16,7 +16,7 @@ class Test(unittest.TestCase):
         be in another!
         '''
         #We used the sandbox here
-        self.stoken = os.environ['GENI_KEY']
+        profile.s.set_token(os.environ['GENI_KEY']) 
         profile.s.update_geni_address("https://www.sandbox.geni.com")
         #profile.s.VERIFY_INPUT = False
         #We locate the folder here
@@ -74,7 +74,7 @@ class Test(unittest.TestCase):
         input_file = os.path.join(self.filelocation, "fs-PotenteAsegurado.xlsx")
         fsclass = getFSfamily(input_file, naming_convention = "wrong_input")
         self.assertFalse(fsclass.correct_execution)
-        self.assertFalse(fsclass.create_profiles_in_Geni("None", "data"))
+        self.assertFalse(fsclass.create_profiles_in_Geni("data"))
         self.assertFalse(fsclass.create_gedcom_file("myoutput"))
     
     def test_empty_excel(self):

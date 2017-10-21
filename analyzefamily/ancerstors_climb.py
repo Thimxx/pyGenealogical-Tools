@@ -16,7 +16,6 @@ class climb(object):
         As input it is needed a class pyGeni.profile already obtained.
         '''
         self.source_person = source_person
-        self.geni_token = source_person.token
     def get_ancestors(self, generations):
         '''
         This functions obtains the ancestors up to the requested generations.
@@ -38,7 +37,7 @@ class climb(object):
                     #be careful with duplications!!! we will not repeat it!
                     if not parent in affected_profiles:
                         #Now we get the profile of the parents
-                        next_gen[parent] = immediate_family(self.geni_token, parent)
+                        next_gen[parent] = immediate_family(parent)
                         #We add it to avoid duplications later on!
                         affected_profiles.append(parent)
             #If there are no longer ancestors, we should stop!
@@ -79,7 +78,7 @@ class climb(object):
                     for child in family_item.children:
                         #And now all the children of that person!
                         if not child in affected_profiles:
-                            down_gen[child] = immediate_family(self.geni_token, child)
+                            down_gen[child] = immediate_family(child)
                             #We add it to avoid duplications later on!
                             affected_profiles.append(child)
                 cousins_array[i][j-1] = down_gen

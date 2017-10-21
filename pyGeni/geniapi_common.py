@@ -16,13 +16,12 @@ class geni_calls():
     '''
 
 
-    def __init__(self, token):
+    def __init__(self):
         '''
         Just introducing the token, a common one between the different functions
         '''
-        self.token = token
     def token_string(self):
-        return s.GENI_SINGLE_TOKEN + self.token
+        return s.GENI_SINGLE_TOKEN + s.get_token()
     @classmethod
     def get_profile_url(cls, profile_id):
         '''
@@ -31,7 +30,7 @@ class geni_calls():
         return s.GENI_API + profile_id
     def check_valid_genikey(self):
         # Validate access token, connecting to Geni, this might take a while
-        valid_token = s.geni_request_get(s.GENI_VALIDATE_TOKEN + self.token).json()
+        valid_token = s.geni_request_get(s.GENI_VALIDATE_TOKEN + s.get_token()).json()
 
         tokenIsOk = False
         #The way the API informs of a wrong token is the following:

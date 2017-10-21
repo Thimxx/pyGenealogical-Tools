@@ -418,9 +418,24 @@ def get_score_compare_dates(date1, accuracy1, date2, accuracy2):
             return 0.2 + 0.06*(10 - diff_years), 0.3 + 0.04*(10 -diff_years)
         else:
             return 20/(diff_years*diff_years), 30/(diff_years*diff_years)
-    
 
-
+def get_location_standard(location):
+    '''
+    This function will provide a standarized comman separated location value
+    '''
+    result = ""
+    for keys_data in ["city", "county", "state", "country"]:
+        value = location.get(keys_data, None)
+        if value:
+            if result == "":
+                result = value
+            else:
+                result += ", " + value
+    return result
+                
+#====================================================================================
+#Execution of module code
+#====================================================================================
 for language in LANGUAGES_FILES.keys():
     if not language in LANGUAGES_DATA.keys(): LANGUAGES_DATA[language] = {}
     for data_kind in LANGUAGES_FILES[language].keys():

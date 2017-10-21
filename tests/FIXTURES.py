@@ -69,5 +69,6 @@ GENI_INPUT_THROUGH_API = "https://sandbox.geni.com/api/profile-g6000000048574355
 GENI_WRONG_GET_METHOD =  "https://www.geni.com/api/profiles-g6000000048374355159?tokren=sfsdfsdfsdfsd"
 GENI_TWO_MARRIAGES_PROFILE = "https://sandbox.geni.com/people/Tow-Marriages-Profile/1161868"
 GENI_TWO_MARRIAGES_PROFILE_LINK = "https://api.sandbox.geni.com/profile-930"
-
+#Wrong token for testing execution
+WRONG_TOKEN='iSNPWCfIVKI2vH2HQLUnYppCssIMVN17kpno9ZTe'
 
