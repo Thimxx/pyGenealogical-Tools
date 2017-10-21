@@ -14,12 +14,11 @@ class geni_calls():
     This class introduces the common functions to be shared by several classes
     inside pyGeni
     '''
-
-
     def __init__(self):
         '''
         Just introducing the token, a common one between the different functions
         '''
+    @classmethod
     def token_string(self):
         return s.GENI_SINGLE_TOKEN + s.get_token()
     @classmethod
@@ -28,6 +27,7 @@ class geni_calls():
         Small function delivering back the profile url based on the profile_id
         '''
         return s.GENI_API + profile_id
+    @classmethod
     def check_valid_genikey(self):
         # Validate access token, connecting to Geni, this might take a while
         valid_token = s.geni_request_get(s.GENI_VALIDATE_TOKEN + s.get_token()).json()

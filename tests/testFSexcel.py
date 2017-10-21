@@ -165,7 +165,25 @@ class Test(unittest.TestCase):
         assert(fsclass.parents_profiles[1][0].gen_data["surname"] =="Toral")
         assert(fsclass.parents_profiles[1][1].gen_data["surname"] =="Martín")
 
-       
+    def test_bug_equal_surnames(self):
+        '''
+        Test parents with same surname not captured
+        '''
+        input_file = os.path.join(self.filelocation, "fs-NuñezArribas.xlsx")
+        fsclass = getFSfamily(input_file, "spanish_surname", language = "es")
+        for prof in fsclass.related_profiles:
+            assert(fsclass.related_profiles[prof].gen_data["surname"] == "Sanz Sanz")
+            
+
+    def test_binfo(self):
+        '''
+        Test missing surname of partner
+        '''
+        input_file = os.path.join(self.filelocation, "fs-ArribasRuiz.xlsx")
+        fsclass = getFSfamily(input_file, "spanish_surname", language = "es")
+        for prof in fsclass.profiles:
+            assert(prof.gen_data["surname"] == "Arribas Ruiz")
+          
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_fs_reader']
     unittest.main()

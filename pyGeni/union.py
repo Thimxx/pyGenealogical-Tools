@@ -26,9 +26,9 @@ class union(geni_calls):
         self.union_data = {}
         for key_value in data.keys():
             if key_value == "id": self.union_data["id"] = data[key_value]
-            if key_value == "url": self.union_data["url"] = data[key_value] 
+            if key_value == "url": self.union_data["url"] = data[key_value]
             if key_value == "guid": self.union_data["guid"] = data[key_value]
-            if key_value == "marriage_date": 
+            if key_value == "marriage_date":
                 day = data["marriage_date"].get("day", 1)
                 month = data["marriage_date"].get("month", 1)
                 year = data["marriage_date"].get("year", 1)

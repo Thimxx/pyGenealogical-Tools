@@ -22,11 +22,10 @@ class gedcom_file(gedcom.GedcomFile):
         Constructor
         '''
         gedcom.GedcomFile.__init__(self)
-    
     def create_family(self, husband, wife, children):
         '''
         Creates a family inside the gedcomfile, it only creates the family, all
-        individuals should have been already included 
+        individuals should have been already included
         
         Inputs shall be gedcom_profiles format, children shall be a list
         '''
@@ -49,9 +48,9 @@ class gedcom_file(gedcom.GedcomFile):
         :param fileout: Filename or open file-like object to save this to.
         :raises Exception: if the filename exists
         """
-        file = open(fileout, "wb") 
+        file = open(fileout, "wb")
 
         for line in self.gedcom_lines():
             file.write(line.encode("iso-8859-1"))
-            file.write("\n".encode("iso-8859-1"))        
+            file.write("\n".encode("iso-8859-1"))
         

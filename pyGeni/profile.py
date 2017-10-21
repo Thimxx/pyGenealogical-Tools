@@ -17,7 +17,7 @@ SPECIFIC_GENI_STRING = ['id', 'url', 'profile_url', 'creator' ]
 SPECIFIC_GENI_BOOLEAN =  ['public', 'is_alive', 'deleted']
 SPECIFIC_GENI_INTEGER = ['guid', 'created_at', 'updated_at']
 #TODO: review teh complete post method and include all fields here : https://www.geni.com/platform/developer/help/api?path=profile%2Fadd-child&version=1
-DATA_STRING_IN_GENI = { "name" : "first_name", "surname" : "last_name",  
+DATA_STRING_IN_GENI = { "name" : "first_name", "surname" : "last_name",
                        "gender": "gender", "comment": "about_me"}
 DATA_LIST_IN_GENI = {"nicknames": "nicknames"}
 #TODO: think about a logic for display name...
@@ -62,7 +62,6 @@ class profile(geni_calls, gen_profile):
         Get relations by using the immediate family api
         '''
         self.relations = immediate_family(self.geni_specific_data['id'])
-        
         self.parents = self.relations.parents
         self.sibligns = self.relations.sibligns
         self.partner = self.relations.partner
@@ -124,10 +123,10 @@ class profile(geni_calls, gen_profile):
         marriage
         '''
         if (union == None):
-            #If no union is added is because is the unique... 
+            #If no union is added is because is the unique...
             if(len(self.marriage_union) == 1):
                 union = self.marriage_union[0].union_id
-            else: 
+            else:
                 #If we have more than one marriage we cannot proceed
                 return False
         #We create the url for creating the child
@@ -143,7 +142,7 @@ class profile(geni_calls, gen_profile):
             logging.error(ERROR_REQUESTS + data["error"])
             #TODO: process the data creation and update relations
     @classmethod
-    def create_internally(cls, geni_input , type_geni): 
+    def create_internally(cls, geni_input , type_geni):
         return cls(geni_input , type_geni)
     def creation_operations(self, adding_input):
         '''
@@ -258,7 +257,7 @@ class profile(geni_calls, gen_profile):
             if (event_value): data[event_geni] = event_value
         event_residence = self.event_value("residence")
         if (event_residence):
-            msg = RESIDENCE_MESSAGE 
+            msg = RESIDENCE_MESSAGE
             if event_residence.get("date", {}).get("year", None):
                 msg += " Year = " + str(event_residence.get("date", {}).get("year", None))
             if event_residence.get("date", {}).get("month", None):

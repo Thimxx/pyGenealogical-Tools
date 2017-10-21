@@ -90,7 +90,7 @@ class RememoryParser(HTMLParser):
                     self.inside_results = False
         if self.inside_results:
             if (tag == "li"):
-                name, surname = get_name_surname_from_complete_name(self.name, convention="spanish_surname")
+                name, surname, _ = get_name_surname_from_complete_name(self.name, convention="spanish_surname")
                 prof_record = gen_profile(name, surname)
                 prof_record.setWebReference(self.web_link)
                 prof_record.setCheckedDate("death_date", self.death_date, "EXACT")

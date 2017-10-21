@@ -26,7 +26,6 @@ class gedcom_profile(common_profile.gen_profile):
         name = ""
         surname = ""
         self.individual = individual
-        
         for data in individual.get_list("NAME"):
             for names in data.get_list("GIVN"):
                 name = names.value

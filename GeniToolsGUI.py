@@ -5,7 +5,7 @@ This will be the main GUI caller to be used as part of the GeniTools
 
 @author: Val
 '''
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 ###########################################################################
 ## Python code generated with wxFormBuilder (version Aug  4 2017)
 ## http://www.wxformbuilder.org/

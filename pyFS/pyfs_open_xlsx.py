@@ -11,6 +11,7 @@ from pyGenealogy.gen_utils import is_year, naming_conventions, get_children_surn
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name, get_splitted_name_from_complete_name, get_location_standard
 from datetime import datetime
 from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED, NO_VALID_FILE, NOT_EXISTING_FILE, NO_GENI_EXECUTION, NO_GENI_KEY
+from messages.pyFS_messages import COLUMN_NOT_FOUND
 from pyGeni import profile
 from pyGenealogy import NOT_KNOWN_VALUE
 import os
@@ -21,7 +22,7 @@ from pyGeni.geniapi_common import geni_calls
 
 DIFFERNCE_BIRTH_BAPT = 90
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name"]
-date_fields = {"birth_date" : "birth_date" , "burial_date" : "burial_date", "chr_date" : "baptism_date", 
+date_fields = {"birth_date" : "birth_date" , "burial_date" : "burial_date", "chr_date" : "baptism_date",
                "residence_date" : "residence_date", "death_date" : "death_date", "marriage_date" : "marriage_date"}
 LOCATION_EQUIVALENCE = {"birth_place_text" : "birth_place", "death_place_text" : "death_place", "residence_place_text" : "residence_place",
                         "chr_place_text" : "baptism_place", "marriage_place_text" : "marriage_place"}
@@ -46,10 +47,9 @@ class getFSfamily(object):
             logging.error(NOT_EXISTING_FILE + filename)
             self.correct_execution = False
         if (not naming_convention in naming_conventions):
-            logging.error(NO_VALID_NAMING_CONVENTION) 
+            logging.error(NO_VALID_NAMING_CONVENTION)
             self.correct_execution = False
         self.naming_convention = naming_convention
-        
         if self.correct_execution:
             self.loaded_data = load_workbook(filename, data_only=True)
             if (self.__locate_key_fields__()):
@@ -109,12 +109,16 @@ class getFSfamily(object):
                 cell_value = current_sheet.cell(row=row, column=column_index).value
                 if (column_criteria in ["father_full_name", "mother_full_name"]  ):
                     name_data = get_name_surname_from_complete_name(cell_value, convention=self.naming_convention, language=self.language)
+                    #We have two surnames or one?
+                    surname_cand = name_data[1]
+                    if (name_data[2] == 2):
+                        surname_cand = name_data[1].split()[0]
                     if(column_criteria == "father_full_name"):
-                        if (not name_data[1] in potential_father_surname):
-                            potential_father_surname.append(name_data[1])
+                        if (not surname_cand in potential_father_surname):
+                            potential_father_surname.append(surname_cand)
                             potential_father_surname_repetitions.append(1)
                         else:
-                            index = potential_father_surname.index(name_data[1])
+                            index = potential_father_surname.index(surname_cand)
                             potential_father_surname_repetitions[index] = potential_father_surname_repetitions[index] + 1
                         if (not name_data[0] in potential_father_name):
                             potential_father_name.append(name_data[0])
@@ -123,11 +127,11 @@ class getFSfamily(object):
                             index = potential_father_name.index(name_data[0])
                             potential_father_name_repetitions[index] = potential_father_name_repetitions[index] + 1
                     elif(column_criteria == "mother_full_name"):
-                        if (not name_data[1] in potential_mother_surname):
-                            potential_mother_surname.append(name_data[1])
+                        if (not surname_cand in potential_mother_surname):
+                            potential_mother_surname.append(surname_cand)
                             potential_mother_surname_repetitions.append(1)
                         else:
-                            index = potential_mother_surname.index(name_data[1])
+                            index = potential_mother_surname.index(surname_cand)
                             potential_mother_surname_repetitions[index] = potential_mother_surname_repetitions[index] + 1
                         if (not name_data[0] in potential_mother_name):
                             potential_mother_name.append(name_data[0])
@@ -154,7 +158,7 @@ class getFSfamily(object):
                 column_criteria = current_sheet.cell(row=self.initial_row, column=column_index).value
                 cell_value = current_sheet.cell(row=row, column=column_index).value
                 #We are ignoring all those cells that are empty.
-                if ( cell_value ): 
+                if ( cell_value ):
                     this_introduction = True
                     #Ok, now we go one by one each of the different values
                     if(column_criteria == "gender"):
@@ -186,8 +190,8 @@ class getFSfamily(object):
                         #The separator provided by family search is semicolumn
                         parents = cell_value.split(";")
                         #We obtain firstly the different names
-                        father_name, father_surname = get_name_surname_from_complete_name(parents[0], convention=self.naming_convention, language=self.language)
-                        mother_name, mother_surname = get_name_surname_from_complete_name(parents[1], convention=self.naming_convention, language=self.language)
+                        father_name, father_surname, _ = get_name_surname_from_complete_name(parents[0], convention=self.naming_convention, language=self.language)
+                        mother_name, mother_surname, _ = get_name_surname_from_complete_name(parents[1], convention=self.naming_convention, language=self.language)
                         #The algorithm provides an empty surname, we fill it with not known
                         if (father_surname == ""): father_surname = NOT_KNOWN_VALUE
                         if (mother_surname == ""): mother_surname = NOT_KNOWN_VALUE
@@ -202,6 +206,7 @@ class getFSfamily(object):
                         pass
                     else:
                         number_missing = number_missing + 1
+                        logging.warning(COLUMN_NOT_FOUND + column_criteria)
                     if (not this_introduction): included_right = False
                 #This is a way to later on identify the link between the profiles
             id_profiles += 1
@@ -213,7 +218,7 @@ class getFSfamily(object):
             birth_d = profile_obtained.gen_data.get("birth_date", None)
             bapt_d = profile_obtained.gen_data.get("baptism_date", None)
             if birth_d and bapt_d:
-                difference = bapt_d - birth_d 
+                difference = bapt_d - birth_d
                 if abs(difference.days) < DIFFERNCE_BIRTH_BAPT:
                     place_birth = profile_obtained.gen_data.get("birth_place", {}).get("raw", None)
                     place_baptism = profile_obtained.gen_data.get("baptism_place", {}).get("raw", None)
@@ -244,7 +249,7 @@ class getFSfamily(object):
                         mother.gen_data["surname"] = surnames[1]
                     if (self.naming_convention == "spanish_surname"):
                         #We need to ensure 2 surnames in spanish naming conventions
-                        if not (mother.gen_data["surname"] in partner.gen_data["surname"]):
+                        if not (mother.gen_data["surname"] in partner.gen_data["surname"]) or (len(partner.gen_data["surname"].split()) == 1):
                             partner.gen_data["surname"] = " ".join([partner.gen_data["surname"], mother.gen_data["surname"]])
         #Finally, let's merge those profiles that are the same!
         indexes_to_remove = []
@@ -274,7 +279,7 @@ class getFSfamily(object):
         '''
         This method will create the needed profiles directly in Geni
         '''
-        if not self.correct_execution: 
+        if not self.correct_execution:
             logging.error(NO_GENI_EXECUTION)
             return False
         else:

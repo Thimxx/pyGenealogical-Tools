@@ -19,7 +19,7 @@ burial_date = date(1970,1,2)
 
 #This function will provide a True if the dates are consistent (i.e. your are not getting baptised before being born of after dying)
 checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date, death_date, burial_date,
-                         accuracy_birth = "EXACT", accuracy_residence = "EXACT", accuracy_baptism = "EXACT", 
+                         accuracy_birth = "EXACT", accuracy_residence = "EXACT", accuracy_baptism = "EXACT",
                          accuracy_marriage = "EXACT", accuracy_death = "EXACT", accuracy_burial = "EXACT")
 
 

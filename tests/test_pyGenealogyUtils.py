@@ -160,42 +160,42 @@ class Test(unittest.TestCase):
         Test get name from complete name
         '''
         name1 = "José Martínez  Pérez "
-        name, surname = get_name_surname_from_complete_name(name1, convention="spanish_surname")
+        name, surname, _ = get_name_surname_from_complete_name(name1, convention="spanish_surname")
         assert(name == "José")
         assert(surname == "Martínez Pérez")
         
         name2 = "John Smith"
-        name, surname = get_name_surname_from_complete_name(name2)
+        name, surname, _ = get_name_surname_from_complete_name(name2)
         assert(name == "John")
         assert(surname == "Smith")
         
-        name, surname = get_name_surname_from_complete_name(name2, convention="wrong_convention")
+        name, surname, _ = get_name_surname_from_complete_name(name2, convention="wrong_convention")
         assert(name == None)
         assert(surname == None)
         
         #This one makes sure that having a spanish naming convention with only one surname will work.
         name3 = "Benito Molpecérez"
-        name, surname = get_name_surname_from_complete_name(name3, convention = "spanish_surname")
+        name, surname, _ = get_name_surname_from_complete_name(name3, convention = "spanish_surname")
         assert(name == "Benito")
         assert(surname == "Molpecérez")
         
         name4 = "Valentín Lupicino"
-        name, surname = get_name_surname_from_complete_name(name4, convention = "spanish_surname", language="es")
+        name, surname, _ = get_name_surname_from_complete_name(name4, convention = "spanish_surname", language="es")
         assert(name == name4)
         assert(surname == "")
         
         name5 = "Valentin Lupicino Martin"
-        name, surname = get_name_surname_from_complete_name(name5, convention = "spanish_surname", language="es")
+        name, surname, _ = get_name_surname_from_complete_name(name5, convention = "spanish_surname", language="es")
         assert(name == "Valentín Lupicino")
         assert(surname == "Martín")
         
         name6 = "Pedro"
-        name, surname = get_name_surname_from_complete_name(name6, convention = "spanish_surname", language="es")
+        name, surname, _ = get_name_surname_from_complete_name(name6, convention = "spanish_surname", language="es")
         assert(name == "Pedro")
         assert(surname == "")
         
         name7 = "Hijinia"
-        name, surname = get_name_surname_from_complete_name(name7, convention = "spanish_surname", language="es")
+        name, surname, _ = get_name_surname_from_complete_name(name7, convention = "spanish_surname", language="es")
         assert(name == "Higinia")
         assert(surname == "")
         

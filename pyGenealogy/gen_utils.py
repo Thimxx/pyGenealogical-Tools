@@ -65,7 +65,7 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
     for surname in merged_list:
         temp_surname = surname.split(" ")
         if len(temp_surname) > 1:
-            for i in range(len(temp_surname)):
+            for i, _ in enumerate(temp_surname):
                 if temp_surname[i] in LANGUAGES_ADDS[language]:
                     temp_surname[i] = ""
             new_surname = " ".join(temp_surname).rstrip().strip()
@@ -112,7 +112,7 @@ def adapted_doublemetaphone(data, language="en"):
     else:
         return result
 def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date, death_date, burial_date,
-                         accuracy_birth = "EXACT", accuracy_residence = "EXACT", accuracy_baptism = "EXACT", 
+                         accuracy_birth = "EXACT", accuracy_residence = "EXACT", accuracy_baptism = "EXACT",
                          accuracy_marriage = "EXACT", accuracy_death = "EXACT", accuracy_burial = "EXACT"):
     '''
     Checker of the different dates are consistent
@@ -167,7 +167,7 @@ def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date
         #Now we check here the data consistency
         if (len(dates_death_check) > 0):
             if (max(dates_death_check) > max(burial_death)):
-                logging.error(NO_VALID_DEATH_DATE) 
+                logging.error(NO_VALID_DEATH_DATE)
                 return False
     return True
 def getBestDate(date1, accuracy1, date2, accuracy2):
@@ -179,7 +179,7 @@ def getBestDate(date1, accuracy1, date2, accuracy2):
     #in such case we will have the possibility of having before and after
     #Wrong accuracy provided will provide None data
     if (not accuracy1 in VALUES_ACCURACY) or (not accuracy2 in VALUES_ACCURACY):
-        logging.error(NO_VALID_ACCURACY) 
+        logging.error(NO_VALID_ACCURACY)
         return None, None
     #If we have an exact date, that's the one!
     if (accuracy1 == "EXACT"):
@@ -212,7 +212,7 @@ def get_formatted_location(location_string, language="en"):
                 #As we got the location details, let's get them
                 output["latitude"] = data["results"][0]["geometry"]["location"]["lat"]
                 output["longitude"] = data["results"][0]["geometry"]["location"]["lng"]
-            elif(result_input == "address_components"):  
+            elif(result_input == "address_components"):
                 #This is the data of the name of the location
                 for level in  data["results"][0]["address_components"]:
                     if "locality" in level["types"]: output["city"] = level["long_name"]
@@ -220,7 +220,7 @@ def get_formatted_location(location_string, language="en"):
                     elif "administrative_area_level_1" in level["types"]: output["state"] = level["long_name"]
                     elif "country" in level["types"]: output["country"] = level["long_name"]
     else:
-        return None 
+        return None
     if (not location_string.split(",")[0] in output.values()):
         final_input = []
         for particle in location_string.split(",")[0].split(" "):
@@ -256,11 +256,11 @@ def get_name_surname_from_complete_name(complete_name, convention="father_surnam
         if (surnames == 0):
             name = " ".join(name_split).rstrip()
             surname = ""
-        else:    
+        else:
             name = " ".join(name_split[:surnames]).rstrip()
             surname = " ".join(name_split[surnames:]).rstrip()
-        return name,surname
-    else: return None, None
+        return name,surname, abs(surnames)
+    else: return None, None, None
 def get_splitted_name_from_complete_name(complete_name, language="en", include_particle=True):
     '''
     This functions will take an string with the complete name and will
@@ -290,10 +290,10 @@ def get_splitted_name_from_complete_name(complete_name, language="en", include_p
                 #The data is not found in any of the lists
                 name_split[i] = particle.lower().title()
                 name_category.append("U")
-            elif (name[1] > surname[1]): 
+            elif (name[1] > surname[1]):
                 name_split[i] = name[0].rstrip()
                 name_category.append("N")
-            elif (surname[1] > name[1]): 
+            elif (surname[1] > name[1]):
                 name_split[i] = surname[0].rstrip()
                 name_category.append("S")
             else:
@@ -335,7 +335,6 @@ def get_compared_data_file(data, language="en", data_kind = "surname"):
                 else:
                     return data, -1.0
     return data, -1.0
-    
 
 def get_score_compare_names(name1, surname1, name2, surname2, language="en", convention="father_surname"):
     '''
