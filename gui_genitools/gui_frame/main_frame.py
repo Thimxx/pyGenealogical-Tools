@@ -6,6 +6,7 @@ Created on 12 ago. 2017
 import wx
 from gui_genitools.messages_gui import NO_VALIDATED_KEY
 from gui_genitools.gui_frame.geni_key_frame import GeniKeyInput
+from gui_genitools.gui_frame.geni_fs_import import GeniFsImport
 from wx.lib.pubsub import pub
 
 ###########################################################################
@@ -16,7 +17,6 @@ class MainMenu ( wx.Frame ):
     def __init__( self, parent ):
         self.status_validation = False
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 900,400 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
-        
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
         
         bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
@@ -52,6 +52,7 @@ class MainMenu ( wx.Frame ):
         
         # Connect Events
         self.m_button1.Bind( wx.EVT_BUTTON, self.OnClickIntroductionKey )
+        self.m_button4.Bind( wx.EVT_BUTTON, self.OnClickOpenImportFSDialog )
         
         #Subsriptions
         pub.subscribe(self.__onGeniKeyUpdateValidation, 'geni.key.validate')
@@ -68,12 +69,26 @@ class MainMenu ( wx.Frame ):
             self.m_infoCtrl2.ShowMessage(NO_VALIDATED_KEY, wx.ICON_INFORMATION)
         else:
             self.m_infoCtrl2.Close(force=False)
+            self.m_infoCtrl2.Dismiss()
         self.validation_status = status_validation
     
     def OnClickIntroductionKey( self, event ):
-        
+        '''
+        Launching the message window to introduce the Geni key
+        '''
         message_genikey = GeniKeyInput(None)
         message_genikey.Show(True)
         event.Skip()
+    def OnClickOpenImportFSDialog( self, event ):
+        '''
+        This is launching the creation of the dialog for importing FS excels
+        '''
+        interface_input = GeniFsImport(None)
+        interface_input.Show(True)
+        event.Skip()
     def __onGeniKeyUpdateValidation(self, validation_status):
+        '''
+        Listener that will try to remove the error message in the guy of missing
+        geni key
+        '''
         self.get_validation_status(validation_status)

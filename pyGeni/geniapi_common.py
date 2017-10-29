@@ -30,7 +30,7 @@ class geni_calls():
     @classmethod
     def check_valid_genikey(self):
         # Validate access token, connecting to Geni, this might take a while
-        valid_token = s.geni_request_get(s.GENI_VALIDATE_TOKEN + s.get_token()).json()
+        valid_token = s.geni_request_get(s.GENI_VALIDATE_TOKEN + str(s.get_token())).json()
 
         tokenIsOk = False
         #The way the API informs of a wrong token is the following:

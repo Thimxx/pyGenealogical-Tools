@@ -260,13 +260,13 @@ class getFSfamily(object):
                     merged = self.profiles[i].merge_profile(other_prof, language=self.language, convention=self.naming_convention)
                     if merged:
                         indexes_to_remove.append(i+j+1)
-        
         new_values = list(set(indexes_to_remove))
         new_values.sort()
         for deletion in reversed(new_values):
             del self.profiles[deletion]
         return correct_introduction
-    def __include_a_date__(self, column_criteria, profile, date_object, accuracy ):
+    @classmethod
+    def __include_a_date__(cls, column_criteria, profile, date_object, accuracy ):
         '''
         Function to avoid repetition
         '''
@@ -316,7 +316,7 @@ class getFSfamily(object):
         '''
         This function will create the gedcom file that can be read by other genealogical tools
         '''
-        if not self.correct_execution: 
+        if not self.correct_execution:
             logging.error(NO_GENI_EXECUTION)
             return False
         else:

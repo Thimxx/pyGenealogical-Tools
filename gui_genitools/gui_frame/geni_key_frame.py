@@ -54,6 +54,10 @@ class GeniKeyInput ( wx.Frame ):
     
     # Virtual event handlers, overide them in your derived class
     def OnIntroducingKey( self, event ):
+        '''
+        Accept introducing the key and executing the next steps
+        '''
+        #We get the value from the input
         geni_key = self.m_textCtrl1.GetValue()
         pub.sendMessage('geni.key.send', geni_key_updated = geni_key)
         self.Close(force=False)

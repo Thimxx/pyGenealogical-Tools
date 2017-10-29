@@ -73,6 +73,7 @@ class profile(geni_calls, gen_profile):
         Simple function to get Geni ID
         '''
         return self.data['id']
+    @classmethod
     def get_date(self, data_dict):
         '''
         Get date from the Geni standard
@@ -267,7 +268,6 @@ class profile(geni_calls, gen_profile):
             if self.gen_data.get("residence_place", {}).get("raw", None):
                 msg += " Location = " + self.gen_data.get("residence_place", {}).get("raw", None)
             data["about_me"] += msg
-            
         return data
     def event_value(self, event_geni):
         '''
