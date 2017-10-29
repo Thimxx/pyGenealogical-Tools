@@ -75,5 +75,5 @@ def geni_request_post(url, data_input=None):
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!
         logging.error(ERROR_REQUESTS + str(data.json()))
-    return data 
+    return data
     

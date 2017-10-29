@@ -275,7 +275,6 @@ class getFSfamily(object):
         else:
             logging.error(NO_VALID_DATA_FIELD + column_criteria)
             return False
-    
     def create_profiles_in_Geni(self, geni_data):
         '''
         This method will create the needed profiles directly in Geni

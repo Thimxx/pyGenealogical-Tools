@@ -165,7 +165,6 @@ class gen_profile(object):
                          marriage_date, death_date, burial_date,
                          accuracy_birth, accuracy_residence, accuracy_baptism,
                          accuracy_marriage , accuracy_death, accuracy_burial)
-    
     def comparison_score(self, profile, data_language="en", name_convention="father_surname"):
         '''
         Get the score value in comparison

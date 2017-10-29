@@ -24,7 +24,6 @@ class reader_input:
         self.genikey_given = False
         self.climbancestors = False
         self.climbcousins = False
-        
         for line in self.file:
             divided = line.split()
             if (divided[0] == "PROFILE"):

@@ -360,7 +360,7 @@ def get_score_compare_names(name1, surname1, name2, surname2, language="en", con
     met_name2 = adapted_doublemetaphone(splitted_name2[0], language=language)
     met_surname1 = adapted_doublemetaphone(splitted_surname1[0], language=language)
     met_surname2 = adapted_doublemetaphone(splitted_surname2[0], language=language)
-    
+    #Let's calculate the factors
     factor1 = get_jaro_to_list(met_name1, met_name2)
     factor2 = get_jaro_to_list(met_surname1, met_surname2, factor=0.95)
     return 2*(factor1 +factor2), factor1*factor2

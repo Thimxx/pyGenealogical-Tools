@@ -69,8 +69,6 @@ class RememoryParser(HTMLParser):
                 self.at_data_location = True
             elif (tag == "div"):
                 self.at_comments_location = True
-                
-                
     def handle_data(self, data):
         if self.at_name_location:
             self.name = data

@@ -32,7 +32,6 @@ class gedcom_profile(common_profile.gen_profile):
             for surnames in data.get_list("SURN"):
                 surname = surnames.value
         common_profile.gen_profile.__init__(self, name, surname)
-    
     @classmethod
     def convert_gedcom(cls, base_profile):
         '''

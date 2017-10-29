@@ -26,4 +26,3 @@ parent_profile = "INTRODUC THE HTTP ADDRESS OF THE PARENT PROFILE IF HAS A UNIQU
 
 family = getFSfamily(my_file)
 family.create_profiles_in_Geni( my_token, parent_profile)
-    

@@ -26,7 +26,6 @@ class gedcom_file(gedcom.GedcomFile):
         '''
         Creates a family inside the gedcomfile, it only creates the family, all
         individuals should have been already included
-        
         Inputs shall be gedcom_profiles format, children shall be a list
         '''
         ged_family = self.family()

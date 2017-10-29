@@ -18,9 +18,8 @@ class MainMenu ( wx.Frame ):
         self.status_validation = False
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 900,400 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
-        
+        #Introducing the sizers
         bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
-        
         bSizer2 = wx.BoxSizer( wx.VERTICAL )
         
         self.m_infoCtrl2 = wx.InfoBar( self )
