@@ -13,7 +13,6 @@ from wx.lib.pubsub import pub
 ###########################################################################
 
 class GeniKeyInput ( wx.Frame ):
-    
     def __init__( self, parent ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 700,202 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         

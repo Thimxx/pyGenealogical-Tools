@@ -229,7 +229,6 @@ def get_formatted_location(location_string, language="en"):
             return output2
         else:
             return output
-            
     else:
         return None
     if (not location_string.split(",")[0] in output.values()):

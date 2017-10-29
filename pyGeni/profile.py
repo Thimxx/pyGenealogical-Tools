@@ -9,7 +9,7 @@ from pyGeni.geniapi_common import geni_calls
 from pyGeni.immediate_family import immediate_family
 from pyGenealogy.common_profile import gen_profile, EVENT_DATA, ALL_EVENT_DATA
 from pyGenealogy import NOT_KNOWN_VALUE
-from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS, RESIDENCE_MESSAGE
+from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS, RESIDENCE_MESSAGE, NO_VALID_UNION_PROFILE
 from datetime import date
 import logging
 
@@ -183,6 +183,10 @@ class profile(geni_calls, gen_profile):
             #TODO: add error checking if tmp_prof is not properly created.
             if (len(tmp_prof.marriage_union) == 1):
                 union_to_use = tmp_prof.marriage_union[0].union_id
+            else:
+                #We have a problem, potentially a wrong profile
+                logging.error(NO_VALID_UNION_PROFILE + str(len(tmp_prof.marriage_union)))
+        if (union_to_use == None): return False
         #Calling essentially the constructors
         base_profile.__class__ = cls
         geni_calls.__init__(cls)
@@ -190,6 +194,7 @@ class profile(geni_calls, gen_profile):
         add_child = s.GENI_API + union_to_use + s.GENI_ADD_CHILD + s.GENI_INITIATE_PARAMETER + "first_name="
         add_child += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + s.get_token()
         base_profile.creation_operations(add_child)
+        return True
     @classmethod
     def create_as_a_parent(cls, base_profile, profile = None,
                           geni_input = None, type_geni="g"):

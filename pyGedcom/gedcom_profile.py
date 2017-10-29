@@ -31,7 +31,6 @@ class gedcom_profile(common_profile.gen_profile):
                 name = names.value
             for surnames in data.get_list("SURN"):
                 surname = surnames.value
-        
         common_profile.gen_profile.__init__(self, name, surname)
     
     @classmethod

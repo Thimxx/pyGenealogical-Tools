@@ -9,7 +9,7 @@ from pyGeni.geniapi_common import geni_calls
 from pyGeni import set_token
 from wx.lib.pubsub import pub
 
-class AppGeni(wx.App):    
+class AppGeni(wx.App):
     def OnInit(self):
         self.app_data = StoringKeys()
         self.valid_key = False
