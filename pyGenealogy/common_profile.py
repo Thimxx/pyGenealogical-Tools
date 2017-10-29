@@ -172,7 +172,12 @@ class gen_profile(object):
         '''
         score, factor = get_score_compare_names(self.gen_data["name"], self.gen_data["surname"],
                         profile.gen_data["name"], profile.gen_data["surname"], language=data_language, convention=name_convention)
-        
+        #Comparing gender
+        if ("gender" in self.gen_data) and ("gender" in profile.gen_data):
+            if self.gen_data["gender"] == profile.gen_data["gender"]:
+                score += 0.5
+            else:
+                factor = 0.5*factor
         for date_id in MERGE_DATES:
             if (date_id in self.gen_data.keys()) and (date_id in profile.gen_data.keys()):
                 score_temp, factor_temp = get_score_compare_dates(self.gen_data[date_id],

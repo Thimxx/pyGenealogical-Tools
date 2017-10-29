@@ -53,7 +53,7 @@ class Test(unittest.TestCase):
         assert(get_name_from_fullname("Geronima De Bargas Albarez", ['Vargas'], ['Álvarez'], language="es") == "Gerónima")
         #The bug with the "de" particle
         assert(get_name_from_fullname("Florentina Montemayor Leon", ['Montemayor'], ['de Leon'], language="es") == "Florentina")
-    
+        
     def test_date_check(self):
         '''
         Test of the function for date check
@@ -130,6 +130,15 @@ class Test(unittest.TestCase):
         assert(output2["place_name"] == "Nuestra Señora de los Remedios")
         
         assert(get_location_standard(output2) == "La Parrilla, Valladolid, Castilla y León, España" )
+        
+        output3 = get_formatted_location("La Asunción, Herrera De Duero, Valladolid, Spain", language="es")
+        
+        assert("city" in output3)
+        
+        
+        output4 = get_formatted_location("La Asunción Herrera De Duero, Valladolid, Spain", language="es")
+        assert("raw" in output4)
+        self.assertFalse("country" in output4)
     
     def test_return_sex(self):
         '''
@@ -319,6 +328,7 @@ class Test(unittest.TestCase):
         '''
         assert(adapted_doublemetaphone("Mathea", language="es") == adapted_doublemetaphone("Matea", language="es"))
         assert(adapted_doublemetaphone("Catalina", language="es") == adapted_doublemetaphone("Cathalina", language="es"))
+        assert(adapted_doublemetaphone("Phelipe", language="es") == adapted_doublemetaphone("Felipe", language="es"))
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

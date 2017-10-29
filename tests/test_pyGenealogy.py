@@ -219,7 +219,26 @@ class Test(unittest.TestCase):
         profile.setWebReference(["Myaddress"])
         #This will check the data types is working
         assert(len(profile.gen_data["web_ref"]) == 2)
-            
+    
+    def test_comparison_profile(self):
+        '''
+        Test some profile comparison 
+        '''
+        profile = gen_profile("Name", "Surname")
+        profile2 = gen_profile("Name", "Surname")
+        
+        profile.setCheckedGender("M")
+        profile2.setCheckedGender("M")
+        
+        score, factor = profile.comparison_score(profile2)
+        assert(score == 4.5)
+        assert(factor == 1.0)
+        
+        profile2.setCheckedGender("F")
+        score, factor = profile.comparison_score(profile2)
+        assert(score == 4.0)
+        assert(factor == 0.5)
+               
     
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_introducing_gender']

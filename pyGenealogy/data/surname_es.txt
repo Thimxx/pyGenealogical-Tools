@@ -141,6 +141,7 @@ Bartolomé
 Bas
 Bastida
 Batalla
+Baticón
 Batlle
 Bautista
 Bauzà
@@ -240,6 +241,7 @@ Carbajo
 Carbó
 Carbonell
 Cárdenas
+Cardiel
 Cardona
 Carlos
 Carmona
@@ -609,6 +611,7 @@ Medina
 Meléndez
 Melero
 Mena
+Mencias
 Méndez
 Mendizábal
 Mendoza
@@ -1022,6 +1025,7 @@ Vilalta
 Vilaplana
 Vilar
 Villa
+Villafañe
 Villalba
 Villalobos
 Villalonga

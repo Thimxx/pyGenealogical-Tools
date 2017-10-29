@@ -175,7 +175,6 @@ class getFSfamily(object):
                         else:
                             this_introduction = self.__include_a_date__(column_criteria, included_profile, datetime.strptime(cell_value, "%d %b %Y").date(), "EXACT")
                     elif(column_criteria == "full_name"):
-                        #TODO:Better replace by a method call
                         included_profile.set_name(get_name_from_fullname(cell_value,potential_father_surname, potential_mother_surname, language=self.language))
                         #In the case the name if not the same, we create it as nickname
                         if (cell_value != included_profile.returnFullName()): included_profile.add_nickname(cell_value)
@@ -261,8 +260,10 @@ class getFSfamily(object):
                     merged = self.profiles[i].merge_profile(other_prof, language=self.language, convention=self.naming_convention)
                     if merged:
                         indexes_to_remove.append(i+j+1)
-        indexes_to_remove.sort()
-        for deletion in reversed(indexes_to_remove):
+        
+        new_values = list(set(indexes_to_remove))
+        new_values.sort()
+        for deletion in reversed(new_values):
             del self.profiles[deletion]
         return correct_introduction
     def __include_a_date__(self, column_criteria, profile, date_object, accuracy ):

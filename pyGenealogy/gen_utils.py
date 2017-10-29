@@ -4,7 +4,7 @@ Created on 26 ago. 2017
 @author: Val
 '''
 import logging
-from messages.pyGenealogymessages import NO_VALID_CONVENTION, NO_VALID_ACCURACY
+from messages.pyGenealogymessages import NO_VALID_CONVENTION, NO_VALID_ACCURACY, NO_VALID_LOCATION
 from messages.pyGenealogymessages import NO_VALID_BIRTH_DATE, NO_VALID_DEATH_DATE, NO_VALID_DEATH_AND_BURIAL
 from datetime import date
 from pyGenealogy import VALUES_ACCURACY
@@ -103,9 +103,9 @@ def adapted_doublemetaphone(data, language="en"):
     for data2met in list_data:
         if (language == "es"):
             if not re.match(r"[Cc]h", data2met):
-                data2met = re.sub(r"h", "", data2met)
+                data2met = re.sub(r"h", "", data2met.lower().replace("ph", "f"))
             #In spanish b and v are pronunced equally, if we know the language is spanish we shall remove!
-            result.append(doublemetaphone(data2met.lower().replace("v", "b").replace("gi","ji").replace("ge","je")))
+            result.append(doublemetaphone(data2met.lower().replace("v", "b").replace("gi","ji").replace("ge","je").replace("ph","f")))
         result.append(doublemetaphone(data2met))
     if using_string:
         return result[0]
@@ -219,6 +219,17 @@ def get_formatted_location(location_string, language="en"):
                     elif "administrative_area_level_2" in level["types"]: output["county"] = level["long_name"]
                     elif "administrative_area_level_1" in level["types"]: output["state"] = level["long_name"]
                     elif "country" in level["types"]: output["country"] = level["long_name"]
+    elif (data["status"] == "ZERO_RESULTS"):
+        #Data is not found, let's try removing some
+        logging.warning(NO_VALID_LOCATION)
+        logging.warning(location_string)
+        if (len(location_string.split(",")) > 3):
+            output2 = get_formatted_location(",".join(location_string.split(",")[1:]), language=language)
+            output2["raw"] = output["raw"]
+            return output2
+        else:
+            return output
+            
     else:
         return None
     if (not location_string.split(",")[0] in output.values()):
