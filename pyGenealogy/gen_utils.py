@@ -364,7 +364,6 @@ def get_score_compare_names(name1, surname1, name2, surname2, language="en", con
     factor1 = get_jaro_to_list(met_name1, met_name2)
     factor2 = get_jaro_to_list(met_surname1, met_surname2, factor=0.95)
     return 2*(factor1 +factor2), factor1*factor2
-        
 def get_jaro_to_list(first4jaro, list4jaro, factor = 0.9):
     result = [[0 for x in range(len(list4jaro))] for y in range(len(first4jaro))]
     loc_data = 0.0

@@ -45,13 +45,11 @@ class gedcom_profile(common_profile.gen_profile):
         else:
             base_profile.__class__ = cls
             base_profile.individual = cls.return_individual_gedcom(base_profile)
-    
     def return_id(self):
         '''
         This function will return the id of the profile
         '''
         return self.individual.__dict__["id"]
-    
     def return_individual_gedcom(self):
         '''
         This function will return the gedcom type individual
@@ -78,7 +76,6 @@ class gedcom_profile(common_profile.gen_profile):
             include_date, ged_event = self.get_event_element(date_key)
             if include_date : individual.add_child_element(ged_event)
         return individual
-    
     def get_event_element(self, date_key):
         '''
         Function that provides the event value as an element
@@ -117,4 +114,3 @@ class gedcom_profile(common_profile.gen_profile):
                     ged_loc.add_child_element(ged_new_loc_data)
             ged_event.add_child_element(ged_loc)
         return include_date, ged_event
-        

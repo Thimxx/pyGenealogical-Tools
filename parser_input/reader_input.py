@@ -39,7 +39,6 @@ class reader_input:
             elif (divided[0] == "GENERATIONS"):
                 self.generations = int(divided[1])
                 self.generations_given = True
-                
         if (not self.genikey_given):
             logging.warning(GENI_KEY_MISSING)
             self.continue_execution = False
@@ -50,7 +49,3 @@ class reader_input:
             if (not self.generations_given):
                 logging.warning(GENERATIONS_MISSING)
                 self.continue_execution = False
-                
-        
-
-

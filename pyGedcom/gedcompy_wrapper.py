@@ -37,10 +37,8 @@ class gedcom_file(gedcom.GedcomFile):
         for child in children:
             ged_child = gedcom.Element(tag="CHIL", value=child.return_id())
             ged_family.add_child_element(ged_child)
-        
         include_marr, ged_marr = husband.get_event_element("marriage")
         if include_marr: ged_family.add_child_element(ged_marr)
-    
     def save(self, fileout):
         """
         Save the contents of this GEDCOM file to specified filename or file-like object.
@@ -48,8 +46,7 @@ class gedcom_file(gedcom.GedcomFile):
         :raises Exception: if the filename exists
         """
         file = open(fileout, "wb")
-
+        #Lets now write one by one
         for line in self.gedcom_lines():
             file.write(line.encode("iso-8859-1"))
             file.write("\n".encode("iso-8859-1"))
-        

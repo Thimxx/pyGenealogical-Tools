@@ -185,7 +185,6 @@ class gen_profile(object):
                                                               profile.gen_data["accuracy_" + date_id])
                 score += score_temp
                 factor = factor*factor_temp
-        
         return score, factor
         
     def merge_profile(self, profile, language="en", convention="father_surname"):

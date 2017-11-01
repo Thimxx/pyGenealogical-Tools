@@ -16,12 +16,10 @@ class GeniKeyInput ( wx.Frame ):
     def __init__( self, parent ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 700,202 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
-        
+        #Including the sizers for centering the buttons
         bSizer3 = wx.BoxSizer( wx.VERTICAL )
-        
         bSizer4 = wx.BoxSizer(wx.HORIZONTAL)
-        
-        
+        #We sett the info of each button
         self.Text_geni_key = wx.StaticText( self, wx.ID_ANY, MESSAGE_GENI_KEY_ADDRESS, wx.DefaultPosition, wx.DefaultSize, 0 )
         self.Text_geni_key.Wrap( -1 )
         bSizer4.Add( self.Text_geni_key, 0, wx.ALIGN_CENTER|wx.ALL, 0 )

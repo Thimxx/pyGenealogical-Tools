@@ -18,11 +18,15 @@ https://www.geni.com/platform/developer/api_explorer
 '''
 
 from pyFS.pyfs_open_xlsx import getFSfamily
+from pyGeni import set_token
 
 
 my_file = "ENTER HERE THE LOCATION OF YOUR FILE"
 my_token = "INTRODUCE THE OBTAINED TOKEN"
 parent_profile = "INTRODUC THE HTTP ADDRESS OF THE PARENT PROFILE IF HAS A UNIQUE MARRIAGE"
 
+#We set the token
+set_token(my_token)
+
 family = getFSfamily(my_file)
-family.create_profiles_in_Geni( my_token, parent_profile)
+family.create_profiles_in_Geni( parent_profile)

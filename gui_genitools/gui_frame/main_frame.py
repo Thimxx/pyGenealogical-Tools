@@ -21,44 +21,35 @@ class MainMenu ( wx.Frame ):
         #Introducing the sizers
         bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
         bSizer2 = wx.BoxSizer( wx.VERTICAL )
-        
+        #Let's set up the controls
         self.m_infoCtrl2 = wx.InfoBar( self )
         self.m_infoCtrl2.SetShowHideEffects( wx.SHOW_EFFECT_NONE, wx.SHOW_EFFECT_NONE )
         self.m_infoCtrl2.SetEffectDuration( 500 )
         bSizer2.Add( self.m_infoCtrl2, 0, wx.ALL|wx.EXPAND, 5 )
-        
+        #
         self.m_button1 = wx.Button( self, wx.ID_ANY, u"Introduce Geni Token", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer2.Add( self.m_button1, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
-        
+        #
         self.m_button2 = wx.Button( self, wx.ID_ANY, u"Get Ancestors", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer2.Add( self.m_button2, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
-        
+        #
         self.m_button3 = wx.Button( self, wx.ID_ANY, u"Get Cousins", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer2.Add( self.m_button3, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
-        
+        #
         self.m_button4 = wx.Button( self, wx.ID_ANY, u"Import Family Search to Geni", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer2.Add( self.m_button4, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
-        
-        
         bSizer1.Add( bSizer2, 1, wx.EXPAND, 5 )
-        
-        
+        #
         self.SetSizer( bSizer1 )
         self.Layout()
-        
         self.Centre( wx.BOTH )
-        
-        
         # Connect Events
         self.m_button1.Bind( wx.EVT_BUTTON, self.OnClickIntroductionKey )
         self.m_button4.Bind( wx.EVT_BUTTON, self.OnClickOpenImportFSDialog )
-        
         #Subsriptions
         pub.subscribe(self.__onGeniKeyUpdateValidation, 'geni.key.validate')
-
     def __del__( self ):
         pass
-    
     def get_validation_status(self, status_validation):
         '''
         This function will provide the status of the validation of the Geni_KEY
@@ -70,7 +61,6 @@ class MainMenu ( wx.Frame ):
             self.m_infoCtrl2.Close(force=False)
             self.m_infoCtrl2.Dismiss()
         self.validation_status = status_validation
-    
     def OnClickIntroductionKey( self, event ):
         '''
         Launching the message window to introduce the Geni key

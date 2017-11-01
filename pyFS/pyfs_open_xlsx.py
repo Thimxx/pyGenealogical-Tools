@@ -183,6 +183,9 @@ class getFSfamily(object):
                         names = get_name_surname_from_complete_name(cell_value, convention=self.naming_convention, language=self.language)
                         partner = gen_profile(names[0], names[1])
                         partner.set_id(id_profiles)
+                        #If the surname is changed we shall include the previous surname in the nicknames
+                        if (cell_value != partner.returnFullName()): partner.add_nickname(cell_value)
+                        #Now we link the profiles
                         included_profile.set_marriage_id_link(id_profiles)
                         self.related_profiles[id_profiles] = partner
                     elif (column_criteria == "other_full_names"):
@@ -197,6 +200,9 @@ class getFSfamily(object):
                         #Create the standard profiles
                         father = gen_profile(father_name, father_surname)
                         mother = gen_profile(mother_name, mother_surname)
+                        #If the surname is changed we shall include the previous surname in the nicknames
+                        if (parents[0] != father.returnFullName()): father.add_nickname(parents[0])
+                        if (parents[1] != mother.returnFullName()): mother.add_nickname(parents[1])
                         #add gender
                         father.setCheckedGender("M")
                         mother.setCheckedGender("F")
@@ -249,6 +255,7 @@ class getFSfamily(object):
                     if (self.naming_convention == "spanish_surname"):
                         #We need to ensure 2 surnames in spanish naming conventions
                         if not (mother.gen_data["surname"] in partner.gen_data["surname"]) or (len(partner.gen_data["surname"].split()) == 1):
+                            if len(partner.gen_data["nicknames"]) == 0: partner.add_nickname(partner.returnFullName())
                             partner.gen_data["surname"] = " ".join([partner.gen_data["surname"], mother.gen_data["surname"]])
         #Finally, let's merge those profiles that are the same!
         indexes_to_remove = []
