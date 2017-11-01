@@ -38,7 +38,7 @@ class Test(unittest.TestCase):
         first_profile = fsclass.profiles[0]
         assert(first_profile.gen_data["name"] == "Tiburcio")
         second_profile = fsclass.profiles[1]
-        assert(second_profile.gen_data["name"] == "Lucia")
+        assert(second_profile.gen_data["name"] == "Lucía")
         married_profile = fsclass.profiles[2]
         assert(married_profile.gen_data["name"] == "Nicasia")
         assert(married_profile.gen_data["marriage_place"]["city"] == "Tudela de Duero")

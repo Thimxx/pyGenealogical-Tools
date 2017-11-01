@@ -136,7 +136,7 @@ class Test(unittest.TestCase):
         assert("city" in output3)
         
         
-        output4 = get_formatted_location("La Asunción Herrera De Duero, Valladolid, Spain", language="es")
+        output4 = get_formatted_location("")
         assert("raw" in output4)
         self.assertFalse("country" in output4)
     
@@ -148,11 +148,6 @@ class Test(unittest.TestCase):
         assert(get_partner_gender("F") == "M")
         assert(get_partner_gender("G") == None)
     
-    def test_wrong_google_maps_message(self):
-        '''
-        Test wrong google maps message
-        '''
-        assert(get_formatted_location("") == None)
     
     def test_wrong_inputs(self):
         '''

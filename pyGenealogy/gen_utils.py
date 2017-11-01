@@ -219,7 +219,7 @@ def get_formatted_location(location_string, language="en"):
                     elif "administrative_area_level_2" in level["types"]: output["county"] = level["long_name"]
                     elif "administrative_area_level_1" in level["types"]: output["state"] = level["long_name"]
                     elif "country" in level["types"]: output["country"] = level["long_name"]
-    elif (data["status"] == "ZERO_RESULTS"):
+    elif (data["status"] in ["ZERO_RESULTS", 'INVALID_REQUEST']):
         #Data is not found, let's try removing some
         logging.warning(NO_VALID_LOCATION)
         logging.warning(location_string)
