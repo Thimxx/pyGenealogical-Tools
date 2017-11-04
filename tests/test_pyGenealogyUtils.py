@@ -141,7 +141,7 @@ class Test(unittest.TestCase):
         self.assertFalse("country" in output4)
         
         #Suggestino from https://stackoverflow.com/questions/47063366/google-maps-geocoding-api-zero-results-example/47092855
-        output5 = get_formatted_location("postal_code%3A12345%7Ccountry%3ASE", language="es")
+        output5 = get_formatted_location("postal_code%3A12345%7Ccountry%3ASE,,,", language="es")
         assert("raw" in output5)
         self.assertFalse("country" in output5)
     

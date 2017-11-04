@@ -717,6 +717,7 @@ Pagès
 Palacio
 Palacios
 Palau
+Palencia
 Palma
 Palmer
 Palomar
@@ -972,6 +973,7 @@ Toro
 Torralba
 Torre
 Torrecilla
+Torrego
 Torrens
 Torrent
 Torrents
