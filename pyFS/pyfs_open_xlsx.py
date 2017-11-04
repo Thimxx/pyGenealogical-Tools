@@ -309,7 +309,7 @@ class getFSfamily(object):
                 else:
                     self.mother_profile.merge_profile(parent_data, language = self.language, convention = self.naming_convention)
                     if other_parent: self.father_profile.merge_profile(other_parent, language = self.language, convention = self.naming_convention)
-                
+                #Once parents have been read, we proceed to create the profiles.
                 for profile_obtained in self.profiles:
                     logging.info(profile_obtained.returnFullName())
                     profile.profile.create_as_a_child(profile_obtained, geni_input=geni_data )

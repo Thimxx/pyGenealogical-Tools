@@ -186,7 +186,6 @@ class gen_profile(object):
                 score += score_temp
                 factor = factor*factor_temp
         return score, factor
-        
     def merge_profile(self, profile, language="en", convention="father_surname"):
         '''
         This will merge into this profile the information from the attached profile

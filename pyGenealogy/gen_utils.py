@@ -382,7 +382,6 @@ def get_jaro_to_list(first4jaro, list4jaro, factor = 0.9):
         return loc_data*loc_data*math.pow(factor, dif)
     else:
         return loc_data*loc_data*get_jaro_to_list(first2return, list4return)
-    
 def get_score_compare_dates(date1, accuracy1, date2, accuracy2):
     '''
     Get an score comparing 2 dates including accuracy
