@@ -116,6 +116,7 @@ Balaguer
 Ballester
 Ballesteros
 Baños
+Baquerín
 Baquero
 Barba
 Barberá
@@ -236,6 +237,7 @@ Cañete
 Cañizares
 Caparrós
 Capdevila
+Capellán
 Carballo
 Carbajo
 Carbó
@@ -325,6 +327,7 @@ Crespi
 Crespo
 Cruz
 Cuadrado
+Cubero
 Cuéllar
 Cuenca
 Cuervo
@@ -644,6 +647,7 @@ Montesinos
 Montoya
 Montserrat
 Mora
+Moral
 Moraleda
 Morales
 Morán
@@ -741,6 +745,7 @@ Peinado
 Peiró
 Peláez
 Pelayo
+Pellejero
 Pellicer
 Peón
 Peña
@@ -934,6 +939,7 @@ Solera
 Solís
 Solsona
 Somoza
+Sopena
 Soria
 Soriano
 Sosa
@@ -986,6 +992,7 @@ Valbuena
 Valcárcel
 Valderrama
 Valdés
+Valdeviejas
 Valencia
 Valenciano
 Valentín

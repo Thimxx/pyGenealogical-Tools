@@ -292,6 +292,8 @@ def process_geni_input(geni_input, type_geni):
     '''
     if ("/api" in str(geni_input)):
         return geni_input
+    elif ("profile" in str(geni_input)):
+        return s.GENI_API + str(geni_input)
     elif ("/people/" in str(geni_input)):
         #The ?through is in case the use has introduced the complete address
         return s.GENI_PROFILE + "g" + geni_input.split("?through")[0].split("/")[-1]

@@ -10,7 +10,7 @@ from pyGenealogy.common_profile import gen_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
 from tests.FIXTURES import SANDBOX_MAIN_ADDRESS, SANDBOX_MAIN_API_G, SANDBOX_MAIN_API_NOG, MAIN_SANDBOX_PROFILE_ID, ACTUAL_SECOND, ACTUAL_THIRD
 from tests.FIXTURES import FATHER_PROFILE_SANDBOX, BROTHER_PROFILE_SANDBOX, GENERIC_PLACE_STRING, GENI_INPUT_THROUGH, GENI_INPUT_THROUGH_API
-from tests.FIXTURES import GENI_TWO_MARRIAGES_PROFILE, GENI_TWO_MARRIAGES_PROFILE_LINK
+from tests.FIXTURES import GENI_TWO_MARRIAGES_PROFILE, GENI_TWO_MARRIAGES_PROFILE_LINK, MAIN_SANDBOX_PROFILE_API
 import os
 
 class Test(unittest.TestCase):
@@ -32,6 +32,12 @@ class Test(unittest.TestCase):
         assert(prof.gen_data["gender"] == "M")
         assert(prof.gen_data["surname"] == "Profile")
         assert(prof.gen_data["name"] == "Testing")
+        #Testing using profile input
+        
+        prof = profile.profile(MAIN_SANDBOX_PROFILE_API)
+        assert(prof.gen_data["name"] == "Testing")
+        assert(prof.properly_executed)
+        
     
     def test_creating_a_child(self):
         '''

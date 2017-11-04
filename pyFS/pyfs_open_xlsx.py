@@ -297,6 +297,19 @@ class getFSfamily(object):
                 logging.error(NO_GENI_KEY)
                 return False
             else:
+                parent_data = profile.profile(geni_input=geni_data)
+                other_parent = None
+                #We only make it for a single partner
+                if len(parent_data.partner) == 1:
+                    other_parent = profile.profile(geni_input=parent_data.partner[0])
+                #We need to understand if it is mother of father, and then the logic diverts
+                if (parent_data.gen_data["gender"] == "M"):
+                    self.father_profile.merge_profile(parent_data, language = self.language, convention = self.naming_convention)
+                    if other_parent: self.mother_profile.merge_profile(other_parent, language = self.language, convention = self.naming_convention)
+                else:
+                    self.mother_profile.merge_profile(parent_data, language = self.language, convention = self.naming_convention)
+                    if other_parent: self.father_profile.merge_profile(other_parent, language = self.language, convention = self.naming_convention)
+                
                 for profile_obtained in self.profiles:
                     logging.info(profile_obtained.returnFullName())
                     profile.profile.create_as_a_child(profile_obtained, geni_input=geni_data )
