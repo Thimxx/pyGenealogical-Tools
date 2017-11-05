@@ -194,8 +194,6 @@ class gen_profile(object):
         score, factor = self.comparison_score(profile, data_language = language,  name_convention = convention)
         if (score*factor > 2.0):
             #Ok, we consider the size big enough
-            #TBD: improve the algorithm
-            
             for key_data in ALL_DATA:
                 if(profile.gen_data.get(key_data, None) != None):
                     #That means we have some data!, exists in the other?

@@ -26,28 +26,21 @@ class GeniKeyInput ( wx.Frame ):
         #Adding the link to the error message related to the lack of token
         self.link = wx.adv.HyperlinkCtrl(self, wx.ID_ANY, label="this page", url="https://www.geni.com/platform/developer/api_explorer")
         bSizer4.Add( self.link, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
-        
         bSizer3.Add(bSizer4)
-        
+        #Addint text box to size
         self.m_textCtrl1 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer3.Add( self.m_textCtrl1, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
-        
+        #Adding the button to size
         self.m_button11 = wx.Button( self, wx.ID_ANY, u"Introduce", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer3.Add( self.m_button11, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
-        
-        
+        #Seeting the size and final operations
         self.SetSizer( bSizer3 )
         self.Layout()
-        
         self.Centre( wx.BOTH )
-        
         # Connect Events
         self.m_button11.Bind( wx.EVT_BUTTON, self.OnIntroducingKey )
-    
     def __del__( self ):
         pass
-    
-    
     # Virtual event handlers, overide them in your derived class
     def OnIntroducingKey( self, event ):
         '''
@@ -58,4 +51,3 @@ class GeniKeyInput ( wx.Frame ):
         pub.sendMessage('geni.key.send', geni_key_updated = geni_key)
         self.Close(force=False)
         event.Skip()
-        

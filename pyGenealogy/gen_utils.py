@@ -13,7 +13,6 @@ from Levenshtein import jaro
 import math
 import requests
 import pyGenealogy, os, re
-from _sqlite3 import adapt
 
 THRESHOLD_JARO = 0.7
 
@@ -450,7 +449,6 @@ def get_location_standard(location):
             else:
                 result += ", " + value
     return result
-                
 #====================================================================================
 #Execution of module code
 #====================================================================================

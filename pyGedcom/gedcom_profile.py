@@ -99,7 +99,7 @@ class gedcom_profile(common_profile.gen_profile):
                 ged_date_string = "AFT " + full_date
             ged_date = gedcom.Element(tag="DATE", value=ged_date_string)
             ged_event.add_child_element(ged_date)
-        #Review of the location data           
+        #Review of the location data
         location = self.gen_data.get(common_profile.ALL_EVENT_DATA[date_key]["location"], {})
         if (any(location)):
             include_date = True
