@@ -3970,6 +3970,7 @@ Esmond
 Esnel
 Esopo
 Especioso
+Espectación
 Espen
 Esperato
 Espin
@@ -7550,8 +7551,6 @@ Micael
 Micaela
 Micaías
 Mical
-Michael
-Michaela
 Michay
 Michel
 Michela
@@ -9100,8 +9099,6 @@ Rani
 Raniero
 Ranquel
 Ranulfo
-Raphael
-Raphaela
 Raquel
 Raquildis
 Rashida

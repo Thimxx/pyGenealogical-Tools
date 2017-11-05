@@ -13,7 +13,9 @@ from Levenshtein import jaro
 import math
 import requests
 import pyGenealogy, os, re
+from _sqlite3 import adapt
 
+THRESHOLD_JARO = 0.7
 
 DATA_FOLDER = os.path.join(os.path.dirname(pyGenealogy.__file__), "data")
 
@@ -22,7 +24,9 @@ GOOGLE_GEOLOCATION_ADDRESS = "https://maps.googleapis.com/maps/api/geocode/json?
 LOCATION_KEYS = ["place_name", "city", "county", "state", "country"]
 
 naming_conventions = ["father_surname", "spanish_surname"]
-
+#These are the particles used in different languages inside the surnames to connect them but in capital letters as a title
+LANGUAGES_ADDS_TITLE = {"en" : [], "es" : ["san"]}
+#These are the particles used in different languages inside the surnames to connect them but NOT in capital letters
 LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del",  "los", "las"]}
 
 LANGUAGES_NEXUS = {"en" : ["and"], "es" : ["y"]}
@@ -85,7 +89,12 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
                     check_surname[j] = ""
         adapted_surname = "".join(check_surname).rstrip()
         if (adapted_doublemetaphone(value, language) in merged_metaphore) or (adapted_doublemetaphone(adapted_surname, language) in merged_metaphore):
-            full_name_list[0][i] = ""
+            #The methapone algorithm is not perfect... so that we include here a crosschecking of very close phonetical, but far written data.
+            similar = 0
+            for compared in merged_list:
+                if jaro(adapted_surname, compared) > similar: similar = jaro(adapted_surname, compared)
+            if similar > THRESHOLD_JARO:
+                full_name_list[0][i] = ""
     return " ".join(full_name_list[0]).rstrip()
 def adapted_doublemetaphone(data, language="en"):
     '''
@@ -279,9 +288,13 @@ def get_splitted_name_from_complete_name(complete_name, language="en", include_p
     name_category = []
     for i, particle in enumerate(name_split):
         #Let's check if the particle is containing data for next
-        if particle.lower() in LANGUAGES_ADDS.get(language, []):
+        if particle.lower() in LANGUAGES_ADDS.get(language, []) + LANGUAGES_ADDS_TITLE.get(language, []):
             if (include_particle):
-                name_split[i] = particle.lower()
+                if particle.lower() in LANGUAGES_ADDS_TITLE.get(language, []):
+                    #it shall be in captial letter as we are using the list of capital lettes
+                    name_split[i] = particle.lower().title()
+                else:
+                    name_split[i] = particle.lower()
             else:
                 name_split[i] = ""
             places_2_join.append(i)

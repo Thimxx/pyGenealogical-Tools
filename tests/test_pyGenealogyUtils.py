@@ -53,6 +53,8 @@ class Test(unittest.TestCase):
         assert(get_name_from_fullname("Geronima De Bargas Albarez", ['Vargas'], ['Álvarez'], language="es") == "Gerónima")
         #The bug with the "de" particle
         assert(get_name_from_fullname("Florentina Montemayor Leon", ['Montemayor'], ['de Leon'], language="es") == "Florentina")
+        #Checking the bug of "Maria de la Cruz" captured as just Maria, due to similarity phonetically of Cruz and Grazia
+        assert(get_name_from_fullname("Maria De La Cruz Garcia", ['García', 'Grazia'], ['Díez', 'Díaz'], language="es") == "María de la Cruz" )
         
     def test_date_check(self):
         '''
@@ -207,7 +209,11 @@ class Test(unittest.TestCase):
         name, surname, _ = get_name_surname_from_complete_name(name7, convention = "spanish_surname", language="es")
         assert(name == "Higinia")
         assert(surname == "")
-        
+        #Bug with particle San in Spanish
+        name8 = "Michaela San Miguel"
+        name, surname, _ = get_name_surname_from_complete_name(name8, convention = "spanish_surname", language="es")
+        assert(name == "Micaela")
+        assert(surname == "San Miguel")
     def test_name_splitted(self):
         '''
         Test the split of names function
