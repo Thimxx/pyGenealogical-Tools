@@ -255,8 +255,11 @@ class getFSfamily(object):
                     if (self.naming_convention == "spanish_surname"):
                         #We need to ensure 2 surnames in spanish naming conventions
                         if not (mother.gen_data["surname"] in partner.gen_data["surname"]) or (len(partner.gen_data["surname"].split()) == 1):
+                            #In the case we have 2 surnames, we try to eliminate the second surnames.
+                            partner_surname_data = get_splitted_name_from_complete_name(partner.gen_data["surname"], language=self.language)
+                            mother_surname_data = get_splitted_name_from_complete_name(mother.gen_data["surname"], language=self.language)
                             if len(partner.gen_data["nicknames"]) == 0: partner.add_nickname(partner.returnFullName())
-                            partner.gen_data["surname"] = " ".join([partner.gen_data["surname"], mother.gen_data["surname"]])
+                            partner.gen_data["surname"] = " ".join([partner_surname_data[0][0], mother_surname_data[0][0]])
         #Finally, let's merge those profiles that are the same!
         indexes_to_remove = []
         iterating_list = list(self.profiles)

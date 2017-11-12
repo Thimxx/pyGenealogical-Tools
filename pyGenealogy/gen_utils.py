@@ -464,6 +464,3 @@ for language in LANGUAGES_FILES.keys():
                 value = line_file.replace("\n", "").rstrip()
                 met_changed = adapted_doublemetaphone(value, language=language)
                 LANGUAGES_DATA[language][data_kind][value] =  met_changed
-            
- 
-    
