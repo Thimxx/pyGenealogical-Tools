@@ -280,11 +280,8 @@ class getFSfamily(object):
         '''
         Function to avoid repetition
         '''
-        if (column_criteria in date_fields.keys()):
-            return profile.setCheckedDate(date_fields[column_criteria], date_object, accuracy)
-        else:
-            logging.error(NO_VALID_DATA_FIELD + column_criteria)
-            return False
+        #No check if included in data_fileds as already included in the check!
+        return profile.setCheckedDate(date_fields[column_criteria], date_object, accuracy)
     def create_profiles_in_Geni(self, geni_data):
         '''
         This method will create the needed profiles directly in Geni

@@ -193,6 +193,7 @@ class Test(unittest.TestCase):
         fsclass = getFSfamily(input_file, "spanish_surname", language = "es")
         assert(fsclass.related_profiles[3].gen_data["surname"] == "de Ayala Martínez")
     
+    
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_fs_reader']
