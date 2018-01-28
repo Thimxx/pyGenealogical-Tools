@@ -6504,7 +6504,6 @@ Leodowaldo
 Leofrido
 Leola
 Leoma
-Leon
 León
 Leona
 Leonard
@@ -7471,7 +7470,6 @@ Melissa
 Melita
 Melitea
 Melito
-Meliton
 Melitón
 Melitona
 Melodie
@@ -7609,6 +7607,7 @@ Milforte
 Milia
 Miliani
 Militina
+Militón
 Militza
 Milka
 Milla
@@ -7621,7 +7620,7 @@ Millicent
 Milo
 Milorad
 Milos
-Milton
+Militon
 Miluzka
 Milva
 Milvana
@@ -8647,8 +8646,6 @@ Paterniano
 Paterno
 Patience
 Patil
-Patric
-Patrice
 Patricia
 Patricio
 Patrick
@@ -8839,6 +8836,7 @@ Polly
 Polo
 Poloma
 Polonia
+Polonio
 Polyeno
 Pomona
 Pompeo
@@ -9074,7 +9072,6 @@ Rama
 Ramira
 Ramiro
 Ramlaf
-Ramon
 Ramón
 Ramona
 Ramses
@@ -10967,11 +10964,9 @@ Vitalina
 Vitantonio
 Vitas
 Vito
+Vitorio
 Vitoldo
-Vitoria
 Vitruvio
-Vittoria
-Vittorio
 Viveka
 Vivencio
 Vivetta
@@ -11133,8 +11128,6 @@ Xanthe
 Xanthus
 Xantifa
 Xanto
-Xavier
-Xaviera
 Xena
 Xenia
 Xenos

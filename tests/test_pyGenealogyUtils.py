@@ -113,13 +113,12 @@ class Test(unittest.TestCase):
         '''
         Test the translation of location data using google API
         '''
-        
         output = get_formatted_location(GENERIC_PLACE_STRING, language="en")
         assert(output["latitude"] > 41.4781556 )
-        assert(output["longitude"] < -4.5863 )
+        assert(output["longitude"] < -4.0 )
         assert(output["city"] == "Portillo")
         assert(output["county"] == "Valladolid")
-        assert(output["state"] == "Castilla y León")
+        assert(output["state"] == "Castile and León")
         assert(output["country"] == "Spain")
         self.assertFalse("place_name" in output.keys())
         output2 = get_formatted_location(GENERIC_PLACE_WITH_PLACE, language="es")

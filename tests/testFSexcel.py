@@ -193,8 +193,15 @@ class Test(unittest.TestCase):
         fsclass = getFSfamily(input_file, "spanish_surname", language = "es")
         assert(fsclass.related_profiles[3].gen_data["surname"] == "de Ayala Martínez")
     
+    def test_issue_single_parent(self):
+        '''
+        Test no issue with a single parent in marriage
+        '''
+        #No need to check anything, just making sure it works ok.
+        input_file = os.path.join(self.filelocation, "fs-JuarezRuiz.xlsx")
+        getFSfamily(input_file, "spanish_surname", language = "es")
+        
     
-
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_fs_reader']
     unittest.main()

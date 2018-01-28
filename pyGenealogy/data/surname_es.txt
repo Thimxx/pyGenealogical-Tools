@@ -88,6 +88,7 @@ Arjona
 Armas
 Armengol
 Arnaiz
+Arnanz
 Arnal
 Arnau
 Aroca
@@ -196,6 +197,7 @@ Bru
 Buendía
 Bueno
 Burgos
+Burgueno
 Busquets
 Bustamante
 Bustos
@@ -213,6 +215,7 @@ Cadenas
 Cal
 Calatayud
 Calderón
+Calero
 Calvet
 Calvo
 Calleja
@@ -447,6 +450,7 @@ Gascón
 Gaya
 Gelabert
 Gibert
+Gijón
 Gil
 Gilabert
 Giménez
@@ -573,6 +577,7 @@ Lloret
 Lluch
 Macías
 Machado
+Machuca
 Madrid
 Madrigal
 Maestre
@@ -764,6 +769,7 @@ Perera
 Pérez
 Pi
 Pina
+Pinar
 Pineda
 Pinedo
 Pinilla
@@ -792,6 +798,7 @@ Porta
 Portero
 Portillo
 Posada
+Potente
 Pou
 Poza
 Pozo
@@ -824,6 +831,7 @@ Ramón
 Ramos
 Raya
 Real
+Rebolledo
 Rebollo
 Recio
 Redondo
@@ -1046,6 +1054,7 @@ Villegas
 Villena
 Viña
 Viñas
+Vitoria
 Vives
 Vizcaíno
 Yáñez
@@ -1123,7 +1132,8 @@ Atencio
 Ávila 
 Avilés 
 Ayala 
-Baca 
+Baca
+Bachiller
 Badillo 
 Báez 
 Baeza 

@@ -224,6 +224,7 @@ def get_formatted_location(location_string, language="en"):
                 #This is the data of the name of the location
                 for level in  data["results"][0]["address_components"]:
                     if "locality" in level["types"]: output["city"] = level["long_name"]
+                    elif "administrative_area_level_4" in level["types"]: output["city"] = level["long_name"]
                     elif "administrative_area_level_2" in level["types"]: output["county"] = level["long_name"]
                     elif "administrative_area_level_1" in level["types"]: output["state"] = level["long_name"]
                     elif "country" in level["types"]: output["country"] = level["long_name"]

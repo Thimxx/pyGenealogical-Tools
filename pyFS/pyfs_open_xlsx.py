@@ -108,37 +108,39 @@ class getFSfamily(object):
                 column_criteria = current_sheet.cell(row=self.initial_row, column=column_index).value
                 cell_value = current_sheet.cell(row=row, column=column_index).value
                 if (column_criteria in ["father_full_name", "mother_full_name"]  ):
-                    name_data = get_name_surname_from_complete_name(cell_value, convention=self.naming_convention, language=self.language)
-                    #We have two surnames or one?
-                    surname_cand = name_data[1]
-                    if (name_data[2] == 2):
-                        surname_cand = name_data[1].split()[0]
-                    if(column_criteria == "father_full_name"):
-                        if (not surname_cand in potential_father_surname):
-                            potential_father_surname.append(surname_cand)
-                            potential_father_surname_repetitions.append(1)
-                        else:
-                            index = potential_father_surname.index(surname_cand)
-                            potential_father_surname_repetitions[index] = potential_father_surname_repetitions[index] + 1
-                        if (not name_data[0] in potential_father_name):
-                            potential_father_name.append(name_data[0])
-                            potential_father_name_repetitions.append(1)
-                        else:
-                            index = potential_father_name.index(name_data[0])
-                            potential_father_name_repetitions[index] = potential_father_name_repetitions[index] + 1
-                    elif(column_criteria == "mother_full_name"):
-                        if (not surname_cand in potential_mother_surname):
-                            potential_mother_surname.append(surname_cand)
-                            potential_mother_surname_repetitions.append(1)
-                        else:
-                            index = potential_mother_surname.index(surname_cand)
-                            potential_mother_surname_repetitions[index] = potential_mother_surname_repetitions[index] + 1
-                        if (not name_data[0] in potential_mother_name):
-                            potential_mother_name.append(name_data[0])
-                            potential_mother_name_repetitions.append(1)
-                        else:
-                            index = potential_mother_name.index(name_data[0])
-                            potential_mother_name_repetitions[index] = potential_mother_name_repetitions[index] + 1
+                    #If the cell_value is null we shall avoid continuing
+                    if (cell_value != None):
+                        name_data = get_name_surname_from_complete_name(cell_value, convention=self.naming_convention, language=self.language)
+                        #We have two surnames or one?
+                        surname_cand = name_data[1]
+                        if (name_data[2] == 2):
+                            surname_cand = name_data[1].split()[0]
+                        if(column_criteria == "father_full_name"):
+                            if (not surname_cand in potential_father_surname):
+                                potential_father_surname.append(surname_cand)
+                                potential_father_surname_repetitions.append(1)
+                            else:
+                                index = potential_father_surname.index(surname_cand)
+                                potential_father_surname_repetitions[index] = potential_father_surname_repetitions[index] + 1
+                            if (not name_data[0] in potential_father_name):
+                                potential_father_name.append(name_data[0])
+                                potential_father_name_repetitions.append(1)
+                            else:
+                                index = potential_father_name.index(name_data[0])
+                                potential_father_name_repetitions[index] = potential_father_name_repetitions[index] + 1
+                        elif(column_criteria == "mother_full_name"):
+                            if (not surname_cand in potential_mother_surname):
+                                potential_mother_surname.append(surname_cand)
+                                potential_mother_surname_repetitions.append(1)
+                            else:
+                                index = potential_mother_surname.index(surname_cand)
+                                potential_mother_surname_repetitions[index] = potential_mother_surname_repetitions[index] + 1
+                            if (not name_data[0] in potential_mother_name):
+                                potential_mother_name.append(name_data[0])
+                                potential_mother_name_repetitions.append(1)
+                            else:
+                                index = potential_mother_name.index(name_data[0])
+                                potential_mother_name_repetitions[index] = potential_mother_name_repetitions[index] + 1
         index_father_surname = potential_father_surname_repetitions.index(max(potential_father_surname_repetitions))
         index_mother_surname = potential_mother_surname_repetitions.index(max(potential_mother_surname_repetitions))
         father_surname = potential_father_surname[index_father_surname]
@@ -171,7 +173,7 @@ class getFSfamily(object):
                         #Notice that we shall detect if the given date is a year or a specific date
                         #we will make the different using "about" and using datetime in the background
                         if(is_year(cell_value)):
-                            this_introduction = self.__include_a_date__(column_criteria, included_profile, datetime.strptime(str(cell_value), "%Y").date(), "ABOUT")
+                            this_introduction = self.__include_a_date__(column_criteria, included_profile, datetime.strptime(str(cell_value.replace(" ", "")), "%Y").date(), "ABOUT")
                         else:
                             this_introduction = self.__include_a_date__(column_criteria, included_profile, datetime.strptime(cell_value, "%d %b %Y").date(), "EXACT")
                     elif(column_criteria == "full_name"):
@@ -193,7 +195,8 @@ class getFSfamily(object):
                         parents = cell_value.split(";")
                         #We obtain firstly the different names
                         father_name, father_surname, _ = get_name_surname_from_complete_name(parents[0], convention=self.naming_convention, language=self.language)
-                        mother_name, mother_surname, _ = get_name_surname_from_complete_name(parents[1], convention=self.naming_convention, language=self.language)
+                        if (len(parents) == 2):
+                            mother_name, mother_surname, _ = get_name_surname_from_complete_name(parents[1], convention=self.naming_convention, language=self.language)
                         #The algorithm provides an empty surname, we fill it with not known
                         if (father_surname == ""): father_surname = NOT_KNOWN_VALUE
                         if (mother_surname == ""): mother_surname = NOT_KNOWN_VALUE
@@ -202,7 +205,7 @@ class getFSfamily(object):
                         mother = gen_profile(mother_name, mother_surname)
                         #If the surname is changed we shall include the previous surname in the nicknames
                         if (parents[0] != father.returnFullName()): father.add_nickname(parents[0])
-                        if (parents[1] != mother.returnFullName()): mother.add_nickname(parents[1])
+                        if (len(parents) == 2) and (parents[1] != mother.returnFullName()): mother.add_nickname(parents[1])
                         #add gender
                         father.setCheckedGender("M")
                         mother.setCheckedGender("F")
