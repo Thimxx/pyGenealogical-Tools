@@ -1,0 +1,8 @@
+requests
+metaphone
+openpyxl
+pyexcel 
+pyexcel-xls 
+python-Levenshtein
+pyexcel-xlsx
+gedcompy

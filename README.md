@@ -35,6 +35,12 @@ This application uses the Geni API but is not endorsed, operated, or sponsored b
 
 # Installation instructions
 
+You can install it using pip
+
+::
+
+    pip install pyGenealogicalTools
+
 Tested using python 3.5.3 and 3.6.2, happy to test other versions if needed. Main limitation are the testing capabilities in travis for wxpython.
 
 In order to use the tools you will need to install the following modules:
@@ -45,6 +51,8 @@ In order to use the tools you will need to install the following modules:
 * pyexcel pyexcel-xls pyexcel-xlsx (only used for transforming xls into xlsx)
 * python-Levenshtein
 * gedcompy https://pypi.python.org/pypi/gedcompy | https://github.com/rory/gedcompy/
+
+All the previous modules are available in the requirements.txt file, but wxpython needs to be manually installed, visit wxpython page for further info.
 
 Concerning testing, the repository if configured to use nose, coverage, nose-htmloutput, so you will need to install in your local installation as well.
 

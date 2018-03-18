@@ -67,8 +67,8 @@ class testAncestorsClimb(unittest.TestCase):
         for i in range(0, generations+1):
             for j in range(0, generations + 1):
                 total_final = total_final + anc_count[i][j]
-        assert(total_final == 38)
-        assert(len(profiles) == 38)
+        assert(total_final == 36)
+        assert(len(profiles) == 36)
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

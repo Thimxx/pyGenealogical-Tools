@@ -131,9 +131,7 @@ class Test(unittest.TestCase):
         assert(output2["place_name"] == "Nuestra Señora de los Remedios")
         
         assert(get_location_standard(output2) == "La Parrilla, Valladolid, Castilla y León, España" )
-        
         output3 = get_formatted_location("La Asunción, Herrera De Duero, Valladolid, Spain", language="es")
-        
         assert("city" in output3)
         
         

@@ -109,3 +109,4 @@ ENV/
 /genidata.out.dir
 /update_key.py
 /testing_exec.py
+/.pypirc

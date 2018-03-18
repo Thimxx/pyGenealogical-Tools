@@ -21,7 +21,7 @@ from pyGedcom.gedcompy_wrapper import gedcom_file
 from pyGeni.geniapi_common import geni_calls
 
 DIFFERNCE_BIRTH_BAPT = 90
-ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name"]
+ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name", "easy_unique_id", "record_url", "subcollection_id"]
 date_fields = {"birth_date" : "birth_date" , "burial_date" : "burial_date", "chr_date" : "baptism_date",
                "residence_date" : "residence_date", "death_date" : "death_date", "marriage_date" : "marriage_date"}
 LOCATION_EQUIVALENCE = {"birth_place_text" : "birth_place", "death_place_text" : "death_place", "residence_place_text" : "residence_place",
