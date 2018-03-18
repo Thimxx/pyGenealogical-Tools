@@ -7,12 +7,13 @@ import logging
 from messages.pyGenealogymessages import NO_VALID_CONVENTION, NO_VALID_ACCURACY, NO_VALID_LOCATION
 from messages.pyGenealogymessages import NO_VALID_BIRTH_DATE, NO_VALID_DEATH_DATE, NO_VALID_DEATH_AND_BURIAL
 from datetime import date
-from pyGenealogy import VALUES_ACCURACY
+from pyGenealogy import VALUES_ACCURACY, get_google_key
 from metaphone import doublemetaphone
 from Levenshtein import jaro
 import math
 import requests
 import pyGenealogy, os, re
+import googlemaps
 
 THRESHOLD_JARO = 0.7
 
@@ -208,27 +209,36 @@ def get_formatted_location(location_string, language="en"):
     This function will provide a standard location based on google maps service
     online
     '''
+    #Set up first the output
     output = {}
     output["raw"] = location_string
-    url = GOOGLE_GEOLOCATION_ADDRESS + "language=" + language + "&address=" + location_string
-    r = requests.get(url)
-    data = r.json()
-    if (data["status"] == "OK"):
+    gmaps_result = []
+    #We are keeping the previous coding in case somebody is not getting the google API key
+    #Google maps API is not answering properly is an empty script is provided.
+    if (get_google_key == None) or (location_string == ""):
+        url = GOOGLE_GEOLOCATION_ADDRESS + "language=" + language + "&address=" + location_string
+        r = requests.get(url)
+        data = r.json()
+        gmaps_result = data["results"]
+    else:
+        gmaps = googlemaps.Client(key=get_google_key())
+        gmaps_result = gmaps.geocode(location_string, language=language)
+    if (len(gmaps_result) > 0):
         #Received data is ok, we can proceed
-        for result_input in data["results"][0].keys():
+        for result_input in gmaps_result[0].keys():
             if(result_input == "geometry"):
                 #As we got the location details, let's get them
-                output["latitude"] = data["results"][0]["geometry"]["location"]["lat"]
-                output["longitude"] = data["results"][0]["geometry"]["location"]["lng"]
+                output["latitude"] = gmaps_result[0]["geometry"]["location"]["lat"]
+                output["longitude"] = gmaps_result[0]["geometry"]["location"]["lng"]
             elif(result_input == "address_components"):
                 #This is the data of the name of the location
-                for level in  data["results"][0]["address_components"]:
+                for level in  gmaps_result[0]["address_components"]:
                     if "locality" in level["types"]: output["city"] = level["long_name"]
                     elif "administrative_area_level_4" in level["types"]: output["city"] = level["long_name"]
                     elif "administrative_area_level_2" in level["types"]: output["county"] = level["long_name"]
                     elif "administrative_area_level_1" in level["types"]: output["state"] = level["long_name"]
                     elif "country" in level["types"]: output["country"] = level["long_name"]
-    elif (data["status"] in ["ZERO_RESULTS", 'INVALID_REQUEST']):
+    else:
         #Data is not found, let's try removing some
         logging.warning(NO_VALID_LOCATION)
         logging.warning(location_string)

@@ -37,8 +37,6 @@ This application uses the Geni API but is not endorsed, operated, or sponsored b
 
 You can install it using pip
 
-::
-
     pip install pyGenealogicalTools
 
 Tested using python 3.5.3 and 3.6.2, happy to test other versions if needed. Main limitation are the testing capabilities in travis for wxpython.
@@ -51,10 +49,40 @@ In order to use the tools you will need to install the following modules:
 * pyexcel pyexcel-xls pyexcel-xlsx (only used for transforming xls into xlsx)
 * python-Levenshtein
 * gedcompy https://pypi.python.org/pypi/gedcompy | https://github.com/rory/gedcompy/
+* googlemaps
 
 All the previous modules are available in the requirements.txt file, but wxpython needs to be manually installed, visit wxpython page for further info.
 
 Concerning testing, the repository if configured to use nose, coverage, nose-htmloutput, so you will need to install in your local installation as well.
+
+## Google Key API
+
+One of the packages used is googlemaps, which wraps the Google Maps API. However this library requires the use of a google maps API to work.
+
+It has been found that not having a google API KEY creates random crashes and wrong values, so it is strongly recommended to use the KEY. To get the key just follow these intructions (same instructions for googlemaps api https://github.com/googlemaps/google-maps-services-python/blob/master/README.md):
+
+ 1. Visit https://developers.google.com/console and log in with
+    a Google Account.
+ 1. Select one of your existing projects, or create a new project.
+ 1. Enable the API(s) you want to use. The Python Client for Google Maps Services
+    accesses the following APIs:
+    * Directions API
+    * Distance Matrix API
+    * Elevation API
+    * Geocoding API
+    * Geolocation API
+    * Places API
+    * Roads API
+    * Time Zone API
+ 1. Create a new **Server key**.
+ 1. If you'd like to restrict requests to a specific IP address, do so now.
+ 
+ Finally you need to transfer to pyGenealogyTools the variable value. There are 2 ways:
+ 
+ 1. Introduce an environmental variable called GOOGLE_API with the value
+ 1. Use the functions pyGenealogy.set_google_key() to set up the value of the API KEY.
+
+Without the key, pyGenealogyTools will work, but it is prone to errors due to lack of a key, so be aware in case you are using it extensively. Better description of the issue can be found here: https://stackoverflow.com/questions/48488693/unstable-behaviour-of-google-maps-api
 
 # Usage
 

@@ -5,6 +5,7 @@ Created on 26 ago. 2017
 '''
 import unittest
 from datetime import date
+from pyGenealogy import get_google_key, set_google_key
 from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_fullname, checkDateConsistency, getBestDate, get_partner_gender
 from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name, get_splitted_name_from_complete_name
 from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates, get_compared_data_file, adapted_doublemetaphone
@@ -108,6 +109,17 @@ class Test(unittest.TestCase):
         date8, accuracy8 = getBestDate(date1, "LALALA", date2, "ABOUT")
         assert(date8 == None)
         assert(accuracy8 == None)
+    
+    def test_key_data_for_google(self):
+        '''
+        Test basic use of google key
+        '''
+        previous =  get_google_key()
+        
+        set_google_key(None)
+        assert(None, get_google_key())
+        
+        set_google_key(previous)
     
     def test_get_location_data(self):
         '''
