@@ -1,5 +1,6 @@
 [run]
 omit =
+    setup.py
     GeniTools.py
     GeniToolsGUI.py
     ./tests/*

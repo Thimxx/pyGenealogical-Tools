@@ -63,6 +63,7 @@ SANDBOX_MAIN_API_NOG = "https://sandbox.geni.com/api/profile-399"
 MAIN_SANDBOX_PROFILE_ID = "profile-399"
 FATHER_PROFILE_SANDBOX = "https://sandbox.geni.com/api/profile-g1149810"
 BROTHER_PROFILE_SANDBOX = "https://sandbox.geni.com/api/profile-g1150205"
+GRANDFATHER_SANDBOX = "https://sandbox.geni.com/people/GrandFather-Profile/1230605"
 
 #Other data
 GENI_INPUT_THROUGH = "https://www.geni.com/people/Leoncio-Cerro-Siguenza/6000000048574355159?through=6000000048688500197"

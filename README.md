@@ -15,6 +15,7 @@ It is mainly offering the following capabilities:
 * Create a child, parents or partner in geni
 * Delete a profile in geni
 * Get profile, relations and union data.
+* Extract the tree of descendants of a profile in gedcom
 3) Several genealogical functions.
 * Get children surname based on several naming conventions
 * Get name removing surnames
@@ -55,7 +56,7 @@ All the previous modules are available in the requirements.txt file, but wxpytho
 
 Concerning testing, the repository if configured to use nose, coverage, nose-htmloutput, so you will need to install in your local installation as well.
 
-## Google Key API
+### Google Key API
 
 One of the packages used is googlemaps, which wraps the Google Maps API. However this library requires the use of a google maps API to work.
 

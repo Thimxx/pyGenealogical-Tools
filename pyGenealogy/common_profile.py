@@ -139,11 +139,8 @@ class gen_profile(object):
         '''
         if event_place in DATA_PLACES:
             location_data = get_formatted_location(location, language)
-            if (location_data == None):
-                return False
-            else:
-                self.gen_data[event_place] = location_data
-                return True
+            self.gen_data[event_place] = location_data
+            return True
         else:
             return False
     def selfcheckDateConsistency(self, dict_dates, dict_accuracy):

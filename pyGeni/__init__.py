@@ -1,4 +1,4 @@
-__all__ = ["profile", "data_models", "immediate_family", "geniapi_common", "union"]
+__all__ = ["profile", "data_models", "immediate_family", "geniapi_common", "union", "geni2gedcom"]
 
 import requests, logging
 from messages.pygeni_messages import ERROR_REQUESTS

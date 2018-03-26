@@ -46,9 +46,9 @@ class testpyGeniNoProfile(unittest.TestCase):
         '''
         philip_family = immediate_family(FIXTURES.PHILIPIVid)
         assert (len(philip_family.parents) == 2)
-        assert(len(philip_family.sibligns) == 7)
+        assert(len(philip_family.sibligns) == 8)
         assert(len(philip_family.partner) == 5)
-        assert(len(philip_family.children) == 18)
+        assert(len(philip_family.children) == 19)
         assert(philip_family.union_extracted)
         
     def test_immediatefamily_not_operational(self):

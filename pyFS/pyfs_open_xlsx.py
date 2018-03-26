@@ -10,7 +10,7 @@ from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import is_year, naming_conventions, get_children_surname, get_name_from_fullname, get_partner_gender
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name, get_splitted_name_from_complete_name, get_location_standard
 from datetime import datetime
-from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, NO_VALID_DATA_FIELD, ENDED, NO_VALID_FILE, NOT_EXISTING_FILE, NO_GENI_EXECUTION, NO_GENI_KEY
+from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, ENDED, NO_VALID_FILE, NOT_EXISTING_FILE, NO_GENI_EXECUTION, NO_GENI_KEY
 from messages.pyFS_messages import COLUMN_NOT_FOUND
 from pyGeni import profile
 from pyGenealogy import NOT_KNOWN_VALUE
