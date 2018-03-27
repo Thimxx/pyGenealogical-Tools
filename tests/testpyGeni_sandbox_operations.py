@@ -32,7 +32,8 @@ class Test(unittest.TestCase):
         assert(prof.gen_data["gender"] == "M")
         assert(prof.gen_data["surname"] == "Profile")
         assert(prof.gen_data["name"] == "Testing")
-        #Testing using profile input
+        #Securing before is properly captured
+        assert(prof.gen_data["accuracy_baptism_date"] == "BEFORE")
         
         prof = profile.profile(MAIN_SANDBOX_PROFILE_API)
         assert(prof.gen_data["name"] == "Testing")
@@ -164,7 +165,6 @@ class Test(unittest.TestCase):
         partner_profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
         partner_profile.setCheckedDate("marriage_date", date(2017,11,20) , "EXACT")
         partner_profile.setPlaces("marriage_place",GENERIC_PLACE_STRING , language="es")
-        
         profile.profile.create_as_a_partner(partner_profile, geni_input = BROTHER_PROFILE_SANDBOX)
         #TODO: add checking of marriage data once is included
         assert(partner_profile.properly_executed)

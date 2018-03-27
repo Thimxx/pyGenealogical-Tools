@@ -83,8 +83,8 @@ class profile(geni_calls, gen_profile):
         date_received = None
         if (data_dict.get("year",None) != None): date_received = date(data_dict.get("year"), data_dict.get("month", 1), data_dict.get("day", 1))
         if (data_dict.get("circa", "false") == "true"): accuracy = "ABOUT"
-        elif (data_dict.get("range", "before") == "true"): accuracy = "BEFORE"
-        elif (data_dict.get("range", "after") == "true"): accuracy = "AFTER"
+        elif (data_dict.get("range", "") == "before"): accuracy = "BEFORE"
+        elif (data_dict.get("range", "") == "after"): accuracy = "AFTER"
         else: accuracy = "EXACT"
         return date_received, accuracy
     def get_geni_data(self, data):

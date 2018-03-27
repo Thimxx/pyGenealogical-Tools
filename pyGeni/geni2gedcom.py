@@ -4,10 +4,11 @@ Created on 26 mar. 2018
 @author: Val
 '''
 #TODO: mixed families+
-
+import logging
 from pyGedcom.gedcompy_wrapper import gedcom_file
 from pyGedcom.gedcom_profile import gedcom_profile
 from pyGeni import profile
+from messages.pygeni_messages import NUMBER_OF_PROFILES, PROCESSING
 
 class geni2gedcom(object):
     '''
@@ -34,6 +35,7 @@ class geni2gedcom(object):
         '''
         Recursive function to introduce the family in the gedcom
         '''
+        logging.info(NUMBER_OF_PROFILES + str(len(self.added_profiles.keys())) + PROCESSING + init_profile.nameLifespan())
         #Let's take first the children
         children = init_profile.children
         prof_id = init_profile.geni_specific_data["id"]

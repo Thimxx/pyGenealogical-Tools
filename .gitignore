@@ -110,3 +110,4 @@ ENV/
 /update_key.py
 /testing_exec.py
 /.pypirc
+/get_gedcom.py
