@@ -10,13 +10,11 @@ from datetime import date
 
 class union(geni_calls):
     '''
-    This class will be extractin data about unions in Geni
+    This class will be extracting data about unions in Geni
     '''
-
-
     def __init__(self, union_id):
         '''
-        Constructor
+        Constructor it takes the union id from Geni
         '''
         #We initiate the base classes
         geni_calls.__init__(self)

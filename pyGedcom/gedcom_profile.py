@@ -107,6 +107,9 @@ class gedcom_profile(common_profile.gen_profile):
             if "raw" in location.keys():
                 ged_event_plac = gedcom.Element(tag="PLAC", value=location["raw"])
                 ged_event.add_child_element(ged_event_plac)
+            elif "formatted_location" in location.keys():
+                ged_event_plac = gedcom.Element(tag="PLAC", value=location["formatted_location"])
+                ged_event.add_child_element(ged_event_plac)
             for loc_key in LOCATION_EQUIVALENCE.keys():
                 #Ok, this data is available, let's use it!
                 if loc_key in location.keys():
