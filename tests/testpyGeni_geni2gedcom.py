@@ -30,9 +30,9 @@ class Test(unittest.TestCase):
         if os.path.exists(file_ged): os.remove(file_ged)
         prof = profile.profile(GRANDFATHER_SANDBOX)
         tester = geni2gedcom.geni2gedcom(prof)
-        tester.get_gedcom(file_ged)
+        gedcomfile = tester.get_gedcom(file_ged)
         
-        gedcomfile = gedcom.parse(file_ged)
+        #gedcomfile = gedcom.parse(file_ged)
         counts = 0
         for person in gedcomfile.individuals:
             firstname, lastname = person.name

@@ -8,6 +8,7 @@ Created on 8 ago. 2017
 import pyGeni as s
 from messages.pygeni_messages import NO_VALID_TOKEN
 import logging
+from datetime import date
 
 class geni_calls():
     '''
@@ -41,3 +42,17 @@ class geni_calls():
         elif ( str(valid_token['result']) == "OK"):
             tokenIsOk = True
         return tokenIsOk
+    @classmethod
+    def get_date(self, data_dict):
+        '''
+        Get date from the Geni standard, used in unions and profiles
+        '''
+        #TODO: this needs a restructuring when changing as well the data model of dates.
+        accuracy = None
+        date_received = None
+        if (data_dict.get("year",None) != None): date_received = date(data_dict.get("year"), data_dict.get("month", 1), data_dict.get("day", 1))
+        if (data_dict.get("circa", "false") == "true"): accuracy = "ABOUT"
+        elif (data_dict.get("range", "") == "before"): accuracy = "BEFORE"
+        elif (data_dict.get("range", "") == "after"): accuracy = "AFTER"
+        else: accuracy = "EXACT"
+        return date_received, accuracy

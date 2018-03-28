@@ -10,7 +10,6 @@ from pyGeni.immediate_family import immediate_family
 from pyGenealogy.common_profile import gen_profile, EVENT_DATA, ALL_EVENT_DATA
 from pyGenealogy import NOT_KNOWN_VALUE
 from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS, RESIDENCE_MESSAGE, NO_VALID_UNION_PROFILE
-from datetime import date
 import logging
 
 SPECIFIC_GENI_STRING = ['id', 'url', 'profile_url', 'creator' ]
@@ -68,25 +67,15 @@ class profile(geni_calls, gen_profile):
         self.children = self.relations.children
         self.parent_union = self.relations.parent_union
         self.marriage_union = self.relations.marriage_union
+        #This is temporal, only a single marriage is considered
+        if (len(self.relations.marriage_dates) > 0):
+            self.setCheckedDate("marriage_date", self.relations.marriage_dates[0], self.relations.marriage_accuracy[0])
+            self.gen_data["marriage_place"] =self.relations.marriage_places[0]
     def get_id(self):
         '''
         Simple function to get Geni ID
         '''
         return self.data['id']
-    @classmethod
-    def get_date(self, data_dict):
-        '''
-        Get date from the Geni standard
-        '''
-        #TODO: this needs a restructuring when changing as well the data model of dates.
-        accuracy = None
-        date_received = None
-        if (data_dict.get("year",None) != None): date_received = date(data_dict.get("year"), data_dict.get("month", 1), data_dict.get("day", 1))
-        if (data_dict.get("circa", "false") == "true"): accuracy = "ABOUT"
-        elif (data_dict.get("range", "") == "before"): accuracy = "BEFORE"
-        elif (data_dict.get("range", "") == "after"): accuracy = "AFTER"
-        else: accuracy = "EXACT"
-        return date_received, accuracy
     def get_geni_data(self, data):
         '''
         Transfer json geni data into the base profile

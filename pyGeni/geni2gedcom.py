@@ -31,6 +31,7 @@ class geni2gedcom(object):
         self.introduce_family(self.geni_profile, new_gedcom)
         #We save in the output specified
         new_gedcom.save(output)
+        return new_gedcom
     def introduce_family(self, init_profile, gedcom_data):
         '''
         Recursive function to introduce the family in the gedcom

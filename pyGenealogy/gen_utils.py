@@ -460,6 +460,15 @@ def get_location_standard(location):
             else:
                 result += ", " + value
     return result
+
+def formated_year(year, accuracy):
+    '''
+    This function will create a standard formated year
+    '''
+    if (accuracy == "EXACT"): return str(year)
+    elif (accuracy == "ABOUT"): return "ca " + str(year)
+    elif (accuracy == "AFTER"): return "aft. " + str(year)
+    elif (accuracy == "BEFORE"): return "bef. " + str(year)
 #====================================================================================
 #Execution of module code
 #====================================================================================

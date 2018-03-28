@@ -5,7 +5,7 @@ Created on 13 ago. 2017
 '''
 from pyGenealogy.gen_utils import checkDateConsistency, get_formatted_location, get_score_compare_names, get_score_compare_dates
 from pyGenealogy import VALUES_ACCURACY
-from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS
+from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS, formated_year
 
 TOOL_ID = "PY-GENEALOGY"
 DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments", "id", "marriage_link"]
@@ -118,9 +118,9 @@ class gen_profile(object):
         Function for printing an standard format of naming
         '''
         year_birth = "?"
-        if("birth_date" in self.gen_data.keys()): year_birth = str(self.gen_data["birth_date"].year)
+        if("birth_date" in self.gen_data.keys()): year_birth = formated_year(self.gen_data["birth_date"].year, self.gen_data["accuracy_birth_date"]) 
         year_death = "?"
-        if("death_date" in self.gen_data.keys()): year_death = str(self.gen_data["death_date"].year)
+        if("death_date" in self.gen_data.keys()): year_death = formated_year(self.gen_data["death_date"].year, self.gen_data["accuracy_death_date"]) 
         if (year_birth == "?") and (year_death == "?"):
             return self.gen_data["name_to_show"]
         else:

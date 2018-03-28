@@ -6,7 +6,6 @@ Created on 19 sept. 2017
 
 import pyGeni as geni
 from pyGeni.geniapi_common import geni_calls
-from datetime import date
 
 class union(geni_calls):
     '''
@@ -27,10 +26,7 @@ class union(geni_calls):
             if key_value == "url": self.union_data["url"] = data[key_value]
             if key_value == "guid": self.union_data["guid"] = data[key_value]
             if key_value == "marriage_date":
-                day = data["marriage_date"].get("day", 1)
-                month = data["marriage_date"].get("month", 1)
-                year = data["marriage_date"].get("year", 1)
-                self.union_data["marriage_date"] = date(year, month, day)
+                self.union_data["marriage_date"], self.union_data["accuracy_marriage_date"] = self.get_date(data["marriage_date"])
             if key_value == "marriage_location":
                 self.union_data["marriage_place"] = {}
                 for location_key in data["marriage_location"].keys():

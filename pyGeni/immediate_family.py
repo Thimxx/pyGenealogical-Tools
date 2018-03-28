@@ -7,6 +7,7 @@ Created on 8 ago. 2017
 import pyGeni as s
 from pyGeni.geniapi_common import geni_calls
 from pyGeni.data_models import geni_union
+from pyGeni.union import union
 
 class immediate_family(geni_calls):
     '''
@@ -30,6 +31,9 @@ class immediate_family(geni_calls):
         self.children = []
         self.parent_union = []
         self.marriage_union = []
+        self.marriage_dates = []
+        self.marriage_places = []
+        self.marriage_accuracy = []
         if not( 'error' in self.data ):
             #In this case, we have extracted properly the union data
             self.union_extracted = True
@@ -47,7 +51,13 @@ class immediate_family(geni_calls):
                         self.sibligns = self.sibligns + tmp_union.children
                         self.parent_union.append(tmp_union)
                     else:
+                        #In this case we know is a marriage union
                         tmp_union.parents.remove(myid)
                         self.partner = self.partner +  tmp_union.parents
                         self.children = self.children + tmp_union.children
+                        #We obtain the union from Geni in order to introduce the marriage
+                        marriage_union = union(tmp_union.union_id)
                         self.marriage_union.append(tmp_union)
+                        self.marriage_dates.append( marriage_union.union_data.get('marriage_date', None))
+                        self.marriage_places.append(marriage_union.union_data.get('marriage_place', {}))
+                        self.marriage_accuracy.append(marriage_union.union_data.get('accuracy_marriage_date', None))

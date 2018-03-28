@@ -9,7 +9,7 @@ from pyGenealogy import get_google_key, set_google_key
 from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_fullname, checkDateConsistency, getBestDate, get_partner_gender
 from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name, get_splitted_name_from_complete_name
 from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates, get_compared_data_file, adapted_doublemetaphone
-from pyGenealogy.gen_utils import get_location_standard
+from pyGenealogy.gen_utils import get_location_standard, formated_year
 from tests.FIXTURES import RIGHT_YEAR, RIGHT_YEAR_IN_A_TEXT, WRONG_YEAR, JUST_TEXT, RIGHT_YEAR_IN_A_DATE
 from tests.FIXTURES import FATHER_SURNAME, MOTHER_SURNAME, SPANISH_CHILD_SURNAME, GENERIC_PLACE_CAPITALS
 from tests.FIXTURES import FULL_NAME, FULL_NAME_SPANISH, ACTUAL_NAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
@@ -344,6 +344,15 @@ class Test(unittest.TestCase):
         assert(adapted_doublemetaphone("Mathea", language="es") == adapted_doublemetaphone("Matea", language="es"))
         assert(adapted_doublemetaphone("Catalina", language="es") == adapted_doublemetaphone("Cathalina", language="es"))
         assert(adapted_doublemetaphone("Phelipe", language="es") == adapted_doublemetaphone("Felipe", language="es"))
+        
+    def test_year_formated(self):
+        '''
+        Test formatted year output
+        '''
+        assert(formated_year(2016, "EXACT") == "2016")
+        assert(formated_year(2016, "ABOUT") == "ca 2016")
+        assert(formated_year("2016", "AFTER") == "aft. 2016")
+        assert(formated_year(2016, "BEFORE") == "bef. 2016")
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
