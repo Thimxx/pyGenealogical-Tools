@@ -90,6 +90,7 @@ class RememoryParser(HTMLParser):
             self.at_name_location = False
         elif self.at_data_location:
             if ("Ayer" in data): self.death_date = datetime.datetime.today().date() - datetime.timedelta(days=1)
+            elif ("Hoy" in data): self.death_date = datetime.datetime.today().date()
             else:
                 self.death_date = datetime.datetime.strptime(data, "%d/%m/%Y").date()
             self.at_data_location = False

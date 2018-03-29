@@ -256,6 +256,12 @@ class Test(unittest.TestCase):
         score, factor = get_score_compare_names("Juan", "de la Fuente", "Juan", "Fuente", language="es")
         assert(score == 4.0)
         assert(factor == 1.0)
+        score, factor = get_score_compare_names("Juan", "Gómez Martín", "Juan", "Martín Gómez", language="es")
+        assert(score > 2.0)
+        assert(factor < 0.01)
+        score, factor = get_score_compare_names("Juan", "Gómez Martín", "Juan", "Gomez Martin", language="es")
+        assert(score == 6.0)
+        assert(factor == 1.0)
     
     def test_compare_date(self):
         '''

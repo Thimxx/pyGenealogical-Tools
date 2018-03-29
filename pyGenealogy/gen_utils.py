@@ -381,10 +381,17 @@ def get_score_compare_names(name1, surname1, name2, surname2, language="en", con
     met_name2 = adapted_doublemetaphone(splitted_name2[0], language=language)
     met_surname1 = adapted_doublemetaphone(splitted_surname1[0], language=language)
     met_surname2 = adapted_doublemetaphone(splitted_surname2[0], language=language)
+    
     #Let's calculate the factors
     factor1 = get_jaro_to_list(met_name1, met_name2)
-    factor2 = get_jaro_to_list(met_surname1, met_surname2, factor=0.95)
-    return 2*(factor1 +factor2), factor1*factor2
+    #We make a difference with spanish language, as we might have 2 surnames, making things easier for comparison
+    if ((len(met_surname1) == 4) and (len(met_surname2) == 4) and language=="es"):
+        factor_sub1 = get_jaro_to_list(met_surname1[0:2], met_surname2[0:2], factor=0.95)
+        factor_sub2 = get_jaro_to_list(met_surname1[2:], met_surname2[2:], factor=0.95)
+        return 2*(factor1 +factor_sub1+factor_sub2), factor1*factor_sub1*factor_sub2
+    else:
+        factor2 = get_jaro_to_list(met_surname1, met_surname2, factor=0.95)
+        return 2*(factor1 +factor2), factor1*factor2
 def get_jaro_to_list(first4jaro, list4jaro, factor = 0.9):
     result = [[0 for x in range(len(list4jaro))] for y in range(len(first4jaro))]
     loc_data = 0.0
