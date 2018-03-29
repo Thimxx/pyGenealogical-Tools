@@ -108,6 +108,8 @@ class Test(unittest.TestCase):
         assert(profile.setCheckedDate("birth_date", birth_date))
         assert(profile.setCheckedDate("death_date", death_date))
         assert(profile.setCheckedDate("baptism_date", baptism_date))
+        #Checking the function earliest date.
+        assert(profile.get_earliest_event() == birth_date)
         
         assert(not profile.setCheckedDate("baptism_date", earliest_date))
         assert(not profile.setCheckedDate("baptism_date", latest_date))

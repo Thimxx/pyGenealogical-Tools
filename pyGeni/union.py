@@ -17,9 +17,15 @@ class union(geni_calls):
         '''
         #We initiate the base classes
         geni_calls.__init__(self)
-        url = geni.GENI_API + union_id + geni.GENI_SINGLE_TOKEN + geni.get_token()
-        r = geni.geni_request_get(url)
-        data = r.json()
+        data = ""
+        if (union_id in geni.GENI_CALLED_UNIONS):
+            #In order to save calls we try to save the different calls
+            data = geni.GENI_CALLED_UNIONS[union_id]
+        else:
+            url = geni.GENI_API + union_id + geni.GENI_SINGLE_TOKEN + geni.get_token()
+            r = geni.geni_request_get(url)
+            data = r.json()
+            geni.GENI_CALLED_UNIONS[union_id] = data
         self.union_data = {}
         for key_value in data.keys():
             if key_value == "id": self.union_data["id"] = data[key_value]

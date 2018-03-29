@@ -23,6 +23,9 @@ GENI_API = GENI_ADDRESS + "/api/"
 GENI_PEOPLE = GENI_ADDRESS + "/people/"
 GENI_PROFILE =  GENI_API + "profile-"
 
+GENI_CALLED_UNIONS = {}
+GENI_CALLED_PROFILES = {}
+GENI_CALLED_FAMILIES = {}
 
 #The token data
 TOKEN = None

@@ -143,6 +143,19 @@ class gen_profile(object):
             return True
         else:
             return False
+    def get_earliest_event(self):
+        '''
+        It will return the earliest event, of course, the birth, but it is already checked,
+        for simplicity I will not consider that case
+        '''
+        earliest_date = None
+        for date_key in DATA_DATES:
+            if date_key in self.gen_data:
+                if earliest_date == None:
+                    earliest_date = self.gen_data[date_key]
+                elif self.gen_data[date_key] < earliest_date:
+                    earliest_date = self.gen_data[date_key]
+        return earliest_date
     def selfcheckDateConsistency(self, dict_dates, dict_accuracy):
         #We set the dates received or taken from the profiles
         birth_date = dict_dates.get("birth_date", self.gen_data.get("birth_date", None) )

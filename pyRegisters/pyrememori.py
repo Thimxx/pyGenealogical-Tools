@@ -5,13 +5,19 @@ Created on 16 sept. 2017
 '''
 import requests
 from html.parser import HTMLParser
-from datetime import datetime
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name
+from datetime import date
+import datetime
 
 BASE_REMEMORY = "https://www.rememori.com"
 SEARCH_LOCATION = BASE_REMEMORY + "/buscar/que:"
 ADDING_CHAR = "%20"
+#First dead record in rememory
+FIRST_YEAR = 2008
+#Maximum life span of a person
+MAXIMUM_LIFESPAN = 123
+
 
 class rememori_reader(object):
     '''
@@ -30,11 +36,20 @@ class rememori_reader(object):
         This function will look in rememory trying to match a profile
         Input shall be a profile of common profile values
         '''
-        url = SEARCH_LOCATION + profile.gen_data["name"] + ADDING_CHAR
-        url += ADDING_CHAR.join(profile.gen_data["surname"].split(" "))
-        data = requests.get(url)
-        self.parser.feed(data.text)
-        return self.parser.records
+        final_profiles = []
+        #Before executing, if the profile is born before any logical date treated in rememory, we stop
+        if (not ( (profile.get_earliest_event()) and (profile.get_earliest_event() < date(FIRST_YEAR-MAXIMUM_LIFESPAN,1,1)) )):
+            
+            url = SEARCH_LOCATION + profile.gen_data["name"] + ADDING_CHAR
+            url += ADDING_CHAR.join(profile.gen_data["surname"].split(" "))
+            data = requests.get(url)
+            self.parser.feed(data.text)
+            #This will remove all those matches that are very unlikely to be part
+            for deceased in self.parser.records:
+                score, factor = deceased.comparison_score(profile)
+                if (score*factor > 2.0):
+                    final_profiles.append(deceased)
+        return final_profiles
 
 class RememoryParser(HTMLParser):
     '''
@@ -74,7 +89,9 @@ class RememoryParser(HTMLParser):
             self.name = data
             self.at_name_location = False
         elif self.at_data_location:
-            self.death_date = datetime.strptime(data, "%d/%m/%Y").date()
+            if ("Ayer" in data): self.death_date = datetime.datetime.today().date() - datetime.timedelta(days=1)
+            else:
+                self.death_date = datetime.datetime.strptime(data, "%d/%m/%Y").date()
             self.at_data_location = False
         elif self.at_comments_location:
             self.comments = data

@@ -24,6 +24,30 @@ class Test(unittest.TestCase):
             if (profile.gen_data["death_date"] == date2): date2_found = True
         assert(date1_found)
         assert(date2_found)
+    
+    def test_simplifying_list(self):
+        '''
+        Test confirming list will be simplified
+        '''
+        profile = gen_profile("Julián", "Gómez Gómez")
+        profile.setCheckedDate("baptism_date", date(1970,4,2), "EXACT")
+        reader = rememori_reader()
+        records = reader.profile_is_matched(profile)
+        date_found = False
+        for deceased in records:
+            if (deceased.gen_data["death_date"] == date(2017,2,13)): date_found = True
+        assert(date_found)
+    
+    def test_avoiding_analysis(self):
+        '''
+        Test confirming no analysis if antique record
+        '''
+        profile = gen_profile("Julián", "Gómez Gómez")
+        profile.setCheckedDate("baptism_date", date(1870,4,2), "EXACT")
+        reader = rememori_reader()
+        records = reader.profile_is_matched(profile)
+        assert(len(records) == 0)
+        
 
 
 if __name__ == "__main__":

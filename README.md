@@ -29,6 +29,8 @@ It is mainly offering the following capabilities:
 * Rememori: https://www.rememori.com 
 7) Transformation to GEDCOM profile
 * Transforms profile into elements of GEDCOM, allows to create a GEDCOM
+8) Automatic investigation
+* For those interfaces avaialble, it can found potential matches in a GEDCOM.
 
 Notice that this import is intended to import registers from FamilySearch, is you are interested in importing profiles from a family tree located in FamilySearch to Geni use this tool: https://github.com/jeffg2k/SmartCopy, which is a pretty nice piece of software and very helpful.
 
@@ -55,6 +57,17 @@ In order to use the tools you will need to install the following modules:
 All the previous modules are available in the requirements.txt file, but wxpython needs to be manually installed, visit wxpython page for further info.
 
 Concerning testing, the repository if configured to use nose, coverage, nose-htmloutput, so you will need to install in your local installation as well.
+
+### Geni KEY
+
+In order to use the interface, you will need to generate an application card inside Geni and obtain a key. You can create the application card in this: location https://www.geni.com/platform/developer/api_explorer, the key will be only valid for 24h, so you will need to register again the key regularly.
+
+For each execution of the Geni API contained in this software, you will later need to introduce the key. Do not make the key public. In the examples area you have a description of how to obtain the key in execute the complete module, in a nutshell this is the way to set the Geni Key:
+
+
+    from pyGeni import set_token
+    GENI_KEY = "IntroduceHereYourGeniKey"
+    set_token(GENI_KEY)
 
 ### Google Key API
 

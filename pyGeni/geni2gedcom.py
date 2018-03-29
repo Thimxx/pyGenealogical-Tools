@@ -70,7 +70,8 @@ class geni2gedcom(object):
             #the method list to avoid a linked copy
             temp_parents = list(new_prof.parents)
             temp_parents.remove(prof_id)
-            children_matrix[temp_parents[0]].append(new_prof)
+            #Notice that we might have the situation of a single parent!
+            if (len(temp_parents) > 0): children_matrix[temp_parents[0]].append(new_prof)
         #Only in case there is a partner, we include him/her!
         if (len(init_profile.partner) > 0):
             #Now let's use the partner as well, we may have several partners
