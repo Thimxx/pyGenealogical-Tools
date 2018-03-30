@@ -69,7 +69,8 @@ class geni2gedcom(object):
             #To avoid removing data from the profile we create a temp array using
             #the method list to avoid a linked copy
             temp_parents = list(new_prof.parents)
-            temp_parents.remove(prof_id)
+            #When not having access to a profile in geni, the parents provided are empty
+            if prof_id in temp_parents : temp_parents.remove(prof_id)
             #Notice that we might have the situation of a single parent!
             if (len(temp_parents) > 0): children_matrix[temp_parents[0]].append(new_prof)
         #Only in case there is a partner, we include him/her!

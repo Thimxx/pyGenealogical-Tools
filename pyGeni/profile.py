@@ -82,11 +82,11 @@ class profile(geni_calls, gen_profile):
         '''
         #We just add one by one all the different values specific to Geni
         for value in SPECIFIC_GENI_STRING:
-            self.geni_specific_data[value] = data[value]
+            if value in data.keys() : self.geni_specific_data[value] = data[value]
         for value in SPECIFIC_GENI_BOOLEAN:
-            self.geni_specific_data[value] = bool(data[value])
+            if value in data.keys() : self.geni_specific_data[value] = bool(data[value])
         for value in SPECIFIC_GENI_INTEGER:
-            self.geni_specific_data[value] = int(data[value])
+            if value in data.keys() : self.geni_specific_data[value] = int(data[value])
         self.get_relations()
         #These are the general profiles values
         for value_geni in data.keys():
@@ -105,7 +105,9 @@ class profile(geni_calls, gen_profile):
                 self.gen_data[value_geni] = data[value_geni]
             elif value_geni in EVENT_DATA.keys():
                 format_date, accuracy_geni = self.get_date(data.get(value_geni, {}).get("date", {}))
-                self.setCheckedDate(EVENT_DATA[value_geni]["date"], format_date, accuracy=accuracy_geni)
+                #Sometimes in Geni you can have the location of the event, but not the date
+                if (not (format_date == None)):
+                    self.setCheckedDate(EVENT_DATA[value_geni]["date"], format_date, accuracy=accuracy_geni)
                 self.gen_data[EVENT_DATA[value_geni]["location"]] = data.get(value_geni, {}).get("location", {})
     def add_marriage_in_geni(self, union = None):
         '''

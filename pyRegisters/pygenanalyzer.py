@@ -13,22 +13,21 @@ class gen_analyzer(object):
     This class will accept a given GEDCOM file for later on executing all pyRegister modules, final
     output will be a description of potential matches for helping in investigation.
     '''
-
-
-    def __init__(self, gedcomfile):
+    def __init__(self, gedcomfile, language = "en", name_convention= "father_surname"):
         '''
         Introduce a gedcomfile in GEDCOM format
         '''
         self.gedcomfile = gedcomfile
+        self.language = language
+        self.name_convention = name_convention
         self.profiles = []
-        
         for ele in self.gedcomfile.__dict__["root_elements"]:
             if(ele.tag == "INDI"):
                 profile = gen_profile("", "")
                 for sub_ele in ele.__dict__['child_elements']:
                     if sub_ele.tag == "NAME":
                         for name_ele in sub_ele.__dict__['child_elements']:
-                            if (name_ele.tag == "GIVN"): profile.set_name(name_ele.value) 
+                            if (name_ele.tag == "GIVN"): profile.set_name(name_ele.value)
                             if (name_ele.tag == "SURN"): profile.set_surname(name_ele.value)
                     if sub_ele.tag == "BAPM":
                         for name_ele in sub_ele.__dict__['child_elements']:
@@ -41,7 +40,7 @@ class gen_analyzer(object):
                     if sub_ele.tag == "DEAT":
                         for name_ele in sub_ele.__dict__['child_elements']:
                             if (name_ele.tag == "DATE"):
-                                profile.setCheckedDate("death_date", datetime.datetime.strptime(name_ele.value.replace("BEF ", "").replace("AFT ", "").replace("ABT ", ""), "%d %b %Y" ).date(), "EXACT") 
+                                profile.setCheckedDate("death_date", datetime.datetime.strptime(name_ele.value.replace("BEF ", "").replace("AFT ", "").replace("ABT ", ""), "%d %b %Y" ).date(), "EXACT")
                          
                         #F.write(profile.nameLifespan())
                             #F.write("  -  " + str(obtained.nameLifespan()) + str(obtained.gen_data["web_ref"]))
@@ -54,7 +53,7 @@ class gen_analyzer(object):
         if not output == None: self.file = open(output, "w")
         for person in self.profiles:
             print_out(person.nameLifespan(), self.file)
-            reader = rememori_reader()
+            reader = rememori_reader(language=self.language, name_convention=self.name_convention)
             records = reader.profile_is_matched(person)
             for obtained in records:
                 print_out("  -  " + obtained.nameLifespan() + "  " + obtained.gen_data["web_ref"][0], self.file)
