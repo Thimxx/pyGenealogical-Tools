@@ -6,6 +6,7 @@ Created on 28 mar. 2018
 
 from pyGenealogy.common_profile import gen_profile
 from pyRegisters.pyrememori import rememori_reader
+from pyRegisters.pyelnortedecastilla import elnortedecastilla_reader
 import datetime, logging
 
 class gen_analyzer(object):
@@ -32,18 +33,16 @@ class gen_analyzer(object):
                     if sub_ele.tag == "BAPM":
                         for name_ele in sub_ele.__dict__['child_elements']:
                             if (name_ele.tag == "DATE"):
-                                profile.setCheckedDate("baptism_date", datetime.datetime.strptime(name_ele.value.replace("BEF ", "").replace("AFT ", "").replace("ABT ", ""), "%d %b %Y" ).date(), "EXACT")
+                                profile.setCheckedDate("baptism_date", datetime.datetime.strptime(name_ele.value.replace("BEF ", "").replace("AFT ", "").replace("ABT ", ""), "%d %b %Y" ).date(), accuracy_data(name_ele.value))
                     if sub_ele.tag == "BIRT":
                         for name_ele in sub_ele.__dict__['child_elements']:
                             if (name_ele.tag == "DATE"):
-                                profile.setCheckedDate("birth_date", datetime.datetime.strptime(name_ele.value.replace("BEF ", "").replace("AFT ", "").replace("ABT ", ""), "%d %b %Y" ).date(), "EXACT")
+                                profile.setCheckedDate("birth_date", datetime.datetime.strptime(name_ele.value.replace("BEF ", "").replace("AFT ", "").replace("ABT ", ""), "%d %b %Y" ).date(), accuracy_data(name_ele.value))
                     if sub_ele.tag == "DEAT":
                         for name_ele in sub_ele.__dict__['child_elements']:
                             if (name_ele.tag == "DATE"):
-                                profile.setCheckedDate("death_date", datetime.datetime.strptime(name_ele.value.replace("BEF ", "").replace("AFT ", "").replace("ABT ", ""), "%d %b %Y" ).date(), "EXACT")
+                                profile.setCheckedDate("death_date", datetime.datetime.strptime(name_ele.value.replace("BEF ", "").replace("AFT ", "").replace("ABT ", ""), "%d %b %Y" ).date(), accuracy_data(name_ele.value))
                          
-                        #F.write(profile.nameLifespan())
-                            #F.write("  -  " + str(obtained.nameLifespan()) + str(obtained.gen_data["web_ref"]))
                 self.profiles.append(profile)
     def execute(self, output = None):
         '''
@@ -57,6 +56,10 @@ class gen_analyzer(object):
             records = reader.profile_is_matched(person)
             for obtained in records:
                 print_out("  -  " + obtained.nameLifespan() + "  " + obtained.gen_data["web_ref"][0], self.file)
+            reader2 = elnortedecastilla_reader(language=self.language, name_convention=self.name_convention)
+            records2 = reader2.profile_is_matched(person)
+            for obtained in records2:
+                print_out("  -  " + obtained.nameLifespan() + "  " + obtained.gen_data["web_ref"][0], self.file)
         if not self.file == None: self.file.close()
 
 def print_out(message, file):
@@ -66,6 +69,13 @@ def print_out(message, file):
     logging.info(message)
     if not file == None:
         file.write(message + "\n")
-    
-    #F.close()
-        
+
+
+def accuracy_data(data):
+    '''
+    This functions will provide the accuracy data for input
+    '''
+    if "ABT" in data: return "ABOUT"
+    elif "BEF" in data: return "BEFORE"
+    elif "AFT" in data: return "AFTER"
+    else: return "EXACT"

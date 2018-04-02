@@ -3,7 +3,7 @@ Created on 16 sept. 2017
 
 @author: Val
 '''
-import requests
+import requests, re
 from html.parser import HTMLParser
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name
@@ -31,6 +31,7 @@ class rememori_reader(object):
         Constructor
         '''
         self.parser = RememoryParser()
+        self.person_parser = RememoryPersonParser()
         self.language = language
         self.name_convention = name_convention
     def profile_is_matched(self, profile):
@@ -38,6 +39,7 @@ class rememori_reader(object):
         This function will look in rememory trying to match a profile
         Input shall be a profile of common profile values
         '''
+        intermediate_profiles = []
         final_profiles = []
         #Before executing, if the profile is born before any logical date treated in rememory, we stop
         if (not ( (profile.get_earliest_event()) and (profile.get_earliest_event() < date(FIRST_YEAR-MAXIMUM_LIFESPAN,1,1)) )):
@@ -49,7 +51,22 @@ class rememori_reader(object):
             for deceased in self.parser.records:
                 score, factor = deceased.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
                 if (score*factor > 2.0):
-                    final_profiles.append(deceased)
+                    intermediate_profiles.append(deceased)
+            #As takes a significant amount of time to obtain the profiles, in order to improve performance we get the details
+            #only in those more suitable candidates, to reduce the number of html calls that will slow down the calculation
+            for selected_profile in intermediate_profiles:
+                data = requests.get(selected_profile.gen_data["web_ref"][0])
+                self.person_parser.feed(data.text)
+                if (self.person_parser.age):
+                    death = selected_profile.gen_data["death_date"]
+                    birth = date(death.year - self.person_parser.age,1,1)
+                    selected_profile.setCheckedDate("birth_date", birth, "ABOUT")
+                if (self.person_parser.location):
+                    selected_profile.setPlaces("death_place", self.person_parser.location, language="es" )
+                #As we have new data, we crosscheck the information to make sure we do not have profiles we should not have
+                score, factor = selected_profile.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
+                if (score*factor > 2.0):
+                    final_profiles.append(selected_profile)
         return final_profiles
 
 class RememoryParser(HTMLParser):
@@ -113,4 +130,37 @@ class RememoryParser(HTMLParser):
                 prof_record.setCheckedDate("death_date", self.death_date, "EXACT")
                 prof_record.setComments(self.comments)
                 self.records.append(prof_record)
-        
+class RememoryPersonParser(HTMLParser):
+    '''
+    This function will parser an specific individual to extract specific data useful for comparison
+    '''
+    def __init__(self):
+        '''
+        As input we intoduce
+        profile: a generic profile to be updated
+        url: the specific url address
+        '''
+        HTMLParser.__init__(self)
+        self.location = None
+        self.age = None
+        self.located = False
+    def handle_starttag(self, tag, attrs):
+        if tag == "br":
+            self.located = True
+    def handle_data(self, data):
+        if self.located:
+            self.located = False
+            if (("en" in data) and ("a los" in data)):
+                result = re.search('en(.*)a los', data)
+                self.location = result.group(1).strip()
+                result = re.search('a los(.*)años', data)
+                age = result.group(1).strip()
+                if age.isdigit(): self.age = int(result.group(1).strip())
+            elif ("en" in data):
+                self.location = data.split("en",1)[1].strip()
+            elif  ("a los" in data): 
+                result = re.search('a los(.*)años', data)
+                age = result.group(1).strip()
+                if age.isdigit(): self.age = int(result.group(1).strip())
+    def handle_endtag(self, tag):
+        pass

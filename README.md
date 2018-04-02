@@ -26,7 +26,8 @@ It is mainly offering the following capabilities:
 5) A tool for parsing FamilySearch excel outputs of sons in a family.
 * Import to Geni an excel output of children from FamilySearch records, it will merge common profiles
 6) Interface with several online registers:
-* Rememori: https://www.rememori.com 
+* Rememori: https://www.rememori.com
+* Obituary from this newspaper: http://esquelas.elnortedecastilla.es/
 7) Transformation to GEDCOM profile
 * Transforms profile into elements of GEDCOM, allows to create a GEDCOM
 8) Automatic investigation

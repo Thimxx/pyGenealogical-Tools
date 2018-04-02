@@ -3,9 +3,9 @@ Created on 16 sept. 2017
 
 @author: Val
 '''
-import unittest
+import unittest, requests
 from datetime import date
-from pyRegisters.pyrememori import rememori_reader
+from pyRegisters.pyrememori import rememori_reader, RememoryPersonParser
 from pyGenealogy.common_profile import gen_profile
 
 class Test(unittest.TestCase):
@@ -48,6 +48,16 @@ class Test(unittest.TestCase):
         records = reader.profile_is_matched(profile)
         assert(len(records) == 0)
         
+    def test_person_parser(self):
+        '''
+        Test isolated the person parser
+        '''
+        url_check = "https://www.rememori.com/874091:julian_gomez_izquierdo"
+        data = requests.get(url_check)
+        person_parser = RememoryPersonParser()
+        person_parser.feed(data.text)
+        assert(person_parser.age == 75)
+        assert(person_parser.location == "Bilbao")
 
 
 if __name__ == "__main__":

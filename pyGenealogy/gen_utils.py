@@ -452,6 +452,21 @@ def get_score_compare_dates(date1, accuracy1, date2, accuracy2):
             return 0.2 + 0.06*(10 - diff_years), 0.3 + 0.04*(10 -diff_years)
         else:
             return 20/(diff_years*diff_years), 30/(diff_years*diff_years)
+    elif (accuracy1 == "BEFORE"):
+        if (accuracy2 == "BEFORE") : return 0.0, 1.0
+        elif (date2 < date1): return 0.0, 1.0
+        else: return 0.0, 0.0
+    elif (accuracy1 == "AFTER"):
+        if (accuracy2 == "AFTER") : return 0.0, 1.0
+        elif (date2 > date1): return 0.0, 1.0
+        else: return 0.0, 0.0
+    elif (accuracy2 == "BEFORE"):
+        if (date1 < date2): return 0.0, 1.0
+        else: return 0.0, 0.0
+    elif (accuracy2 == "AFTER"):
+        if (date2 < date1): return 0.0, 1.0
+        else: return 0.0, 0.0
+        
 
 def get_location_standard(location):
     '''

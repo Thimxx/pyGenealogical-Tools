@@ -191,8 +191,8 @@ class gen_profile(object):
             if (date_id in self.gen_data.keys()) and (date_id in profile.gen_data.keys()):
                 score_temp, factor_temp = get_score_compare_dates(self.gen_data[date_id],
                                                               self.gen_data["accuracy_" + date_id],
-                                                              profile.gen_data[date_id],
-                                                              profile.gen_data["accuracy_" + date_id])
+                                                              profile.gen_data[date_id], 
+                                                              profile.gen_data["accuracy_" + date_id] )
                 score += score_temp
                 factor = factor*factor_temp
         return score, factor
