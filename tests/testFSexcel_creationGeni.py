@@ -41,7 +41,7 @@ class Test(unittest.TestCase):
         assert(second_profile.gen_data["name"] == "Lucía")
         married_profile = fsclass.profiles[2]
         assert(married_profile.gen_data["name"] == "Nicasia")
-        assert(married_profile.gen_data["marriage_place"]["city"] == "Tudela de Duero")
+        assert(married_profile.gen_data["marriage_place"]["place_name"] == "Tudela de Duero")
         testing_date = datetime.date(1841, 11, 30)
         assert(married_profile.gen_data["marriage_date"] == testing_date)
         

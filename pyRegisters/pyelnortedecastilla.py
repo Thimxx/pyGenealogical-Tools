@@ -100,7 +100,7 @@ class NorteCastillaParser(HTMLParser):
         if self.inside_description:
             self.inside_description = False
             result_AGE = re.search('a los (.*) años', data.lower())
-            result_LOC = re.search('fallecido en (.*) el', data.lower())
+            result_LOC = re.search('fallecido en (.*) el día', data.lower())
             if result_AGE: 
                 self.age_here = True
                 self.age = result_AGE.group(1)
@@ -127,8 +127,10 @@ class NorteCastillaParser(HTMLParser):
             profile.setCheckedDate("death_date", self.death_date, "EXACT")
             if (self.age_here):
                 self.age_here = False
-                birth = date(self.death_date.year - int(self.age),1,1)
-                profile.setCheckedDate("birth_date", birth, "ABOUT")
+                #Just in case we have not extracted the right age of the person
+                if (self.age.isdigit()): 
+                    birth = date(self.death_date.year - int(self.age),1,1)
+                    profile.setCheckedDate("birth_date", birth, "ABOUT")
             if (self.location_here):
                 self.location_here = False
                 profile.setPlaces("death_place", self.location, language="es" )

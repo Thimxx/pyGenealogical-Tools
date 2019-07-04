@@ -28,6 +28,7 @@ It is mainly offering the following capabilities:
 6) Interface with several online registers:
 * Rememori: https://www.rememori.com
 * Obituary from this newspaper: http://esquelas.elnortedecastilla.es/
+* Obituary from this newspaper: https://www.abc.es/esquelas/
 7) Transformation to GEDCOM profile
 * Transforms profile into elements of GEDCOM, allows to create a GEDCOM
 8) Automatic investigation
@@ -70,35 +71,14 @@ For each execution of the Geni API contained in this software, you will later ne
     GENI_KEY = "IntroduceHereYourGeniKey"
     set_token(GENI_KEY)
 
-### Google Key API
+### MapBox API Key
 
-One of the packages used is googlemaps, which wraps the Google Maps API. However this library requires the use of a google maps API to work.
+As google Maps API is no longer working without payments details, Google API has been replaced by MapBox API. In order to work the library needs the MAPBOX API (free of charge). Just set-up this way:
 
-It has been found that not having a google API KEY creates random crashes and wrong values, so it is strongly recommended to use the KEY. To get the key just follow these intructions (same instructions for googlemaps api https://github.com/googlemaps/google-maps-services-python/blob/master/README.md):
-
- 1. Visit https://developers.google.com/console and log in with
-    a Google Account.
- 1. Select one of your existing projects, or create a new project.
- 1. Enable the API(s) you want to use. The Python Client for Google Maps Services
-    accesses the following APIs:
-    * Directions API
-    * Distance Matrix API
-    * Elevation API
-    * Geocoding API
-    * Geolocation API
-    * Places API
-    * Roads API
-    * Time Zone API
- 1. Create a new **Server key**.
- 1. If you'd like to restrict requests to a specific IP address, do so now.
- 
- Finally you need to transfer to pyGenealogyTools the variable value. There are 2 ways:
- 
- 1. Introduce an environmental variable called GOOGLE_API with the value
- 1. Use the functions pyGenealogy.set_google_key() to set up the value of the API KEY.
-
-Without the key, pyGenealogyTools will work, but it is prone to errors due to lack of a key, so be aware in case you are using it extensively. Better description of the issue can be found here: https://stackoverflow.com/questions/48488693/unstable-behaviour-of-google-maps-api
-
+    from pyGenealogy import set_mapbox_key
+    MAPBOX_KEY = "IntroduceHereYourMapBoxKey"
+    set_mapbox_key(MAPBOX_KEY)
+    
 # Usage
 
 The file GeniTools is the one I am using as main programme. It is not yet very stable, but the libraries are getting. Just use the input file "INPUT_TEMPLATE" and select as input inside the script GeniTools.py, the input file needs to include the Geni token and the starting profile.

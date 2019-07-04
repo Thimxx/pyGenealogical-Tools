@@ -138,7 +138,7 @@ class gen_profile(object):
         This function will introduce the location related to each event
         '''
         if event_place in DATA_PLACES:
-            location_data = get_formatted_location(location, language)
+            location_data = get_formatted_location(location)
             self.gen_data[event_place] = location_data
             return True
         else:

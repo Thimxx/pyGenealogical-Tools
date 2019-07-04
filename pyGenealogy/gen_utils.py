@@ -4,16 +4,16 @@ Created on 26 ago. 2017
 @author: Val
 '''
 import logging
-from messages.pyGenealogymessages import NO_VALID_CONVENTION, NO_VALID_ACCURACY, NO_VALID_LOCATION
+from messages.pyGenealogymessages import NO_VALID_CONVENTION, NO_VALID_ACCURACY, NO_VALID_LOCATION, NO_VALID_KEY
 from messages.pyGenealogymessages import NO_VALID_BIRTH_DATE, NO_VALID_DEATH_DATE, NO_VALID_DEATH_AND_BURIAL
+from messages.genitools_messages import MAPBOX_ADDRESS
 from datetime import date
-from pyGenealogy import VALUES_ACCURACY, get_google_key
+from pyGenealogy import VALUES_ACCURACY, get_mapbox_key
 from metaphone import doublemetaphone
 from Levenshtein import jaro
 import math
 import requests
 import pyGenealogy, os, re
-import googlemaps
 
 THRESHOLD_JARO = 0.7
 
@@ -22,6 +22,8 @@ DATA_FOLDER = os.path.join(os.path.dirname(pyGenealogy.__file__), "data")
 GOOGLE_GEOLOCATION_ADDRESS = "https://maps.googleapis.com/maps/api/geocode/json?"
 
 LOCATION_KEYS = ["place_name", "city", "county", "state", "country"]
+
+MAPBOX_TRANS_GENITOOLS = {"locality" : "city", "place" : "place_name", "region" : "county", "country" : "country", "address" : "place_name", "poi" : "place_name"}
 
 naming_conventions = ["father_surname", "spanish_surname"]
 #These are the particles used in different languages inside the surnames to connect them but in capital letters as a title
@@ -204,7 +206,7 @@ def getBestDate(date1, accuracy1, date2, accuracy2):
         #The only option is having 2 abouts... we get the middle value
         newyear = int((date1.year +date2.year)/2)
         return date(newyear,1,1), accuracy1
-def get_formatted_location(location_string, language="en"):
+def get_formatted_location(location_string):
     '''
     This function will provide a standard location based on google maps service
     online
@@ -212,51 +214,45 @@ def get_formatted_location(location_string, language="en"):
     #Set up first the output
     output = {}
     output["raw"] = location_string
-    gmaps_result = []
-    #We are keeping the previous coding in case somebody is not getting the google API key
-    #Google maps API is not answering properly is an empty script is provided.
-    if (get_google_key == None) or (location_string == ""):
-        url = GOOGLE_GEOLOCATION_ADDRESS + "language=" + language + "&address=" + location_string
-        r = requests.get(url)
-        data = r.json()
-        gmaps_result = data["results"]
+    mapbox_results = []
+    #New code moving from google maps to MapBox.
+    if (get_mapbox_key() == None) or (location_string == ""):
+        #Data is not found, let's try removing some
+        logging.warning(NO_VALID_KEY)
+        if (len(location_string.split(",")) > 3):
+            output2 = get_formatted_location(",".join(location_string.split(",")[1:]))
+            output2["raw"] = output["raw"]
+            return output2
+        else:
+            return output
     else:
-        gmaps = googlemaps.Client(key=get_google_key())
-        gmaps_result = gmaps.geocode(location_string, language=language)
-    if (len(gmaps_result) > 0):
+        url = MAPBOX_ADDRESS + location_string +".json?access_token=" + get_mapbox_key()
+        r = requests.get(url)
+        mapbox_results = r.json()
+    if ( (len(mapbox_results) > 0) and ("context" in mapbox_results["features"][0])):
         #Received data is ok, we can proceed
-        for result_input in gmaps_result[0].keys():
-            if(result_input == "geometry"):
-                #As we got the location details, let's get them
-                output["latitude"] = gmaps_result[0]["geometry"]["location"]["lat"]
-                output["longitude"] = gmaps_result[0]["geometry"]["location"]["lng"]
-            elif(result_input == "address_components"):
-                #This is the data of the name of the location
-                for level in  gmaps_result[0]["address_components"]:
-                    if "locality" in level["types"]: output["city"] = level["long_name"]
-                    elif "administrative_area_level_4" in level["types"]: output["city"] = level["long_name"]
-                    elif "administrative_area_level_2" in level["types"]: output["county"] = level["long_name"]
-                    elif "administrative_area_level_1" in level["types"]: output["state"] = level["long_name"]
-                    elif "country" in level["types"]: output["country"] = level["long_name"]
+        output["latitude"] = mapbox_results["features"][0]["center"][1]
+        output["longitude"] = mapbox_results["features"][0]["center"][0]
+        for location_data in mapbox_results["features"][0]["context"]:
+            if "locality" in location_data["id"]: output["city"] = location_data["text"]
+            elif "place" in location_data["id"]: output["place_name"] = location_data["text"]
+            elif "region" in location_data["id"]: output["county"] =  location_data["text"]
+            elif "country" in location_data["id"]: output["country"] = location_data["text"]
+        #In the MapBox API apparently the more accurate location is at the beginning, to make sure overwrites any other
+        place_type = mapbox_results["features"][0]["place_type"]
+        place_text =  mapbox_results["features"][0]["text"]
+        output[MAPBOX_TRANS_GENITOOLS[place_type[0]]] = place_text
+        return output
     else:
         #Data is not found, let's try removing some
         logging.warning(NO_VALID_LOCATION)
         logging.warning(location_string)
         if (len(location_string.split(",")) > 3):
-            output2 = get_formatted_location(",".join(location_string.split(",")[1:]), language=language)
+            output2 = get_formatted_location(",".join(location_string.split(",")[1:]))
             output2["raw"] = output["raw"]
             return output2
         else:
             return output
-    if (not location_string.split(",")[0] in output.values()):
-        final_input = []
-        for particle in location_string.split(",")[0].split(" "):
-            if (particle.lower() in LANGUAGES_ADDS[language]):
-                final_input.append(particle.lower())
-            else:
-                final_input.append(particle.lower().title())
-        output["place_name"] = " ".join(final_input).rstrip()
-    return output
 def get_partner_gender(gender):
     '''
     Simple function, it provides the opposite sex
@@ -267,6 +263,9 @@ def get_partner_gender(gender):
 def get_name_surname_from_complete_name(complete_name, convention="father_surname", language="en"):
     '''
     This function provides name and surname from a given name
+    convention alternatives
+        father_surname: the inheritated surname is only father's one
+        spanish_surname: the inheritated surname is following spanish conventions including father and mother
     '''
     if convention in naming_conventions:
         name_split, data_identified = get_splitted_name_from_complete_name(complete_name, language=language)

@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
         assert(fsclass.profiles[0].gen_data["baptism_date"] == datetime.date(1853,9,13))
         assert(fsclass.profiles[0].gen_data["burial_date"] == datetime.date(1853,9,30))
         assert(fsclass.profiles[0].gen_data["baptism_place"]["city"] == "La Parrilla")
-        assert(fsclass.profiles[0].gen_data["death_place"]["city"] == "La Parrilla")
+        assert(fsclass.profiles[0].gen_data["death_place"]["place_name"] == "La Parrilla")
         assert(len(fsclass.profiles[0].gen_data["web_ref"]) == 3)
         assert(fsclass.profiles[0].gen_data["residence_date"] == datetime.date(1853,1,1))
         #Wenceslao Potente Asegurado
@@ -54,7 +54,7 @@ class Test(unittest.TestCase):
         assert(fsclass.profiles[2].gen_data["death_date"] == datetime.date(1863,6,28))
         assert(fsclass.profiles[2].gen_data["burial_date"] == datetime.date(1863,6,28))
         assert(fsclass.profiles[2].gen_data["baptism_place"]["city"] == "La Parrilla")
-        assert(fsclass.profiles[2].gen_data["death_place"]["city"] == "La Parrilla")
+        assert(fsclass.profiles[2].gen_data["death_place"]["place_name"] == "La Parrilla")
         assert(len(fsclass.profiles[2].gen_data["web_ref"]) == 2)
         assert(fsclass.profiles[2].gen_data["residence_date"] == datetime.date(1862,1,1))
         #Evarista Potente Asegurado
@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
         assert(fsclass.profiles[4].gen_data["baptism_date"] == datetime.date(1857,11,1))
         assert(fsclass.profiles[4].gen_data["burial_date"] == datetime.date(1858,2,25))
         assert(fsclass.profiles[4].gen_data["baptism_place"]["city"] == "La Parrilla")
-        assert(fsclass.profiles[4].gen_data["death_place"]["city"] == "La Parrilla")
+        assert(fsclass.profiles[4].gen_data["death_place"]["place_name"] == "La Parrilla")
         assert(len(fsclass.profiles[4].gen_data["web_ref"]) == 2)
         assert(fsclass.profiles[4].gen_data["residence_date"] == datetime.date(1857,1,1))
 
@@ -131,10 +131,9 @@ class Test(unittest.TestCase):
         assert(this_profile.gen_data["accuracy_death_date"] == "EXACT")
         assert(this_profile.gen_data["burial_date"] == datetime.date(1863,6,28))
         assert(this_profile.gen_data["accuracy_burial_date"] == "EXACT")
-        assert(this_profile.gen_data["death_place"]["city"] == 'La Parrilla')
-        assert(this_profile.gen_data["birth_place"]["city"] == 'La Parrilla')
-        assert(this_profile.gen_data["residence_place"]["state"] == 'Castile and León')
-        assert(this_profile.gen_data["baptism_place"]["place_name"] == 'Nuestra Señora De Los Remedios')
+        assert(this_profile.gen_data["death_place"]["place_name"] == 'La Parrilla')
+        assert(this_profile.gen_data["birth_place"]["place_name"] == 'La Parrilla')
+        assert(this_profile.gen_data["baptism_place"]["place_name"] == 'Calle Nuestra Señora De Los Remedios')
         assert(len(this_profile.gen_data["nicknames"]))
         assert("Wenceslao Potente" in this_profile.gen_data["nicknames"])
 

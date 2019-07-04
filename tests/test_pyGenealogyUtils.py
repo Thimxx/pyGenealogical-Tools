@@ -5,7 +5,7 @@ Created on 26 ago. 2017
 '''
 import unittest
 from datetime import date
-from pyGenealogy import get_google_key, set_google_key
+from pyGenealogy import get_mapbox_key, set_mapbox_key
 from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_fullname, checkDateConsistency, getBestDate, get_partner_gender
 from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name, get_splitted_name_from_complete_name
 from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates, get_compared_data_file, adapted_doublemetaphone
@@ -114,47 +114,42 @@ class Test(unittest.TestCase):
         '''
         Test basic use of google key
         '''
-        previous =  get_google_key()
+        previous =  get_mapbox_key()
         
-        set_google_key(None)
-        assert(None, get_google_key())
+        set_mapbox_key(None)
+        assert(None, get_mapbox_key())
         
-        set_google_key(previous)
+        set_mapbox_key(previous)
     
     def test_get_location_data(self):
         '''
         Test the translation of location data using google API
         '''
-        output = get_formatted_location(GENERIC_PLACE_STRING, language="en")
-        assert(output["latitude"] > 41.4781556 )
+        output = get_formatted_location(GENERIC_PLACE_STRING)
+        assert(output["latitude"] > 41.47 )
         assert(output["longitude"] < -4.0 )
-        assert(output["city"] == "Portillo")
+        assert(output["place_name"] == "Portillo")
         assert(output["county"] == "Valladolid")
-        assert(output["state"] == "Castile and León")
         assert(output["country"] == "Spain")
-        self.assertFalse("place_name" in output.keys())
-        output2 = get_formatted_location(GENERIC_PLACE_WITH_PLACE, language="es")
-        assert(output2["latitude"] > 41.535338 )
-        assert(output2["longitude"] < -4.53061)
+        assert(output["city"] == "Arrabal de Portillo")
+        self.assertFalse("state" in output.keys())
+        output2 = get_formatted_location(GENERIC_PLACE_WITH_PLACE)
+        assert(output2["latitude"] > 41.53 )
+        assert(output2["longitude"] < -4.53)
         assert(output2["city"] == "La Parrilla")
         assert(output2["county"] == "Valladolid")
-        assert(output2["state"] == "Castilla y León")
-        assert(output2["country"] == "España")
-        assert(output2["place_name"] == "Nuestra Señora de los Remedios")
+        assert(output2["country"] == "Spain")
+        assert(output2["place_name"] == "Calle Nuestra Señora De Los Remedios")
+        self.assertFalse("state" in output.keys())
         
-        assert(get_location_standard(output2) == "La Parrilla, Valladolid, Castilla y León, España" )
-        output3 = get_formatted_location("La Asunción, Herrera De Duero, Valladolid, Spain", language="es")
+        assert(get_location_standard(output2) == "La Parrilla, Valladolid, Spain" )
+        output3 = get_formatted_location("La Asunción, Herrera De Duero, Valladolid, Spain")
         assert("city" in output3)
         
         
         output4 = get_formatted_location("")
         assert("raw" in output4)
         self.assertFalse("country" in output4)
-        
-        #Suggestino from https://stackoverflow.com/questions/47063366/google-maps-geocoding-api-zero-results-example/47092855
-        output5 = get_formatted_location("postal_code%3A12345%7Ccountry%3ASE,,,", language="es")
-        assert("raw" in output5)
-        self.assertFalse("country" in output5)
     
     def test_return_sex(self):
         '''
@@ -345,9 +340,10 @@ class Test(unittest.TestCase):
         '''
         Test Capital Letters are fixed
         '''
-        output = get_formatted_location(GENERIC_PLACE_CAPITALS, language="es")
-        assert(output["place_name"] == "San Juan Evangelista del Arrabal")
-        assert(output["country"] == "España")
+        output = get_formatted_location(GENERIC_PLACE_CAPITALS)
+        print("HOLLAAA=", output["place_name"], output )
+        assert(output["place_name"] == "Pz San Juan Evangelista")
+        assert(output["country"] == "Spain")
     
     def test_compare_with_files(self):
         '''

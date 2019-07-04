@@ -7,21 +7,20 @@ NOT_KNOWN_VALUE = "N.N."
 from os import environ, getenv
 
 #The token data
-GOOGLE_KEY = None
+MAPBOX_KEY = None
 
-if "GOOGLE_API" in environ : GOOGLE_KEY = getenv("GOOGLE_API")
+if "MAPBOX_API" in environ : MAPBOX_KEY = getenv("MAPBOX_API")
 
 TOKEN = None
 
-def get_google_key():
+def get_mapbox_key():
     '''
-    Function to get the google key variable currently in use
+    Function to get the mabox key variable currently in use
     '''
-    return GOOGLE_KEY
-
-def set_google_key(key_value):
+    return MAPBOX_KEY
+def set_mapbox_key(key_value):
     '''
     Function to set-up the google key value
     '''
-    global GOOGLE_KEY
-    GOOGLE_KEY = key_value
+    global MAPBOX_KEY
+    MAPBOX_KEY = key_value
