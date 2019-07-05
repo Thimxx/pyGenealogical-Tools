@@ -5,7 +5,6 @@ Created on 15 ago. 2017
 '''
 import logging, pyexcel
 from openpyxl import load_workbook
-from openpyxl.utils import  column_index_from_string
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import is_year, naming_conventions, get_children_surname, get_name_from_fullname, get_partner_gender
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name, get_splitted_name_from_complete_name, get_location_standard
@@ -104,7 +103,7 @@ class getFSfamily(object):
         #We firstly detect the surnames of the parents of the profile,we cannot avoid the double
         #iteration
         for row in range(self.initial_row+1, self.loaded_data[self.sheet_title].max_row+1):
-            for column_index in range(column_index_from_string(self.initial_column),self.loaded_data[self.sheet_title].max_column):
+            for column_index in range(self.initial_column,self.loaded_data[self.sheet_title].max_column):
                 column_criteria = current_sheet.cell(row=self.initial_row, column=column_index).value
                 cell_value = current_sheet.cell(row=row, column=column_index).value
                 if (column_criteria in ["father_full_name", "mother_full_name"]  ):
@@ -156,7 +155,7 @@ class getFSfamily(object):
         for row in range(self.initial_row+1, self.loaded_data[self.sheet_title].max_row+1):
             included_profile = gen_profile("TBD", children_surname)
             included_right = True
-            for column_index in range(column_index_from_string(self.initial_column),self.loaded_data[self.sheet_title].max_column):
+            for column_index in range(self.initial_column,self.loaded_data[self.sheet_title].max_column):
                 column_criteria = current_sheet.cell(row=self.initial_row, column=column_index).value
                 cell_value = current_sheet.cell(row=row, column=column_index).value
                 #We are ignoring all those cells that are empty.

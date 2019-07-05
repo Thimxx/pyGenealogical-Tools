@@ -50,7 +50,7 @@ In order to use the tools you will need to install the following modules:
 * requests: http://docs.python-requests.org/en/master/ 
 * wxpython
 * metaphone: https://pypi.python.org/pypi/Metaphone/0.4 
-* openpyxl
+* openpyxl (notice that there is a regression on this library. Tested on 2.6.2)
 * pyexcel pyexcel-xls pyexcel-xlsx (only used for transforming xls into xlsx)
 * python-Levenshtein
 * gedcompy https://pypi.python.org/pypi/gedcompy | https://github.com/rory/gedcompy/

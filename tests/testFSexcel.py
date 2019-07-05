@@ -36,7 +36,7 @@ class Test(unittest.TestCase):
         input_file = os.path.join(self.filelocation, "fs-PotenteAsegurado.xlsx")
         fsclass = getFSfamily(input_file, naming_convention="spanish_surname", language="es")
         assert(fsclass.correct_execution)
-        assert(fsclass.initial_column == "A")
+        assert(fsclass.initial_column == 1)
         assert(fsclass.initial_row == 6)
         assert(fsclass.sheet_title == "Sheet0")
 
