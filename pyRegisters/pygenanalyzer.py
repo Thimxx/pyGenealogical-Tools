@@ -43,7 +43,6 @@ class gen_analyzer(object):
                         for name_ele in sub_ele.__dict__['child_elements']:
                             if (name_ele.tag == "DATE"):
                                 profile.setCheckedDate("death_date", datetime.datetime.strptime(name_ele.value.replace("BEF ", "").replace("AFT ", "").replace("ABT ", ""), "%d %b %Y" ).date(), accuracy_data(name_ele.value))
-                         
                 self.profiles.append(profile)
     def execute(self, output = None):
         '''
