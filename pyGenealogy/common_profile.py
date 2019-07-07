@@ -179,11 +179,11 @@ class gen_profile(object):
         '''
         Get the score value in comparison
         '''
-        score, factor = get_score_compare_names(self.gen_data["name"], self.gen_data["surname"],
-                        profile.gen_data["name"], profile.gen_data["surname"], language=data_language, convention=name_convention)
+        score, factor = get_score_compare_names(self.getName(), self.getSurname(),
+                        profile.getName(), profile.getSurname(), language=data_language, convention=name_convention)
         #Comparing gender
-        if ("gender" in self.gen_data) and ("gender" in profile.gen_data):
-            if self.gen_data["gender"] == profile.gen_data["gender"]:
+        if (self.getGender()) and (profile.getGender()):
+            if self.getGender() == profile.getGender():
                 score += 0.5
             else:
                 factor = 0.5*factor
@@ -213,13 +213,13 @@ class gen_profile(object):
                     else:
                         #We have data in both!
                         if (key_data == "name"):
-                            name1 = get_splitted_name_from_complete_name(self.gen_data["name"], language=language)
-                            name2 = get_splitted_name_from_complete_name(profile.gen_data["name"], language=language)
-                            if (len(name2) > len(name1)): self.gen_data["name"] = profile.gen_data["name"]
+                            name1 = get_splitted_name_from_complete_name(self.getName(), language=language)
+                            name2 = get_splitted_name_from_complete_name(profile.getName(), language=language)
+                            if (len(name2) > len(name1)): self.set_name(profile.getName())  
                         elif (key_data == "surname"):
-                            surname1 = get_splitted_name_from_complete_name(self.gen_data["surname"], language=language)
-                            surname2 = get_splitted_name_from_complete_name(profile.gen_data["surname"], language=language)
-                            if (len(surname2[0]) > len(surname1[0])): self.gen_data["surname"] = profile.gen_data["surname"]
+                            surname1 = get_splitted_name_from_complete_name(self.getSurname(), language=language)
+                            surname2 = get_splitted_name_from_complete_name(profile.getSurname(), language=language)
+                            if (len(surname2[0]) > len(surname1[0])): self.set_surname(profile.getSurname()) 
                         elif (key_data == "comments"):
                             self.gen_data["comments"] += "\n" + profile.gen_data["comments"]
                         elif (key_data in DATA_LISTS):
@@ -238,7 +238,7 @@ class gen_profile(object):
         else:
             return False
 #===============================================================================
-#         GET methods
+#         GET methods: for compatibility withe RootsMagic profile we shall keep compatibility
 #===============================================================================
     def getName(self):
         '''
@@ -250,3 +250,11 @@ class gen_profile(object):
         Function to return the surname
         '''
         return self.gen_data["surname"]
+    def getGender(self):
+        '''
+        Returns the gender of the profile
+        '''
+        if "gender" in self.gen_data:
+            return self.gen_data["gender"]
+        else:
+            return None

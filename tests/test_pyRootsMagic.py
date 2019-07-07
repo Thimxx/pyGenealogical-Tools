@@ -36,6 +36,7 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         death_date, accuracy2 = prof.getDate("death_date")
         assert(death_date == date(1950,1,1))
         assert(accuracy2 == "EXACT")
+        assert(prof.getGender() == "F")
         
         #This profile has a date "ABOUT"
         prof2 = db.profiles[2]
@@ -51,6 +52,12 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         death_date3, accuracy5 = prof3.getDate("death_date")
         assert(death_date3 == date(1970,1,1))
         assert(accuracy5 == "BEFORE")
+        assert(prof3.getGender() == "M")
+        
+        
+        #This profile includes a wrong sex, it will check the file works properly
+        prof4 = db.profiles[5]
+        assert(prof4.getGender() == "U")
         
         db.close_db()
 if __name__ == "__main__":

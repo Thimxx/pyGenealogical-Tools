@@ -6,14 +6,12 @@ Created on 7 jul. 2019
 from pyGenealogy import common_profile
 from datetime import date
 
-DATE_EVENT_ID = {"birth_date" : "1", "death_date" : "2"}
+DATE_EVENT_ID = {"birth_date" : "1", "death_date" : "2", "baptism_date" : "3",  "burial_date" : "4"}
 
 class rootsmagic_profile(common_profile.gen_profile):
     '''
     classdocs
     '''
-
-
     def __init__(self, name, surname, rm_id, owner_id, database):
         '''
         Constructor
@@ -48,5 +46,14 @@ class rootsmagic_profile(common_profile.gen_profile):
             return date(year, month, day), accuracy
         else: 
             return None, None
-        
-        
+    def getGender(self):
+        '''
+        Method override in order to access directly to the gender of the profile
+        '''
+        person_info = self.database.execute("SELECT * FROM PersonTable WHERE PersonID=" + str(self.rm_id) )
+        person_data = person_info.fetchone()
+        if person_data:
+            gender = person_data[2]
+            if gender == 0: return "M"
+            elif gender == 1: return "F"
+            else: return "U"
