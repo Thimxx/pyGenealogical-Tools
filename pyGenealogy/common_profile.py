@@ -81,7 +81,7 @@ class gen_profile(object):
         else:
             return name2show
     def returnFullName(self):
-        return self.gen_data["name"] + " " + self.gen_data["surname"]
+        return self.getName() + " " + self.getSurname()
     def setCheckedGender(self, gender):
         '''
         This function will set up the gender of the profile, only the following values
@@ -237,3 +237,16 @@ class gen_profile(object):
             return True
         else:
             return False
+#===============================================================================
+#         GET methods
+#===============================================================================
+    def getName(self):
+        '''
+        Function to get the name
+        '''
+        return self.gen_data["name"]
+    def getSurname(self):
+        '''
+        Function to return the surname
+        '''
+        return self.gen_data["surname"]
