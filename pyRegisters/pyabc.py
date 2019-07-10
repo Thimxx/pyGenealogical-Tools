@@ -34,8 +34,8 @@ class abc_reader(object):
         Input shall be a profile of common profile values
         '''
         #Accents are not accepted by the webpage url call, they shall be removed prior to reading
-        name = unicodedata.normalize('NFD', profile.gen_data["name"]).encode('ascii', 'ignore').decode('ascii')
-        surname = unicodedata.normalize('NFD', profile.gen_data["surname"]).encode('ascii', 'ignore').decode('ascii')
+        name = unicodedata.normalize('NFD', profile.getName()).encode('ascii', 'ignore').decode('ascii')
+        surname = unicodedata.normalize('NFD', profile.getSurname()).encode('ascii', 'ignore').decode('ascii')
         
         url = BASE_ABC_NAME + name.strip().replace(" ", "+")
         url += BASE_ABC_SURNAME + surname.strip().replace(" ", "+") + BASE_ABC_END

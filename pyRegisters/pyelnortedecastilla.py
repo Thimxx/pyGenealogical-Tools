@@ -21,8 +21,6 @@ class elnortedecastilla_reader(object):
     This class analyzes and finds and matches profiles with death records in
     the obituary of the newspaper El Norte de Castilla
     '''
-
-
     def __init__(self, language = "en", name_convention= "father_surname"):
         '''
         Constructor
@@ -95,16 +93,15 @@ class NorteCastillaParser(HTMLParser):
                     self.ending_citation = True
                 if correct and ("content" in attr):
                     self.death_date = datetime.strptime(attr[1], '%Y-%m-%d').date()
-                
     def handle_data(self, data):
         if self.inside_description:
             self.inside_description = False
             result_AGE = re.search('a los (.*) años', data.lower())
             result_LOC = re.search('fallecido en (.*) el día', data.lower())
-            if result_AGE: 
+            if result_AGE:
                 self.age_here = True
                 self.age = result_AGE.group(1)
-            if result_LOC: 
+            if result_LOC:
                 self.location_here = True
                 self.location = result_LOC.group(1)
             self.comment = data
@@ -112,7 +109,7 @@ class NorteCastillaParser(HTMLParser):
             self.inside_profile = False
             result_M = re.search(' (.*) :', data)
             result_F = re.search(' (.*) :', data)
-            if (result_M): 
+            if (result_M):
                 self.sex = "M"
                 self.name = result_M.group(1)
             else:

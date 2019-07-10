@@ -56,11 +56,11 @@ class gedcom_profile(common_profile.gen_profile):
         '''
         individual = gedcom.Individual()
         if "gender" in self.gen_data.keys():
-            sex = gedcom.Element(tag="SEX", value=self.gen_data["gender"])
+            sex = gedcom.Element(tag="SEX", value=self.getGender())
             individual.add_child_element(sex)
-        name = gedcom.Element(tag="NAME", value=(self.gen_data["name"] + "/" + self.gen_data["surname"] + "/"))
-        name_given = gedcom.Element(tag="GIVN", value=self.gen_data["name"])
-        name_surname = gedcom.Element(tag="SURN", value=self.gen_data["surname"])
+        name = gedcom.Element(tag="NAME", value=(self.getName() + "/" + self.getSurname() + "/"))
+        name_given = gedcom.Element(tag="GIVN", value=self.getName())
+        name_surname = gedcom.Element(tag="SURN", value=self.getSurname())
         nick = ""
         for nickname in self.gen_data.get("nicknames", None):
             if nick != "" : nick += ","

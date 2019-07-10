@@ -112,19 +112,19 @@ class gen_profile(object):
         '''
         if (not "comments" in self.gen_data.keys()):
             self.gen_data["comments"] = ""
-        self.gen_data["comments"] = self.gen_data["comments"] + comment
+        self.gen_data["comments"] = self.getComments() + comment
     def nameLifespan(self):
         '''
         Function for printing an standard format of naming
         '''
         year_birth = "?"
-        if("birth_date" in self.gen_data.keys()): year_birth = formated_year(self.gen_data["birth_date"].year, self.gen_data["accuracy_birth_date"]) 
+        if("birth_date" in self.gen_data.keys()): year_birth = formated_year(self.gen_data["birth_date"].year, self.gen_data["accuracy_birth_date"])
         year_death = "?"
-        if("death_date" in self.gen_data.keys()): year_death = formated_year(self.gen_data["death_date"].year, self.gen_data["accuracy_death_date"]) 
+        if("death_date" in self.gen_data.keys()): year_death = formated_year(self.gen_data["death_date"].year, self.gen_data["accuracy_death_date"])
         if (year_birth == "?") and (year_death == "?"):
-            return self.gen_data["name_to_show"]
+            return self.getName2Show()
         else:
-            return self.gen_data["name_to_show"] + " (" + year_birth + " - " + year_death + ")"
+            return self.getName2Show() + " (" + year_birth + " - " + year_death + ")"
     def setWebReference(self, address):
         '''
         Includes web references for the profile.
@@ -191,7 +191,7 @@ class gen_profile(object):
             if (date_id in self.gen_data.keys()) and (date_id in profile.gen_data.keys()):
                 score_temp, factor_temp = get_score_compare_dates(self.gen_data[date_id],
                                                               self.gen_data["accuracy_" + date_id],
-                                                              profile.gen_data[date_id], 
+                                                              profile.gen_data[date_id],
                                                               profile.gen_data["accuracy_" + date_id] )
                 score += score_temp
                 factor = factor*factor_temp
@@ -258,3 +258,13 @@ class gen_profile(object):
             return self.gen_data["gender"]
         else:
             return None
+    def getComments(self):
+        '''
+        Will return the string with all comments from the profile
+        '''
+        return self.gen_data["comments"]
+    def getName2Show(self):
+        '''
+        Function that provides back the name to be shown 
+        '''
+        return self.gen_data["name_to_show"]

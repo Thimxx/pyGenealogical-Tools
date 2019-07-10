@@ -43,8 +43,8 @@ class rememori_reader(object):
         final_profiles = []
         #Before executing, if the profile is born before any logical date treated in rememory, we stop
         if (not ( (profile.get_earliest_event()) and (profile.get_earliest_event() < date(FIRST_YEAR-MAXIMUM_LIFESPAN,1,1)) )):
-            url = SEARCH_LOCATION + profile.gen_data["name"] + ADDING_CHAR
-            url += ADDING_CHAR.join(profile.gen_data["surname"].split(" "))
+            url = SEARCH_LOCATION + profile.getName() + ADDING_CHAR
+            url += ADDING_CHAR.join(profile.getSurname().split(" "))
             data = requests.get(url)
             self.parser.feed(data.text)
             #This will remove all those matches that are very unlikely to be part

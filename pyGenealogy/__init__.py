@@ -1,6 +1,8 @@
 __all__ = ["common_profile", "gen_utils"]
 
-VALUES_ACCURACY = ["EXACT", "BEFORE", "AFTER", "ABOUT"]
+VALUES_ACCURACY = ["EXACT", "BEFORE", "AFTER", "ABOUT", "BETWEEN"]
+
+EVENT_TYPE = ["birth", "death", "baptism",  "burial", "marriage", "residence"]
 
 NOT_KNOWN_VALUE = "N.N."
 

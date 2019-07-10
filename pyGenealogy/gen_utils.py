@@ -465,8 +465,6 @@ def get_score_compare_dates(date1, accuracy1, date2, accuracy2):
     elif (accuracy2 == "AFTER"):
         if (date2 < date1): return 0.0, 1.0
         else: return 0.0, 0.0
-        
-
 def get_location_standard(location):
     '''
     This function will provide a standarized comman separated location value
