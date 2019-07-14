@@ -28,34 +28,34 @@ class Test(unittest.TestCase):
         '''
         profile = gen_profile("Juana", "Bargas")
         profile2 = gen_profile("Juana", "de Bargas Gómez")
-        profile.setCheckedDate("birth_date", date(2016,4,23), "EXACT")
-        profile2.setCheckedDate("birth_date", date(2016,1,1), "ABOUT")
-        profile.setCheckedDate("death_date", date(2018,1,1), "ABOUT")
-        profile2.setCheckedDate("death_date", date(2018,8,24), "EXACT")
-        profile2.setCheckedDate("baptism_date", date(2017,1,1), "ABOUT")
+        profile.setCheckedDate("birth", 2016,4,23, "EXACT")
+        profile2.setCheckedDate("birth", 2016,1,1, "ABOUT")
+        profile.setCheckedDate("death", 2018,1,1, "ABOUT")
+        profile2.setCheckedDate("death", 2018,8,24, "EXACT")
+        profile2.setCheckedDate("baptism", 2017,1,1, "ABOUT")
         profile.setComments("comment1")
         profile2.setComments("comment2")
         profile.setWebReference("THIS")
         profile2.setWebReference("OTHER")
         profile.gen_data["birth_place"] = {}
         profile.gen_data["birth_place"]["raw"] = "a"
-        profile2.setPlaces("birth_place", GENERIC_PLACE_WITH_PLACE)
+        profile2.setPlaces("birth", GENERIC_PLACE_WITH_PLACE)
         
         result = profile.merge_profile(profile2, language="es", convention="spanish_surname")
         
         assert(result)
         assert(profile.gen_data["name"] == "Juana")
         assert(profile.gen_data["surname"] == "de Bargas Gómez")
-        assert(profile.gen_data["birth_date"] == date(2016,4,23))
-        assert(profile.gen_data["accuracy_birth_date"] == "EXACT")
+        assert(profile.gen_data["birth"].get_date() == date(2016,4,23))
+        assert(profile.gen_data["birth"].get_accuracy() == "EXACT")
         assert(profile.gen_data["comments"] == "comment1\ncomment2")
         assert("THIS" in profile.gen_data["web_ref"] )
         assert("OTHER" in profile.gen_data["web_ref"] )
-        assert(profile.gen_data["death_date"] ==  date(2018,8,24))
-        assert(profile.gen_data["accuracy_death_date"] == "EXACT")
-        assert(profile.gen_data["baptism_date"] ==  date(2017,1,1))
-        assert(profile.gen_data["accuracy_baptism_date"] == "ABOUT")
-        assert(profile.gen_data["birth_place"]["city"] == "La Parrilla")
+        assert(profile2.gen_data["death"].get_date() ==  date(2018,8,24))
+        assert(profile2.gen_data["death"].get_accuracy() == "EXACT")
+        assert(profile2.gen_data["baptism"].get_date() ==  date(2017,1,1))
+        assert(profile2.gen_data["baptism"].get_accuracy() == "ABOUT")
+        assert(profile2.gen_data["birth"].get_location()["city"] == "La Parrilla")
     
         profile3 = gen_profile("Juana", "Bargas")
         profile4 = gen_profile("Facundo", "Smith")
@@ -66,91 +66,72 @@ class Test(unittest.TestCase):
         '''
         Testing right introduction of birth date in common_profile
         '''
-        birth_date = date(2016,10, 20)
-        birth_date_late = date(2017,12, 31)
-        batpsim_date_before_birth = date(2016,12, 31)
         profile = gen_profile("Name", "Surname")
-        assert(profile.setCheckedDate("birth_date", birth_date, "EXACT"))
-        assert(profile.setCheckedDate("birth_date", birth_date, "BEFORE"))
-        assert(profile.setCheckedDate("birth_date", birth_date, "AFTER"))
-        assert(profile.setCheckedDate("birth_date", birth_date, "ABOUT"))
-        assert(not profile.setCheckedDate("birth_date", birth_date, "OTHER"))
+        assert(profile.setCheckedDate("birth", 2016, 10, 20, "EXACT"))
+        assert(profile.setCheckedDate("birth", 2016, 10, 20, "BEFORE"))
+        assert(profile.setCheckedDate("birth", 2016, 10, 20, "AFTER"))
+        assert(profile.setCheckedDate("birth", 2016, 10, 20, "ABOUT"))
+        assert(not profile.setCheckedDate("birth", 2016, 10, 20, "OTHER"))
         
-        assert(profile.setCheckedDate("death_date", batpsim_date_before_birth))
-        assert(not profile.setCheckedDate("birth_date", birth_date_late))
+        assert(profile.setCheckedDate("death", 2016, 12, 31))
+        assert(not profile.setCheckedDate("birth", 2017,12,31))
         
     def test_introducing_death_date(self):
         '''
         Testing introduction of several death dates and the logic
         '''
-        birth_date = date(2016,10, 20)
-        death_date = date(2017,12, 31)
-        death_date_before = date(2015,12, 31)
         profile = gen_profile("Name", "Surname")
-        assert(profile.setCheckedDate("death_date", death_date, "EXACT"))
-        assert(profile.setCheckedDate("death_date", death_date, "BEFORE"))
-        assert(profile.setCheckedDate("death_date", death_date, "AFTER"))
-        assert(profile.setCheckedDate("death_date", death_date, "ABOUT"))
-        assert(not profile.setCheckedDate("death_date", death_date, "OTHER"))
         
-        assert(profile.setCheckedDate("birth_date", birth_date))
-        assert(not profile.setCheckedDate("death_date", death_date_before))
+        
+        assert(profile.setCheckedDate("death", 2017, 12, 31, "EXACT"))
+        assert(profile.setCheckedDate("death", 2017, 12, 31, "BEFORE"))
+        assert(profile.setCheckedDate("death", 2017, 12, 31, "AFTER"))
+        assert(profile.setCheckedDate("death", 2017, 12, 31, "ABOUT"))
+        assert(not profile.setCheckedDate("death", 2017, 12, 31, "OTHER"))
+        
+        assert(profile.setCheckedDate("birth", 2016, 10, 20))
+        assert(not profile.setCheckedDate("death", 2015, 12 ,31))
     def test_introduce_baptism_date(self):
         '''
         Testing introduction of baptism date
         '''
-        birth_date = date(2016,10, 20)
-        baptism_date = date(2016,12, 31)
-        death_date = date(2019,12, 31)
-        earliest_date = date(2015,12, 31)
-        latest_date = date(2020,12, 31)
         profile = gen_profile("Name", "Surname")
-        assert(profile.setCheckedDate("birth_date", birth_date))
-        assert(profile.setCheckedDate("death_date", death_date))
-        assert(profile.setCheckedDate("baptism_date", baptism_date))
+        assert(profile.setCheckedDate("birth", 2016,10, 20))
+        assert(profile.setCheckedDate("death", 2019,12, 31))
+        assert(profile.setCheckedDate("baptism", 2016,12, 31))
         #Checking the function earliest date.
-        assert(profile.get_earliest_event() == birth_date)
+        assert(profile.get_earliest_event() == date(2016,10, 20))
         
-        assert(not profile.setCheckedDate("baptism_date", earliest_date))
-        assert(not profile.setCheckedDate("baptism_date", latest_date))
-        assert(not profile.setCheckedDate("baptism_date", baptism_date,"OTHER"))
+        assert(not profile.setCheckedDate("baptism", 2015,12, 31))
+        assert(not profile.setCheckedDate("baptism", 2020,12, 31))
+        assert(not profile.setCheckedDate("baptism", 2016,12, 31,"OTHER"))
     
     def test_introduce_burial_date(self):
         '''
         Testing introduction of baptism date
         '''
-        birth_date = date(2016,10, 20)
-        death_date = date(2019,12, 29)
-        burial_date = date(2019,12, 31)
-        earliest_date = date(2015,12, 31)
-        latest_date = date(2020,12, 31)
         profile = gen_profile("Name", "Surname")
-        assert(profile.setCheckedDate("birth_date", birth_date))
-        assert(profile.setCheckedDate("death_date", death_date))
-        assert(profile.setCheckedDate("burial_date", burial_date))
+        assert(profile.setCheckedDate("birth", 2016,10, 20))
+        assert(profile.setCheckedDate("death", 2019,12, 29))
+        assert(profile.setCheckedDate("burial", 2019,12, 31))
         
-        assert(not profile.setCheckedDate("burial_date", earliest_date))
+        assert(not profile.setCheckedDate("burial", 2015,12, 31))
         #Notice that will be ok to introudce a very late burial date
-        assert(profile.setCheckedDate("burial_date", latest_date))
-        assert(not profile.setCheckedDate("burial_date", burial_date,"OTHER"))
+        assert(profile.setCheckedDate("burial", 2020,12, 31))
+        assert(not profile.setCheckedDate("burial", 2019,12, 31,"OTHER"))
      
     def test_introduce_residence_date(self):
         '''
         Testing introduction of residence date
         '''
-        birth_date = date(2016,10, 20)
-        residence_date = date(2016,12, 31)
-        death_date = date(2019,12, 31)
-        earliest_date = date(2015,12, 31)
-        latest_date = date(2020,12, 31)
         profile = gen_profile("Name", "Surname")
-        assert(profile.setCheckedDate("birth_date", birth_date))
-        assert(profile.setCheckedDate("death_date",death_date))
-        assert(profile.setCheckedDate("residence_date",residence_date))
+        assert(profile.setCheckedDate("birth", 2016,10, 20))
+        assert(profile.setCheckedDate("death",2019,12, 31))
+        assert(profile.setCheckedDate("residence",2016,12, 31))
         
-        assert(not profile.setCheckedDate("residence_date",earliest_date))
-        assert(not profile.setCheckedDate("residence_date",latest_date))
-        assert(not profile.setCheckedDate("burial_date",residence_date,"OTHER"))
+        assert(not profile.setCheckedDate("residence",2015,12, 31))
+        assert(not profile.setCheckedDate("residence",2020,12, 31))
+        assert(not profile.setCheckedDate("burial",2016,12, 31,"OTHER"))
     def test_wrong_input(self):
         '''
         Test wrong input date class
@@ -164,26 +145,20 @@ class Test(unittest.TestCase):
         Testing the accuracy as introduced in dates
         '''
         profile = gen_profile("Name", "Surname")
-        test_date = date(2016,10, 20)
-        residence_date = date(2016,1, 1)
-        death_date = date(2016,12, 31)
-        late_residence_date = date(2016,1,1)
-        assert(profile.setCheckedDate("birth_date", test_date))
-        assert(profile.setCheckedDate("residence_date", residence_date, "ABOUT"))
+        assert(profile.setCheckedDate("birth", 2016,10, 20))
+        assert(profile.setCheckedDate("residence", 2016, accuracy="ABOUT"))
         profile2 = gen_profile("Name", "Surname")
-        assert(profile2.setCheckedDate("birth_date", test_date))
-        assert(profile2.setCheckedDate("death_date", death_date))
-        assert(profile2.setCheckedDate("residence_date", late_residence_date, "ABOUT"))
+        assert(profile2.setCheckedDate("birth", 2016,10, 20))
+        assert(profile2.setCheckedDate("death", 2016,12, 31))
+        assert(profile2.setCheckedDate("residence", 2016, accuracy="ABOUT"))
   
     def test_burial_date_earlier_than_death_date(self):
         '''
         Test burial date before death date is wrong
         '''
         profile = gen_profile("Name", "Surname")
-        death_date = date(2016,10, 20)
-        burial_date = date(2016,10, 19)
-        assert(profile.setCheckedDate("death_date", death_date))
-        self.assertFalse(profile.setCheckedDate("burial_date", burial_date))
+        assert(profile.setCheckedDate("death", 2016,10, 20))
+        self.assertFalse(profile.setCheckedDate("burial", 2016,10, 19))
     
     def test_event_places(self):
         '''
@@ -192,12 +167,12 @@ class Test(unittest.TestCase):
         profile = gen_profile("Name", "Surname")
         
         self.assertFalse(profile.setPlaces("notvalid", GENERIC_PLACE_STRING))
-        assert(profile.setPlaces("birth_place", GENERIC_PLACE_STRING))
-        self.assertFalse("death_place" in profile.gen_data.keys())
-        assert("birth_place" in profile.gen_data.keys())
+        assert(profile.setPlaces("birth", GENERIC_PLACE_STRING))
+        self.assertFalse("death" in profile.gen_data.keys())
+        assert("birth" in profile.gen_data.keys())
         
         #Test wrong introduction of a place to be used in google places.
-        assert(profile.setPlaces("marriage_place", ""))
+        assert(profile.setPlaces("marriage", ""))
            
         
     def test_other_functions(self):

@@ -21,10 +21,10 @@ from pyGeni.geniapi_common import geni_calls
 
 DIFFERNCE_BIRTH_BAPT = 90
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name", "easy_unique_id", "record_url", "subcollection_id"]
-date_fields = {"birth_date" : "birth_date" , "burial_date" : "burial_date", "chr_date" : "baptism_date",
-               "residence_date" : "residence_date", "death_date" : "death_date", "marriage_date" : "marriage_date"}
-LOCATION_EQUIVALENCE = {"birth_place_text" : "birth_place", "death_place_text" : "death_place", "residence_place_text" : "residence_place",
-                        "chr_place_text" : "baptism_place", "marriage_place_text" : "marriage_place"}
+date_fields = {"birth_date" : "birth" , "burial_date" : "burial", "chr_date" : "baptism",
+               "residence_date" : "residence", "death_date" : "death", "marriage_date" : "marriage"}
+LOCATION_EQUIVALENCE = {"birth_place_text" : "birth", "death_place_text" : "death", "residence_place_text" : "residence",
+                        "chr_place_text" : "baptism", "marriage_place_text" : "marriage"}
 
 class getFSfamily(object):
     '''
@@ -222,23 +222,27 @@ class getFSfamily(object):
         #Now we know the data we fix some with the proper logic
         for profile_obtained in self.profiles:
             #If the baptism and birth are close enough we assign the birth place to the baptism place
-            birth_d = profile_obtained.gen_data.get("birth_date", None)
-            bapt_d = profile_obtained.gen_data.get("baptism_date", None)
-            if birth_d and bapt_d:
-                difference = bapt_d - birth_d
+            birth_event = profile_obtained.gen_data.get("birth", None)
+            bapt_event = profile_obtained.gen_data.get("baptism", None)
+            if birth_event and bapt_event:
+                difference = bapt_event.get_date() - birth_event.get_date()
                 if abs(difference.days) < DIFFERNCE_BIRTH_BAPT:
-                    place_birth = profile_obtained.gen_data.get("birth_place", {}).get("raw", None)
-                    place_baptism = profile_obtained.gen_data.get("baptism_place", {}).get("raw", None)
+                    place_birth = None
+                    place_baptism = None
+                    if profile_obtained.gen_data.get("birth", None) and profile_obtained.gen_data.get("birth", None).get_location():
+                        place_birth = profile_obtained.gen_data.get("birth", None).get_location().get("raw", None)
+                    if profile_obtained.gen_data.get("baptism", None) and profile_obtained.gen_data.get("baptism", None).get_location():
+                        place_birth = profile_obtained.gen_data.get("baptism", None).get_location().get("raw", None)
                     if place_baptism and not place_birth:
-                        profile_obtained.setPlaces("birth_place",get_location_standard(profile_obtained.gen_data["baptism_place"]), self.language)
+                        profile_obtained.setPlaces("birth",get_location_standard(profile_obtained.gen_data["baptism"].get_location()), self.language)
             if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
                 id_of_marriage = profile_obtained.gen_data["marriage_link"]
                 partner = self.related_profiles[id_of_marriage]
                 partner.setWebReference(profile_obtained.gen_data["web_ref"])
                 #It is a partner so we add as opposite sex!
                 partner.setCheckedGender(get_partner_gender(profile_obtained.gen_data["gender"]))
-                partner.setCheckedDate("marriage_date", profile_obtained.gen_data["marriage_date"], profile_obtained.gen_data["accuracy_marriage_date"]  )
-                partner.setPlaces("marriage_place", profile_obtained.gen_data["marriage_place"]["raw"], language=self.language )
+                partner.setNewEvent(profile_obtained.gen_data["marriage"])
+                partner.setPlaces("marriage", profile_obtained.gen_data["marriage"].get_location()["raw"], language=self.language )
                 if id_of_marriage in self.parents_profiles.keys():
                     father = self.parents_profiles[id_of_marriage][0]
                     mother = self.parents_profiles[id_of_marriage][1]
@@ -283,7 +287,11 @@ class getFSfamily(object):
         Function to avoid repetition
         '''
         #No check if included in data_fileds as already included in the check!
-        return profile.setCheckedDate(date_fields[column_criteria], date_object, accuracy)
+        if accuracy == "ABOUT":
+            return profile.setCheckedDate(date_fields[column_criteria], date_object.year, accuracy=accuracy)
+        else:
+            return profile.setCheckedDate(date_fields[column_criteria], date_object.year,date_object.month,date_object.day, accuracy=accuracy)
+            
     def create_profiles_in_Geni(self, geni_data):
         '''
         This method will create the needed profiles directly in Geni

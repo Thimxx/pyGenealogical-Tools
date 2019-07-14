@@ -7,7 +7,7 @@
 import pyGeni as s
 from pyGeni.geniapi_common import geni_calls
 from pyGeni.immediate_family import immediate_family
-from pyGenealogy.common_profile import gen_profile, EVENT_DATA, ALL_EVENT_DATA
+from pyGenealogy.common_profile import gen_profile, EVENT_DATA, ALL_EVENT_DATA, EVENT_TYPE
 from pyGenealogy import NOT_KNOWN_VALUE
 from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS, RESIDENCE_MESSAGE, NO_VALID_UNION_PROFILE
 import logging
@@ -67,10 +67,9 @@ class profile(geni_calls, gen_profile):
         self.children = self.relations.children
         self.parent_union = self.relations.parent_union
         self.marriage_union = self.relations.marriage_union
-        #This is temporal, only a single marriage is considered
-        if (len(self.relations.marriage_dates) > 0):
-            self.setCheckedDate("marriage_date", self.relations.marriage_dates[0], self.relations.marriage_accuracy[0])
-            self.gen_data["marriage_place"] =self.relations.marriage_places[0]
+        #TODO:This is temporal, only a single marriage is considered
+        if (len(self.relations.marriage_events) > 0):
+            self.setNewEvent(self.relations.marriage_events[0])
     def get_id(self):
         '''
         Simple function to get Geni ID
@@ -103,12 +102,10 @@ class profile(geni_calls, gen_profile):
                 data_location = list(DATA_LIST_IN_GENI.values()).index(value_geni)
                 value_profile = list(DATA_LIST_IN_GENI.keys())[data_location]
                 self.gen_data[value_geni] = data[value_geni]
-            elif value_geni in EVENT_DATA.keys():
-                format_date, accuracy_geni = self.get_date(data.get(value_geni, {}).get("date", {}))
-                #Sometimes in Geni you can have the location of the event, but not the date
-                if (not (format_date == None)):
-                    self.setCheckedDate(EVENT_DATA[value_geni]["date"], format_date, accuracy=accuracy_geni)
-                self.gen_data[EVENT_DATA[value_geni]["location"]] = data.get(value_geni, {}).get("location", {})
+            elif value_geni in EVENT_TYPE:
+                current_event = self.get_date(value_geni, data.get(value_geni, {}).get("date", {}))
+                current_event.setLocationAlreadyProcessed(data.get(value_geni, {}).get("location", {}))
+                self.gen_data[value_geni] = current_event 
     def add_marriage_in_geni(self, union = None):
         '''
         This method add marriage data in geni, add union if there is no unique
@@ -269,11 +266,13 @@ class profile(geni_calls, gen_profile):
         '''
         Provides event value, uses the function
         '''
-        date = self.gen_data.get(ALL_EVENT_DATA[event_geni]["date"], None)
-        accuracy = self.gen_data.get(ALL_EVENT_DATA[event_geni]["accuracy"], None)
-        location = self.gen_data.get(ALL_EVENT_DATA[event_geni]["location"], None)
-        event_value = getEventStructureGeni(date, accuracy, location)
-        return event_value
+        event_data = {}
+        if event_geni in self.gen_data.keys():
+            date_structure = getDateStructureGeni(self.gen_data[event_geni])
+            location_structure = getLocationStructureGeni(self.gen_data[event_geni].get_location())
+            if(date_structure) : event_data["date"] = date_structure
+            if(location_structure) :event_data["location"] = location_structure
+        return event_data
 #===================================================
 # Util functions
 #===================================================
@@ -292,23 +291,23 @@ def process_geni_input(geni_input, type_geni):
         return s.GENI_PROFILE + type_geni + str(geni_input)
 def stripId(url):  # get node id from url (not guid)
     return (int(url[url.find("profile-") + 8:]))
-def getDateStructureGeni(date, accuracy):
+def getDateStructureGeni(event):
     '''
     Generates a Data structure to be introduced in Geni input
     '''
+    accuracy = event.get_accuracy()
     data_values = {}
-    if (date != None):
+    if (event.get_year() or event.get_month() or event.get_day()):
+        if (event.get_year()) : data_values['year'] = event.get_year()
+        if (event.get_month()) : data_values['month'] = event.get_month()
+        if (event.get_day()) : data_values['day'] = event.get_day()
         if accuracy == "ABOUT":
             data_values['circa'] = True
-            data_values['year'] = date.year
         else:
             if accuracy == "BEFORE":
                 data_values['range'] = "before"
             elif accuracy == "AFTER":
                 data_values['range'] = "after"
-            data_values['year'] = date.year
-            data_values['month'] = date.month
-            data_values['day'] = date.day
     return data_values
 def getLocationStructureGeni(location):
     '''
@@ -321,16 +320,6 @@ def getLocationStructureGeni(location):
             if (key != "raw"):
                 location_data[key] = location[key]
     return location_data
-def getEventStructureGeni(date, accuracy, location):
-    '''
-    Creates an event structure for geni
-    '''
-    event_data = {}
-    date_structure = getDateStructureGeni(date, accuracy)
-    location_structure = getLocationStructureGeni(location)
-    if(date_structure) : event_data["date"] = date_structure
-    if(location_structure) :event_data["location"] = location_structure
-    return event_data
 def process_profile_input(profile = None, geni_input = None, type_geni="g"):
     '''
        Function to avoid code duplication that takes returns the right profile id

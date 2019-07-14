@@ -58,9 +58,10 @@ class rememori_reader(object):
                 data = requests.get(selected_profile.gen_data["web_ref"][0])
                 self.person_parser.feed(data.text)
                 if (self.person_parser.age):
-                    death = selected_profile.gen_data["death_date"]
+                    #As the dates in rememory are exact we can freely do this
+                    death = selected_profile.gen_data["death"].get_date()
                     birth = date(death.year - self.person_parser.age,1,1)
-                    selected_profile.setCheckedDate("birth_date", birth, "ABOUT")
+                    selected_profile.setCheckedDate("birth", birth.year, accuracy="ABOUT")
                 if (self.person_parser.location):
                     selected_profile.setPlaces("death_place", self.person_parser.location, language="es" )
                 #As we have new data, we crosscheck the information to make sure we do not have profiles we should not have
@@ -127,7 +128,7 @@ class RememoryParser(HTMLParser):
                 name, surname, _ = get_name_surname_from_complete_name(self.name, convention="spanish_surname")
                 prof_record = gen_profile(name, surname)
                 prof_record.setWebReference(self.web_link)
-                prof_record.setCheckedDate("death_date", self.death_date, "EXACT")
+                prof_record.setCheckedDate("death", self.death_date.year, self.death_date.month,self.death_date.day,"EXACT")
                 prof_record.setComments(self.comments)
                 self.records.append(prof_record)
 class RememoryPersonParser(HTMLParser):

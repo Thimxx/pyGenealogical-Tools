@@ -28,8 +28,8 @@ checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date, de
 getBestDate(birth_date, "AFTER", residence_date, "EXACT")
 
 GENERIC_PLACE_STRING = "Portillo,Valladolid,Castile and Leon,Spain"
-#This function provides a generic location in standard location format. It is using google maps API in behind
-get_formatted_location(GENERIC_PLACE_STRING, language="en")
+#This function provides a generic location in standard location format. It is using MAPBOX API in behind
+get_formatted_location(GENERIC_PLACE_STRING)
 
 my_name = "John Smith"
 #It splits a given name into the name and surname. It checks the data with a database of names and surnames.

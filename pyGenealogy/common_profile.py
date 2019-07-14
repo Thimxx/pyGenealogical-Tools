@@ -3,14 +3,14 @@ Created on 13 ago. 2017
 
 @author: Val
 '''
-from pyGenealogy.gen_utils import checkDateConsistency, get_formatted_location, get_score_compare_names, get_score_compare_dates
-from pyGenealogy import VALUES_ACCURACY
+from pyGenealogy.gen_utils import checkDateConsistency, get_score_compare_names, get_score_compare_dates
+from pyGenealogy import VALUES_ACCURACY, EVENT_TYPE
 from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS, formated_year
+from pyGenealogy.common_event import event_profile
 
 TOOL_ID = "PY-GENEALOGY"
 DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments", "id", "marriage_link"]
-MERGE_DATES = ["birth_date", "death_date", "baptism_date",  "burial_date", "marriage_date"]
-DATA_DATES = MERGE_DATES + ["residence_date"]
+MERGE_EVENTS = ["birth", "death", "baptism",  "burial", "marriage"]
 DATA_ACCURACY = ["accuracy_birth_date", "accuracy_death_date", "accuracy_baptism_date", "accuracy_residence_date", "accuracy_burial_date", "accuracy_marriage_date"]
 DATA_PLACES = ["birth_place", "death_place", "baptism_place", "residence_place", "burial_place", "marriage_place"]
 DATA_LISTS = ["web_ref", "nicknames"]
@@ -27,7 +27,7 @@ ALL_EVENT_DATA = dict(EVENT_DATA)
 ALL_EVENT_DATA.update(EVENT_MARRIAGE)
 ALL_EVENT_DATA.update(EVENT_RESIDENCE)
 
-ALL_DATA = DATA_STRING + DATA_DATES + DATA_ACCURACY + DATA_PLACES + DATA_LISTS
+ALL_DATA = DATA_STRING + DATA_LISTS + EVENT_TYPE
 
 class gen_profile(object):
     '''
@@ -96,16 +96,30 @@ class gen_profile(object):
             return True
         else:
             return False
-    def setCheckedDate(self, date_name, date, accuracy = "EXACT"):
+    def setCheckedDate(self, event_name, year, month = None, day = None, accuracy = "EXACT", year_end = None,
+                month_end = None, day_end = None):
         '''
-        Input shall be a datetime.date format
+        This function will introduce an event with the data related to the dates of the event
         '''
-        if (not self.selfcheckDateConsistency({ date_name : date}, {"accuracy_" + date_name : accuracy})) or (not accuracy in VALUES_ACCURACY) or (not date_name in DATA_DATES):
+        if (not event_name in EVENT_TYPE) or (not accuracy in VALUES_ACCURACY): return False
+        new_event = event_profile(event_name)
+        new_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)
+        if (not self.selfcheckDateConsistency(new_event)):
             return False
         else:
-            self.gen_data[date_name] = date
-            self.gen_data["accuracy_" + date_name] = accuracy
+            if event_name in self.gen_data.keys():
+                self.gen_data[event_name].setDate(year, month, day, accuracy, year_end, month_end, day_end)
+            else:
+                self.gen_data[event_name] = new_event
             return True
+    def setNewEvent(self,event):
+        '''
+        When the event is already available there is no need to perform the checked date, we just include the event
+        '''
+        if (not self.selfcheckDateConsistency(event)):
+            return False
+        else:
+            self.gen_data[event.get_event_type()] = event
     def setComments(self, comment):
         '''
         Comments are aditive on top of the preivous one
@@ -118,9 +132,9 @@ class gen_profile(object):
         Function for printing an standard format of naming
         '''
         year_birth = "?"
-        if("birth_date" in self.gen_data.keys()): year_birth = formated_year(self.gen_data["birth_date"].year, self.gen_data["accuracy_birth_date"])
+        if("birth" in self.gen_data.keys()): year_birth = formated_year(self.gen_data["birth"].get_year(), self.gen_data["birth"].get_accuracy())
         year_death = "?"
-        if("death_date" in self.gen_data.keys()): year_death = formated_year(self.gen_data["death_date"].year, self.gen_data["accuracy_death_date"])
+        if("death" in self.gen_data.keys()): year_death = formated_year(self.gen_data["death"].get_year(), self.gen_data["death"].get_accuracy())
         if (year_birth == "?") and (year_death == "?"):
             return self.getName2Show()
         else:
@@ -133,13 +147,14 @@ class gen_profile(object):
             self.gen_data["web_ref"] += address
         elif isinstance(address, str):
             self.gen_data["web_ref"].append(address)
-    def setPlaces(self, event_place, location, language="en" ):
+    def setPlaces(self, event_name, location, language="en" ):
         '''
         This function will introduce the location related to each event
         '''
-        if event_place in DATA_PLACES:
-            location_data = get_formatted_location(location)
-            self.gen_data[event_place] = location_data
+        if event_name in EVENT_TYPE:
+            new_event = self.gen_data.get(event_name, event_profile(event_name))
+            new_event.setLocation(location, language)
+            self.gen_data[event_name] = new_event
             return True
         else:
             return False
@@ -149,32 +164,20 @@ class gen_profile(object):
         for simplicity I will not consider that case
         '''
         earliest_date = None
-        for date_key in DATA_DATES:
-            if date_key in self.gen_data:
+        for event_key in EVENT_TYPE:
+            if event_key in self.gen_data:
                 if earliest_date == None:
-                    earliest_date = self.gen_data[date_key]
-                elif self.gen_data[date_key] < earliest_date:
-                    earliest_date = self.gen_data[date_key]
+                    earliest_date = self.gen_data[event_key].get_date()
+                elif self.gen_data[event_key].get_date() < earliest_date:
+                    earliest_date = self.gen_data[event_key].get_date()
         return earliest_date
-    def selfcheckDateConsistency(self, dict_dates, dict_accuracy):
-        #We set the dates received or taken from the profiles
-        birth_date = dict_dates.get("birth_date", self.gen_data.get("birth_date", None) )
-        residence_date = dict_dates.get("residence_date", self.gen_data.get("residence_date", None) )
-        baptism_date = dict_dates.get("baptism_date", self.gen_data.get("baptism_date", None) )
-        marriage_date = dict_dates.get("marriage_date", self.gen_data.get("marriage_date", None) )
-        death_date = dict_dates.get("death_date", self.gen_data.get("death_date", None) )
-        burial_date = dict_dates.get("burial_date", self.gen_data.get("burial_date", None) )
-        #Similar attemp using accuracy
-        accuracy_birth = dict_accuracy.get("accuracy_birth_date", self.gen_data.get("accuracy_birth_date", None) )
-        accuracy_residence = dict_accuracy.get("accuracy_residence_date", self.gen_data.get("accuracy_residence_date", None) )
-        accuracy_baptism = dict_accuracy.get("accuracy_baptism_date", self.gen_data.get("accuracy_baptism_date", None) )
-        accuracy_marriage = dict_accuracy.get("accuracy_marriage_date", self.gen_data.get("accuracy_marriage_date", None) )
-        accuracy_death = dict_accuracy.get("accuracy_death_date", self.gen_data.get("accuracy_death_date", None) )
-        accuracy_burial = dict_accuracy.get("accuracy_burial_date", self.gen_data.get("accuracy_burial_date", None) )
-        return checkDateConsistency(birth_date, residence_date, baptism_date,
-                         marriage_date, death_date, burial_date,
-                         accuracy_birth, accuracy_residence, accuracy_baptism,
-                         accuracy_marriage , accuracy_death, accuracy_burial)
+    def selfcheckDateConsistency(self, new_event):
+        '''
+        This function is a wrapper for calling the function of checking dates consistencies
+        '''
+        all_events = self.getEvents()
+        all_events.append(new_event)
+        return checkDateConsistency(all_events)
     def comparison_score(self, profile, data_language="en", name_convention="father_surname"):
         '''
         Get the score value in comparison
@@ -187,12 +190,10 @@ class gen_profile(object):
                 score += 0.5
             else:
                 factor = 0.5*factor
-        for date_id in MERGE_DATES:
-            if (date_id in self.gen_data.keys()) and (date_id in profile.gen_data.keys()):
-                score_temp, factor_temp = get_score_compare_dates(self.gen_data[date_id],
-                                                              self.gen_data["accuracy_" + date_id],
-                                                              profile.gen_data[date_id],
-                                                              profile.gen_data["accuracy_" + date_id] )
+        for event_name in MERGE_EVENTS:
+            if (event_name in self.gen_data.keys()) and (event_name in profile.gen_data.keys()) and self.gen_data[event_name].is_any_date_available() and profile.gen_data[event_name].is_any_date_available():
+                score_temp, factor_temp = get_score_compare_dates(self.gen_data[event_name],
+                                                              profile.gen_data[event_name] )
                 score += score_temp
                 factor = factor*factor_temp
         return score, factor
@@ -225,15 +226,15 @@ class gen_profile(object):
                         elif (key_data in DATA_LISTS):
                             for info in profile.gen_data[key_data]:
                                 if info not in self.gen_data[key_data] : self.gen_data[key_data].append(info)
-                        elif (key_data in MERGE_DATES):
-                            if profile.gen_data[EVENT_DATA[key_data.replace("_date","")]["accuracy"]] == "EXACT":
-                                self.gen_data[EVENT_DATA[key_data.replace("_date","")]["accuracy"]] = "EXACT"
-                                self.gen_data[EVENT_DATA[key_data.replace("_date","")]["date"]] = profile.gen_data[EVENT_DATA[key_data.replace("_date","")]["date"]]
-                        elif (key_data in DATA_PLACES):
+                        elif (key_data in EVENT_TYPE):
+                            #Merging the data input
+                            event_new = profile.gen_data[key_data]
+                            if event_new.get_accuracy() == "EXACT":
+                                self.gen_data[key_data].setDate(event_new.get_year(),event_new.get_month(),event_new.get_day(),event_new.get_accuracy())
                             for key_location in LOCATION_KEYS:
-                                if profile.gen_data[key_data].get(key_location, None) != None:
-                                    if self.gen_data[key_data].get(key_location, None) == None:
-                                        self.gen_data[key_data][key_location] = profile.gen_data[key_data][key_location]
+                                if event_new.get_location() and (event_new.get_location().get(key_location, None) != None):
+                                    if self.gen_data[key_data].get_location() and (self.gen_data[key_data].get_location().get(key_location, None) == None):
+                                        self.gen_data[key_data].setParameterInLocation(key_location, profile.gen_data[key_data][key_location])
             return True
         else:
             return False
@@ -265,6 +266,29 @@ class gen_profile(object):
         return self.gen_data["comments"]
     def getName2Show(self):
         '''
-        Function that provides back the name to be shown 
+        Function that provides back the name to be shown
         '''
         return self.gen_data["name_to_show"]
+    def getEvents(self):
+        '''
+        This function will provide all present events inside the profile
+        '''
+        all_events = []
+        for event_name in EVENT_TYPE:
+            if event_name in self.gen_data.keys(): all_events.append(self.gen_data[event_name])
+        return all_events
+    def get_specific_event(self, event_name):
+        '''
+        It will return an specific event or None if not present
+        '''
+        return self.gen_data.get(event_name, None)
+    def get_accuracy_event(self, event):
+        '''
+        It will return the accuracy of an event in the profile
+        '''
+        return self.gen_data[event].get_accuracy()
+    def get_location_event(self, event):
+        '''
+        It will return the location of an event in the profile
+        '''
+        return self.gen_data[event].get_location()

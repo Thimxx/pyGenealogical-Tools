@@ -26,8 +26,8 @@ class Test(unittest.TestCase):
         assert(un1.union_data["id"] == "union-155")
         assert(un1.union_data["url"] == "https://api.sandbox.geni.com/union-155")
         assert(un1.union_data["guid"] == "1149813")
-        assert(un1.union_data["marriage_date"] == date(1923,4,3))
-        assert(un1.union_data["marriage_place"]["county"] == 'Madrid')
+        assert(un1.union_data["marriage"].get_date() == date(1923,4,3))
+        assert(un1.union_data["marriage"].get_location()["county"] == 'Madrid')
         assert(len(un1.union_data["partners"]) == 2)
         assert(len(un1.union_data["children"]) == 4)
 

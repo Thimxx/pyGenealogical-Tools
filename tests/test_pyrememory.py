@@ -20,8 +20,8 @@ class Test(unittest.TestCase):
         date1_found = False
         date2_found = False
         for profile in records:
-            if (profile.gen_data["death_date"] == date1): date1_found = True
-            if (profile.gen_data["death_date"] == date2): date2_found = True
+            if (profile.gen_data["death"].get_date() == date1): date1_found = True
+            if (profile.gen_data["death"].get_date() == date2): date2_found = True
         assert(date1_found)
         assert(date2_found)
     
@@ -30,12 +30,12 @@ class Test(unittest.TestCase):
         Test confirming list will be simplified
         '''
         profile = gen_profile("Julián", "Gómez Gómez")
-        profile.setCheckedDate("baptism_date", date(1970,4,2), "EXACT")
+        profile.setCheckedDate("baptism", 1970,4,2, "EXACT")
         reader = rememori_reader()
         records = reader.profile_is_matched(profile)
         date_found = False
         for deceased in records:
-            if (deceased.gen_data["death_date"] == date(2017,2,13)): date_found = True
+            if (deceased.gen_data["death"].get_date() == date(2017,2,13)): date_found = True
         assert(date_found)
     
     def test_avoiding_analysis(self):
@@ -43,7 +43,7 @@ class Test(unittest.TestCase):
         Test confirming no analysis if antique record
         '''
         profile = gen_profile("Julián", "Gómez Gómez")
-        profile.setCheckedDate("baptism_date", date(1870,4,2), "EXACT")
+        profile.setCheckedDate("baptism", 1870,4,2, "EXACT")
         reader = rememori_reader()
         records = reader.profile_is_matched(profile)
         assert(len(records) == 0)

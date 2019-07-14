@@ -41,5 +41,3 @@ class family_profile(object):
         Assigning the event of the marriage
         '''
         if marriage: self.marriage = marriage
-        
-        

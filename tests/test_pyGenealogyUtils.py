@@ -13,6 +13,7 @@ from pyGenealogy.gen_utils import get_location_standard, formated_year
 from tests.FIXTURES import RIGHT_YEAR, RIGHT_YEAR_IN_A_TEXT, WRONG_YEAR, JUST_TEXT, RIGHT_YEAR_IN_A_DATE
 from tests.FIXTURES import FATHER_SURNAME, MOTHER_SURNAME, SPANISH_CHILD_SURNAME, GENERIC_PLACE_CAPITALS
 from tests.FIXTURES import FULL_NAME, FULL_NAME_SPANISH, ACTUAL_NAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
+from pyGenealogy.common_event import event_profile
 
 class Test(unittest.TestCase):
     '''
@@ -61,24 +62,62 @@ class Test(unittest.TestCase):
         '''
         Test of the function for date check
         '''
-        date1 = date(2017,1,1)
-        date2 = date(2016,1,1)
-        date3 = date(2015,1,1)
-        date2b = date(2014,2,1)
-        date4 = date(2014,1,1)
-        assert(checkDateConsistency(None,date2b, None,None,None,None))
-        assert(checkDateConsistency(date4,None, None,None,None,None))
-        assert(checkDateConsistency(date4,None, None,None,None,date1))
-        assert(checkDateConsistency(date4,None, date3,date2,date1,None))
-        
-        assert(not checkDateConsistency(date1,None, None,None,date4,None))
-        assert(not checkDateConsistency(None,None, date1,None,date4,None))
-        assert(not checkDateConsistency(date1,None, date4,None,None,None))
-        #Checking that about dates are ok although the date2b is later than date4
-        assert(checkDateConsistency(date2b, None, None, None, date4, date4, accuracy_death = "ABOUT", accuracy_burial = "ABOUT"))
-        
+        event4end = event_profile("death")
+        event4end.setDate(2014,accuracy = "ABOUT")
+        event2bend = event_profile("burial")
+        event2bend.setDate(2014,month = 2 , day = 1, accuracy = "BEFORE")
         #Test bug of burial and death
-        assert(checkDateConsistency(None,None, None, None,date4,date2b, accuracy_death = "ABOUT", accuracy_burial = "BEFORE"))
+        assert(checkDateConsistency([event4end, event2bend]))
+        
+        
+        #Going events onebyone
+        event1 = event_profile("residence")
+        event1.setDate(2017, 1, 1)
+        event4 = event_profile("birth")
+        event4.setDate(2014, 1, 1)
+        assert(checkDateConsistency( [event1]   ))
+        assert(checkDateConsistency([event4]))
+        event1b = event_profile("burial")
+        event1b.setDate(2017, 1, 1)
+        assert(checkDateConsistency([event4, event1b]))
+        event1d = event_profile("death")
+        event1d.setDate(2017, 1, 1)
+        event2 = event_profile("marriage")
+        event2.setDate(2016, 1, 1)
+        event3 = event_profile("baptism")
+        event3.setDate(2015, 1, 1)
+        assert(checkDateConsistency([event3, event2,event1d, event4 ]))
+        
+        
+        event1bi = event_profile("birth")
+        event1bi.setDate(2017, 1, 1)
+        event4b = event_profile("burial")
+        event4b.setDate(2014, 1, 1)
+        
+        assert(not checkDateConsistency([event1bi, event4b]))
+        event1ba = event_profile("baptism")
+        event1ba.setDate(2017, 1, 1)
+        event4d = event_profile("death")
+        event4d.setDate(2014, 1, 1)
+        assert(not checkDateConsistency([event4d, event1ba]))
+        event4bap = event_profile("baptism")
+        event4bap.setDate(2014, 1, 1)
+        assert(not checkDateConsistency([event4bap, event1bi]))
+        #Checking that about dates are ok although the date2b is later than date4
+        event2btest = event_profile("birth")
+        event2btest.setDate(2014, 2, 1)
+        event4test = event_profile("burial")
+        event4test.setDate(2014,accuracy = "ABOUT")
+        event5test = event_profile("death")
+        event5test.setDate(2014,accuracy = "ABOUT")
+        assert(checkDateConsistency([event2btest, event4test, event5test ]))
+        
+        event4end = event_profile("death")
+        event4end.setDate(2014,accuracy = "ABOUT")
+        event2bend = event_profile("burial")
+        event2bend.setDate(2014,month = 2 , day = 1, accuracy = "BEFORE")
+        #Test bug of burial and death
+        assert(checkDateConsistency([event4end, event2bend]))
     
     def test_getting_a_date(self):
         '''
@@ -264,76 +303,137 @@ class Test(unittest.TestCase):
         '''
         date1 = date(2018,1,1)
         date2 = date(2018,2,6)
-        
-        score, factor = get_score_compare_dates(date1, "EXACT", date1, "EXACT")
+        event1 = event_profile("birth")
+        event1.setDate(2018,1,1)
+        event2 = event_profile("birth")
+        event3 = event_profile("birth")
+        event3.setDate(2018,2,6)
+        #No difference score
+        score, factor = get_score_compare_dates(event1, event1)
         assert(score == 2.0)
         assert(factor == 1.0)
-        score, factor = get_score_compare_dates(date1, "EXACT", date(2018,1,2), "EXACT")
+        #1 day of different
+        event2.setDate(2018,1,2)
+        score, factor = get_score_compare_dates(event1, event2)
         assert(score >1.8)
         assert(factor > 0.9)
-        score, factor = get_score_compare_dates(date1, "EXACT", date(2018,1,8), "EXACT")
+        #One week of different
+        event2.setDate(2018,1,8)
+        score, factor = get_score_compare_dates(event1, event2)
         assert(score >1.4)
         assert(factor > 0.7)
-        score, factor = get_score_compare_dates(date1, "EXACT", date(2018,2,6), "EXACT")
+        #One month of difference
+        event2.setDate(2018,2,6)
+        score, factor = get_score_compare_dates(event1, event2)
         assert(score >0.8)
         assert(factor > 0.4)
-        score, factor = get_score_compare_dates(date1, "EXACT", date(2019,1,1), "EXACT")
+        #one year of different
+        event2.setDate(2019,1,1)
+        score, factor = get_score_compare_dates(event1, event2)
         assert(score >0.08)
         assert(factor > 0.04)
         #About parameters
-        score, factor = get_score_compare_dates(date2, "EXACT", date(2017,1,1), "ABOUT")
+        event2.setDate(2017, accuracy="ABOUT")
+        score, factor = get_score_compare_dates(event3, event2)
         assert(score == 1.0)
         assert(factor == 1.0)
-        score, factor = get_score_compare_dates(date2, "EXACT", date(2016,1,1), "ABOUT")
+        #A little bith more than one year
+        event2.setDate(2016, accuracy="ABOUT")
+        score, factor = get_score_compare_dates(event3, event2)
         assert(score >0.95)
         assert(factor == 1.0)
-        score, factor = get_score_compare_dates(date2, "ABOUT", date(2013,1,1), "EXACT")
+        #Several years
+        event2.setDate(2013, accuracy="ABOUT")
+        score, factor = get_score_compare_dates(event3, event2)
         assert(score >0.2)
         assert(factor > 0.4)
-        score, factor = get_score_compare_dates(date2, "EXACT", date(2010,1,1), "ABOUT")
+        #Far beyond....
+        event2.setDate(2010, accuracy="ABOUT")
+        score, factor = get_score_compare_dates(event3, event2)
         assert(score < 0.1)
         assert(factor > 0.1)
         #Let's check the dates
-        score, factor = get_score_compare_dates(date(2010,1,1), "ABOUT", date(2010,1,1), "ABOUT")
+        event2.setDate(2010, accuracy="ABOUT")
+        event3.setDate(2010, accuracy="ABOUT")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 1.0)
         assert(factor == 1.0)
-        score, factor = get_score_compare_dates(date(2014,1,1), "ABOUT", date(2010,1,1), "ABOUT")
+        #4 years with about different
+        event2.setDate(2014, accuracy="ABOUT")
+        event3.setDate(2010, accuracy="ABOUT")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score > 0.499)
         assert(factor > 0.799)
-        score, factor = get_score_compare_dates(date(2017,1,1), "ABOUT", date(2010,1,1), "ABOUT")
+        #7 years with about different
+        event2.setDate(2017, accuracy="ABOUT")
+        event3.setDate(2010, accuracy="ABOUT")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score > 0.37999)
         assert(factor > 0.41999)
-        score, factor = get_score_compare_dates(date(2030,1,1), "ABOUT", date(2010,1,1), "ABOUT")
+        #20 years with about different
+        event2.setDate(2030, accuracy="ABOUT")
+        event3.setDate(2010, accuracy="ABOUT")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score > 0.04999)
         assert(factor > 0.074999)
-        score, factor = get_score_compare_dates(date(2040,1,1), "BEFORE", date(2030,1,1), "BEFORE")
+        #Befores become irrelevant
+        event2.setDate(2040, accuracy="BEFORE")
+        event3.setDate(2030, accuracy="BEFORE")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 1.0)
-        score, factor = get_score_compare_dates(date(2040,1,1), "BEFORE", date(2030,1,1), "ABOUT")
+        #Befores become irrelevant
+        event2.setDate(2040, accuracy="BEFORE")
+        event3.setDate(2030, accuracy="ABOUT")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 1.0)
-        score, factor = get_score_compare_dates(date(2040,1,1), "BEFORE", date(2050,1,1), "EXACT")
+        #Inconsistentcy gives null
+        event2.setDate(2040, accuracy="BEFORE")
+        event3.setDate(2050, accuracy="EXACT")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 0.0)
-        score, factor = get_score_compare_dates(date(2040,1,1), "AFTER", date(2030,1,1), "AFTER")
+        #After becomes irrelevant
+        event2.setDate(2040, accuracy="AFTER")
+        event3.setDate(2030, accuracy="AFTER")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 1.0)
-        score, factor = get_score_compare_dates(date(2020,1,1), "AFTER", date(2030,1,1), "ABOUT")
+        #After becomes irrelevant
+        event2.setDate(2020, accuracy="AFTER")
+        event3.setDate(2030, accuracy="ABOUT")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 1.0)
-        score, factor = get_score_compare_dates(date(2040,1,1), "AFTER", date(2020,1,1), "EXACT")
+        #After becomes irrelevant
+        event2.setDate(2040, accuracy="AFTER")
+        event3.setDate(2020, accuracy="EXACT")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 0.0)
-        score, factor = get_score_compare_dates(date(2030,1,1), "ABOUT", date(2040,1,1), "BEFORE")
+        #After becomes irrelevant
+        event2.setDate(2030, accuracy="ABOUT")
+        event3.setDate(2040, accuracy="BEFORE")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 1.0)
-        score, factor = get_score_compare_dates(date(2030,1,1), "ABOUT", date(2020,1,1), "BEFORE")
+        #After becomes irrelevant
+        event2.setDate(2030, accuracy="ABOUT")
+        event3.setDate(2020, accuracy="BEFORE")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 0.0)
-        score, factor = get_score_compare_dates(date(2030,1,1), "ABOUT", date(2020,1,1), "AFTER")
+        #After becomes irrelevant
+        event2.setDate(2030, accuracy="ABOUT")
+        event3.setDate(2020, accuracy="AFTER")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 1.0)
-        score, factor = get_score_compare_dates(date(2030,1,1), "ABOUT", date(2040,1,1), "AFTER")
+        #After becomes irrelevant
+        event2.setDate(2030, accuracy="ABOUT")
+        event3.setDate(2040, accuracy="AFTER")
+        score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 0.0)
     def test_bug_capital_letters(self):
@@ -341,7 +441,6 @@ class Test(unittest.TestCase):
         Test Capital Letters are fixed
         '''
         output = get_formatted_location(GENERIC_PLACE_CAPITALS)
-        print("HOLLAAA=", output["place_name"], output )
         assert(output["place_name"] == "Pz San Juan Evangelista")
         assert(output["country"] == "Spain")
     

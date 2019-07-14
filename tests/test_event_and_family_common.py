@@ -7,6 +7,7 @@ import unittest
 from pyGenealogy.common_event import event_profile
 from pyGenealogy.common_family import family_profile
 from pyGenealogy.common_profile import gen_profile
+from asyncio.events import new_event_loop
 
 class Test(unittest.TestCase):
 
@@ -50,7 +51,59 @@ class Test(unittest.TestCase):
         
         family3 = family_profile(child = [child1, child2], father = father, mother = mother, marriage = event1)
         assert(family3.father and family3.mother and family3.children and family3.marriage)
+    
+    def test_date_checker(self):
+        '''
+        It will check 2 dates to confirm which one is the smaller
+        '''
+        new_event = event_profile("birth")
+        
+        self.assertFalse(new_event.is_first_date_lower(2012, None, None, 2010, None, None))
+        assert(new_event.is_first_date_lower(1910, None, None, 1912, None, None))
+        assert(new_event.is_first_date_lower(2010, 1, None, 2010, None, None) == None)
+        assert(new_event.is_first_date_lower(2010, 1, None, 2010, 2, None))
+        self.assertFalse(new_event.is_first_date_lower(2012, 5, None, 2012, 1, None))
+        assert(new_event.is_first_date_lower(2010, 1, None, 2010, 1, None) == None)
+        assert(new_event.is_first_date_lower(2010, 2, 12, 2010, 2, 22))
+        self.assertFalse(new_event.is_first_date_lower(2012, 5, 12, 2012, 5, 5))
+        assert(new_event.is_first_date_lower(2010, 1, 2, 2010, 1, 2) == "Equal")
+        
+        #Testing that the event is smaller or not
+        new_event1 = event_profile("birth")
+        new_event1.setDate(2013,month = 2, accuracy = "AFTER")
+        new_event2 = event_profile("death")
+        new_event2.setDate(2012, day = 3, accuracy = "ABOUT")
+        
+        self.assertFalse(new_event1.is_this_event_earlier_or_simultaneous_to_this(new_event2))
+        assert(new_event2.is_this_event_earlier_or_simultaneous_to_this(new_event1))
 
+        assert(new_event1.is_this_event_later_or_simultaneous_to_this(new_event2) )
+        self.assertFalse(new_event2.is_this_event_later_or_simultaneous_to_this(new_event1))
+    def test_date_for_gedcom(self):
+        '''
+        Testing the output for gedcom
+        '''
+        new_event = event_profile("birth")
+        new_event.setDate(2013,month = 2)
+        assert(new_event.get_gedcom_date() == "FEB 2013")
+        new_event.setDate(2013)
+        assert(new_event.get_gedcom_date() == "2013")
+        new_event.setDate(2013,6, 1)
+        assert(new_event.get_gedcom_date() == "01 JUN 2013")
+        new_event.setDate(2013,12, 18)
+        assert(new_event.get_gedcom_date() == "18 DEC 2013")
+    def test_date_differences(self):
+        '''
+        Will test the differences between 2 events
+        '''
+        event1 = event_profile("birth")
+        event1.setDate(2013, 2, 13, "EXACT")
+        event2 = event_profile("birth")
+        event2.setDate(2013, 6, 26, "EXACT")
+        assert(event1.get_difference_in_days(event2) == 133)
+        event2.setDate(2013, accuracy="EXACT")
+        print(event1.get_difference_in_days(event2) == 43)
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

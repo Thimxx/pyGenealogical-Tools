@@ -7,6 +7,7 @@ import unittest
 from pyGeni import profile, set_token
 from datetime import date
 from pyGenealogy.common_profile import gen_profile
+from pyGenealogy.common_event import event_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
 from tests.FIXTURES import SANDBOX_MAIN_ADDRESS, SANDBOX_MAIN_API_G, SANDBOX_MAIN_API_NOG, MAIN_SANDBOX_PROFILE_ID, ACTUAL_SECOND, ACTUAL_THIRD
 from tests.FIXTURES import FATHER_PROFILE_SANDBOX, BROTHER_PROFILE_SANDBOX, GENERIC_PLACE_STRING, GENI_INPUT_THROUGH, GENI_INPUT_THROUGH_API
@@ -33,7 +34,7 @@ class Test(unittest.TestCase):
         assert(prof.gen_data["surname"] == "Profile")
         assert(prof.gen_data["name"] == "Testing")
         #Securing before is properly captured
-        assert(prof.gen_data["accuracy_baptism_date"] == "BEFORE")
+        assert(prof.get_accuracy_event("baptism") == "BEFORE")
         
         prof = profile.profile(MAIN_SANDBOX_PROFILE_API)
         assert(prof.gen_data["name"] == "Testing")
@@ -47,8 +48,8 @@ class Test(unittest.TestCase):
         child_profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
         child_profile.setCheckedGender("M")
         child_profile.set_name_2_show(ACTUAL_NAME)
-        child_profile.setCheckedDate("birth_date", date(2017,11,20), "ABOUT")
-        child_profile.setCheckedDate("death_date", date(2017,12,1), "EXACT")
+        child_profile.setCheckedDate("birth", 2017, month =  11, day = 20, accuracy = "ABOUT")
+        child_profile.setCheckedDate("death", 2017, month =  12, day = 1)
         child_profile.add_nickname("my_nickname")
         profile.profile.create_as_a_child(child_profile, union = UNION_MAIN_PROFILE )
         
@@ -61,7 +62,7 @@ class Test(unittest.TestCase):
         #Checking dates
         assert(child_profile.data["birth"]["date"]["year"] == 2017)
         assert(child_profile.data["birth"]["date"]["circa"] == True)
-        self.assertFalse("month" in child_profile.data["birth"]["date"].keys())
+        assert("month" in child_profile.data["birth"]["date"].keys())
         assert(child_profile.data["death"]["date"]["year"] == 2017)
         assert(child_profile.data["death"]["date"]["month"] == 12)
         assert(child_profile.data["death"]["date"]["day"] == 1)
@@ -115,23 +116,33 @@ class Test(unittest.TestCase):
         '''
         Test creation of geni date structure
         '''
-        test_date = date(2017,11,20)
+        my_event = event_profile("birth")
+        #my_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)
+        my_event.setDate(2017, 11, 20, "EXACT")
         
-        output = profile.getDateStructureGeni(test_date, "EXACT")
+        output = profile.getDateStructureGeni(my_event)
         assert(output["year"] == 2017)
         assert(output["month"] == 11)
         assert(output["day"] == 20)
-        output2 = profile.getDateStructureGeni(test_date, "ABOUT")
+        #Testing about
+        my_event.setDate(2017,accuracy = "ABOUT")
+        output2 = profile.getDateStructureGeni(my_event)
         assert(output2["year"] == 2017)
         self.assertFalse("month" in output2.keys())
         self.assertFalse("day" in output2.keys())
         assert(output2["circa"] == True)
-        output3 = profile.getDateStructureGeni(test_date, "BEFORE")
+        my_event.setDate(2017,accuracy = "ABOUT")
+        #Testing the data before
+        my_event.setDate(2017,accuracy = "BEFORE")
+        output3 = profile.getDateStructureGeni(my_event)
         assert(output3["range"] == "before")
-        output4 = profile.getDateStructureGeni(test_date, "AFTER")
+        #Testing the data before
+        my_event.setDate(2017,accuracy = "AFTER")
+        output4 = profile.getDateStructureGeni(my_event)
         assert(output4["range"] == "after")
         
-        self.assertFalse( profile.getDateStructureGeni(None, None))
+        my_other_event = event_profile("birth")
+        self.assertFalse( profile.getDateStructureGeni(my_other_event))
         
     def test_location_input(self):
         '''
@@ -163,7 +174,9 @@ class Test(unittest.TestCase):
         Testing adding a parent to a profile
         '''
         partner_profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
-        partner_profile.setCheckedDate("marriage_date", date(2017,11,20) , "EXACT")
+        my_event = event_profile("marriage")
+        my_event.setDate(2017, 11, 20)
+        partner_profile.setCheckedDate("marriage", 2017, 10, 20)
         partner_profile.setPlaces("marriage_place",GENERIC_PLACE_STRING , language="es")
         profile.profile.create_as_a_partner(partner_profile, geni_input = BROTHER_PROFILE_SANDBOX)
         #TODO: add checking of marriage data once is included

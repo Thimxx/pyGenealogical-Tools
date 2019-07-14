@@ -80,40 +80,39 @@ class gedcom_profile(common_profile.gen_profile):
         '''
         Function that provides the event value as an element
         '''
-        date = self.gen_data.get(common_profile.ALL_EVENT_DATA[date_key]["date"], None)
-        accuracy = self.gen_data.get(common_profile.ALL_EVENT_DATA[date_key]["accuracy"], None)
+        date_event = self.gen_data.get(date_key, None)
         include_date = False
         ged_event = gedcom.Element(tag=EQUIVALENCE[date_key], value="")
         #Ok, we have a date defined, let's create the relevant element
-        if (date):
+        if (date_event):
             include_date = True
             ged_date_string = ""
-            full_date =  date.strftime("%d %b %Y").upper()
-            if accuracy == "ABOUT":
-                ged_date_string = "ABT " + str(date.year)
-            elif accuracy == "EXACT":
+            full_date =  date_event.get_gedcom_date()
+            if date_event.get_accuracy() == "ABOUT":
+                ged_date_string = "ABT " + full_date
+            elif date_event.get_accuracy() == "EXACT":
                 ged_date_string = full_date
-            elif accuracy == "BEFORE" :
+            elif date_event.get_accuracy() == "BEFORE" :
                 ged_date_string = "BEF " + full_date
-            elif accuracy == "AFTER" :
+            elif date_event.get_accuracy() == "AFTER" :
                 ged_date_string = "AFT " + full_date
             ged_date = gedcom.Element(tag="DATE", value=ged_date_string)
             ged_event.add_child_element(ged_date)
-        #Review of the location data
-        location = self.gen_data.get(common_profile.ALL_EVENT_DATA[date_key]["location"], {})
-        if (any(location)):
-            include_date = True
-            ged_loc = gedcom.Element(tag="ADDR", value="")
-            if "raw" in location.keys():
-                ged_event_plac = gedcom.Element(tag="PLAC", value=location["raw"])
-                ged_event.add_child_element(ged_event_plac)
-            elif "formatted_location" in location.keys():
-                ged_event_plac = gedcom.Element(tag="PLAC", value=location["formatted_location"])
-                ged_event.add_child_element(ged_event_plac)
-            for loc_key in LOCATION_EQUIVALENCE.keys():
-                #Ok, this data is available, let's use it!
-                if loc_key in location.keys():
-                    ged_new_loc_data = gedcom.Element(tag=LOCATION_EQUIVALENCE[loc_key], value=location[loc_key])
-                    ged_loc.add_child_element(ged_new_loc_data)
-            ged_event.add_child_element(ged_loc)
+            #Review of the location data
+            location = date_event.get_location()
+            if location and (any(location)):
+                include_date = True
+                ged_loc = gedcom.Element(tag="ADDR", value="")
+                if "raw" in location.keys():
+                    ged_event_plac = gedcom.Element(tag="PLAC", value=location["raw"])
+                    ged_event.add_child_element(ged_event_plac)
+                elif "formatted_location" in location.keys():
+                    ged_event_plac = gedcom.Element(tag="PLAC", value=location["formatted_location"])
+                    ged_event.add_child_element(ged_event_plac)
+                for loc_key in LOCATION_EQUIVALENCE.keys():
+                    #Ok, this data is available, let's use it!
+                    if loc_key in location.keys():
+                        ged_new_loc_data = gedcom.Element(tag=LOCATION_EQUIVALENCE[loc_key], value=location[loc_key])
+                        ged_loc.add_child_element(ged_new_loc_data)
+                ged_event.add_child_element(ged_loc)
         return include_date, ged_event

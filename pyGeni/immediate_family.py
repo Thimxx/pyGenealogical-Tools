@@ -31,9 +31,7 @@ class immediate_family(geni_calls):
         self.children = []
         self.parent_union = []
         self.marriage_union = []
-        self.marriage_dates = []
-        self.marriage_places = []
-        self.marriage_accuracy = []
+        self.marriage_events = []
         if not( 'error' in self.data ):
             #In this case, we have extracted properly the union data
             self.union_extracted = True
@@ -58,6 +56,5 @@ class immediate_family(geni_calls):
                         #We obtain the union from Geni in order to introduce the marriage
                         marriage_union = union(tmp_union.union_id)
                         self.marriage_union.append(tmp_union)
-                        self.marriage_dates.append( marriage_union.union_data.get('marriage_date', None))
-                        self.marriage_places.append(marriage_union.union_data.get('marriage_place', {}))
-                        self.marriage_accuracy.append(marriage_union.union_data.get('accuracy_marriage_date', None))
+                        if "marriage" in marriage_union.union_data.keys():
+                            self.marriage_events.append( marriage_union.union_data.get('marriage', None))

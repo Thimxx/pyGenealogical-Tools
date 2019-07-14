@@ -122,62 +122,50 @@ def adapted_doublemetaphone(data, language="en"):
         return result[0]
     else:
         return result
-def checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date, death_date, burial_date,
-                         accuracy_birth = "EXACT", accuracy_residence = "EXACT", accuracy_baptism = "EXACT",
-                         accuracy_marriage = "EXACT", accuracy_death = "EXACT", accuracy_burial = "EXACT"):
+def checkDateConsistency(all_events):
     '''
     Checker of the different dates are consistent
     '''
-    #birth date is always the earliest date
-    dates_death_check = []
-    dates_birth_check = []
-    burial_death = []
-    #If there is no birth date included there is no need for the check
-    if (birth_date != None):
-        dates_birth_check.append(birth_date)
-        check_dates_in_birth = [residence_date, baptism_date, marriage_date, death_date, burial_date]
-        accuracy_in_birth = [accuracy_residence, accuracy_baptism, accuracy_marriage, accuracy_death, accuracy_burial]
-        for index in range(0, len(check_dates_in_birth)):
-            if (check_dates_in_birth[index] != None):
-                if (accuracy_in_birth[index] == "ABOUT"):
-                    #If we have an "about" the event has been around that year, with some margin, in this case, we just include
-                    #the last date of the year for the check
-                    dates_birth_check.append(date(check_dates_in_birth[index].year,12,31))
-                else:
-                    dates_birth_check.append(check_dates_in_birth[index])
-        #Now we check here the data consistency
-        if(min(dates_birth_check) < birth_date):
-            logging.error(NO_VALID_BIRTH_DATE)
-            return False
-    #Burial and Death dates are the latests ones
-    if (burial_date != None):
-        if (accuracy_burial == "ABOUT"):
-            burial_death.append(date(burial_date.year,12,31))
-        else:
-            burial_death.append(burial_date)
-    if (death_date != None):
-        intermediate_death = death_date
-        if (accuracy_death == "ABOUT"):
-            intermediate_death = date(death_date.year,1,1)
-        burial_death.append(intermediate_death)
-        #Burial is never before than death date... unless in vampires, but out of scope
-        if (intermediate_death > min(burial_death)):
-            logging.error(NO_VALID_DEATH_AND_BURIAL)
-            return False
-    if ( len(burial_death) > 0):
-        check_dates_in_db = [residence_date, baptism_date, marriage_date]
-        accuracy_in_db = [accuracy_residence, accuracy_baptism, accuracy_marriage]
-        for index in range(0, len(check_dates_in_db)):
-            if (check_dates_in_db[index] != None):
-                if (accuracy_in_db[index] == "ABOUT"):
-                    #If we have an "about" the event has been around that year, with some margin, in this case, we just include
-                    #the first date of the  year
-                    dates_death_check.append(date(check_dates_in_db[index].year,1,1))
-                else:
-                    dates_death_check.append(check_dates_in_db[index])
-        #Now we check here the data consistency
-        if (len(dates_death_check) > 0):
-            if (max(dates_death_check) > max(burial_death)):
+    #Firstly we check the events to find if all the events we look for are present
+    events_for_birth_check = []
+    events_for_death_check = []
+    events_for_burial_check = []
+    birth_event = None
+    death_event = None
+    burial_event = None
+    for my_event in all_events:
+        #Only events with a date are relevant
+        if my_event.has_date():
+            if my_event.get_event_type() == "birth":
+                events_for_death_check.append(my_event)
+                events_for_burial_check.append(my_event)
+                birth_event = my_event
+            elif my_event.get_event_type() == "death":
+                events_for_birth_check.append(my_event)
+                events_for_burial_check.append(my_event)
+                death_event = my_event
+            elif my_event.get_event_type() == "burial":
+                events_for_birth_check.append(my_event)
+                burial_event = my_event
+            else:
+                events_for_death_check.append(my_event)
+                events_for_birth_check.append(my_event)
+    #Birth date shall be always the earliest
+    if birth_event:
+        for non_birth_event in events_for_birth_check:
+            if not birth_event.is_this_event_earlier_or_simultaneous_to_this(non_birth_event):
+                logging.error(NO_VALID_BIRTH_DATE)
+                return False
+    #Burial data shall be latest one
+    if burial_event:
+        for non_burial_event in events_for_burial_check:
+            if not burial_event.is_this_event_later_or_simultaneous_to_this(non_burial_event):
+                logging.error(NO_VALID_DEATH_AND_BURIAL)
+                return False
+    #Death data shall be greater than the following ones
+    if death_event:
+        for non_death_event in events_for_death_check:
+            if not death_event.is_this_event_later_or_simultaneous_to_this(non_death_event):
                 logging.error(NO_VALID_DEATH_DATE)
                 return False
     return True
@@ -219,12 +207,7 @@ def get_formatted_location(location_string):
     if (get_mapbox_key() == None) or (location_string == ""):
         #Data is not found, let's try removing some
         logging.warning(NO_VALID_KEY)
-        if (len(location_string.split(",")) > 3):
-            output2 = get_formatted_location(",".join(location_string.split(",")[1:]))
-            output2["raw"] = output["raw"]
-            return output2
-        else:
-            return output
+        return output
     else:
         url = MAPBOX_ADDRESS + location_string +".json?access_token=" + get_mapbox_key()
         r = requests.get(url)
@@ -410,11 +393,13 @@ def get_jaro_to_list(first4jaro, list4jaro, factor = 0.9):
         return loc_data*loc_data*math.pow(factor, dif)
     else:
         return loc_data*loc_data*get_jaro_to_list(first2return, list4return)
-def get_score_compare_dates(date1, accuracy1, date2, accuracy2):
+def get_score_compare_dates(event1, event2):
     '''
     Get an score comparing 2 dates including accuracy
     '''
-    diff= abs((date1-date2).days)
+    diff= event1.get_difference_in_days(event2)
+    accuracy1 = event1.get_accuracy()
+    accuracy2 = event2.get_accuracy()
     if (accuracy1 == "EXACT") and (accuracy2 == "EXACT"):
         if (diff == 0):
             return 2.0, 1.0
@@ -425,14 +410,6 @@ def get_score_compare_dates(date1, accuracy1, date2, accuracy2):
         else:
             return 30.0/diff, 15.0/diff
     elif ("EXACT" in [accuracy1, accuracy2]) and ("ABOUT" in [accuracy1, accuracy2]):
-        if (accuracy1 == "ABOUT"):
-            date3 = date(date1.year+1, date1.month, date1.day)
-            date4 = date(date1.year-1, date1.month, date1.day)
-            diff = min(abs((date1-date2).days), abs((date3-date2).days), abs((date4-date2).days))
-        else:
-            date3 = date(date2.year+1, date2.month, date2.day)
-            date4 = date(date2.year-1, date2.month, date2.day)
-            diff = min(abs((date1-date2).days), abs((date3-date1).days), abs((date4-date1).days))
         if (diff < 360):
             return 1.0, 1.0
         elif (diff <720):
@@ -442,7 +419,7 @@ def get_score_compare_dates(date1, accuracy1, date2, accuracy2):
         else:
             return 0.25*math.pow(1440/diff,2), 0.5*math.pow(1440/diff,2)
     elif (accuracy1 == "ABOUT") and (accuracy2 == "ABOUT"):
-        diff_years= abs((date1.year-date2.year))
+        diff_years= abs((event1.get_year()-event2.get_year()))
         if (diff_years < 2):
             return 1.0, 1.0
         elif (diff_years < 5):
@@ -453,17 +430,17 @@ def get_score_compare_dates(date1, accuracy1, date2, accuracy2):
             return 20/(diff_years*diff_years), 30/(diff_years*diff_years)
     elif (accuracy1 == "BEFORE"):
         if (accuracy2 == "BEFORE") : return 0.0, 1.0
-        elif (date2 < date1): return 0.0, 1.0
+        elif (event2.is_this_event_earlier_or_simultaneous_to_this(event1)): return 0.0, 1.0
         else: return 0.0, 0.0
     elif (accuracy1 == "AFTER"):
         if (accuracy2 == "AFTER") : return 0.0, 1.0
-        elif (date2 > date1): return 0.0, 1.0
+        elif (event2.is_this_event_later_or_simultaneous_to_this(event1)): return 0.0, 1.0
         else: return 0.0, 0.0
     elif (accuracy2 == "BEFORE"):
-        if (date1 < date2): return 0.0, 1.0
+        if (event1.is_this_event_earlier_or_simultaneous_to_this(event2)): return 0.0, 1.0
         else: return 0.0, 0.0
     elif (accuracy2 == "AFTER"):
-        if (date2 < date1): return 0.0, 1.0
+        if (event2.is_this_event_earlier_or_simultaneous_to_this(event1)): return 0.0, 1.0
         else: return 0.0, 0.0
 def get_location_standard(location):
     '''
