@@ -4,7 +4,6 @@ Created on 7 jul. 2019
 @author: Val
 '''
 from pyGenealogy import common_profile
-from datetime import date
 from pyGenealogy.common_event import event_profile
 
 DATE_EVENT_ID = {"birth" : "1", "death" : "2", "baptism" : "3",  "burial" : "4"}
@@ -35,7 +34,6 @@ class rootsmagic_profile(common_profile.gen_profile):
             year_end = None
             month_end = None
             day_end = None
-            #TODO: everything down here will require update with the new data model
             accuracy_value = "EXACT"
             if date_data[7][1] == "B":
                 accuracy_value = "BEFORE"
@@ -51,13 +49,20 @@ class rootsmagic_profile(common_profile.gen_profile):
                 if month_end == 0 : month_end = None
                 if day_end == 0 : day_end = None
             elif date_data[7][12] == "C":
-                accuracy_value = "ABOUT" 
+                accuracy_value = "ABOUT"
             year = int(date_data[7][3:7])
             month = int(date_data[7][7:9])
             day = int(date_data[7][9:11])
             if month == 0: month = None
             if day == 0: day = None
             event_output.setDate(year, month, day, accuracy_value, year_end, month_end, day_end)
+            if not date_data[5] == 0:
+                #The only valid place is actually when is an entry in the PlaceTbale
+                place = self.database.execute("SELECT * FROM PlaceTable WHERE PlaceID={}".format(str(date_data[5])) )
+                place_info = place.fetchone()
+                event_output.setLocation(place_info[2])
+                if int(place_info[5]) != 0 and int(place_info[6]) != 0:
+                    event_output.set_geo_location(int(place_info[5])/10000000, int(place_info[6])/10000000)
             return event_output
         else: 
             return None

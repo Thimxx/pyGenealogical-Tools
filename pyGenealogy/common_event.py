@@ -126,6 +126,12 @@ class event_profile(object):
         Small check to confirm that there is a date
         '''
         return (self.year or self.month or self.day)
+    def set_geo_location(self, latitude, longitude):
+        '''
+        Introduce the latitude and longitude of the place of the event
+        '''
+        self.setParameterInLocation("latitude", latitude)
+        self.setParameterInLocation("longitude", longitude)
 #==================================================
 #   GET METHODS
 #==================================================

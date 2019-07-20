@@ -68,6 +68,11 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(event_death4.month_end == 3)
         self.assertFalse(event_death4.day_end)
         
+        #This profile has a date BETWEEN
+        prof5 = db.profiles[0]
+        event_birth3 = prof5.get_specific_event("birth")
+        assert(event_birth3.get_location()["county"] == "Segovia")
+        assert(event_birth3.get_location()["latitude"] < 41.07)
         
         db.close_db()
 if __name__ == "__main__":

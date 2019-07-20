@@ -22,9 +22,9 @@ class Test(unittest.TestCase):
         It will take a gedcom dataclass and perform all executions available
         '''
         profile = gen_profile("Julián", "Gómez Gómez")
-        profile.setCheckedDate("baptism_date", date(1970,4,2), "EXACT")
-        profile.setCheckedDate("birth_date", date(1960,4,2), "EXACT")
-        profile.setCheckedDate("death_date", date(2017,2,12), "EXACT")
+        profile.setCheckedDate("baptism", 1970, 4 ,2)
+        profile.setCheckedDate("birth", 1960, 4, 2)
+        profile.setCheckedDate("death", 2017, 2, 12)
         gedcom_profile.convert_gedcom(profile)
         
         

@@ -7,7 +7,7 @@
 import pyGeni as s
 from pyGeni.geniapi_common import geni_calls
 from pyGeni.immediate_family import immediate_family
-from pyGenealogy.common_profile import gen_profile, EVENT_DATA, ALL_EVENT_DATA, EVENT_TYPE
+from pyGenealogy.common_profile import gen_profile, EVENT_DATA, EVENT_TYPE
 from pyGenealogy import NOT_KNOWN_VALUE
 from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS, RESIDENCE_MESSAGE, NO_VALID_UNION_PROFILE
 import logging
@@ -105,7 +105,7 @@ class profile(geni_calls, gen_profile):
             elif value_geni in EVENT_TYPE:
                 current_event = self.get_date(value_geni, data.get(value_geni, {}).get("date", {}))
                 current_event.setLocationAlreadyProcessed(data.get(value_geni, {}).get("location", {}))
-                self.gen_data[value_geni] = current_event 
+                self.gen_data[value_geni] = current_event
     def add_marriage_in_geni(self, union = None):
         '''
         This method add marriage data in geni, add union if there is no unique

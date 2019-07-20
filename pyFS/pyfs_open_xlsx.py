@@ -291,7 +291,6 @@ class getFSfamily(object):
             return profile.setCheckedDate(date_fields[column_criteria], date_object.year, accuracy=accuracy)
         else:
             return profile.setCheckedDate(date_fields[column_criteria], date_object.year,date_object.month,date_object.day, accuracy=accuracy)
-            
     def create_profiles_in_Geni(self, geni_data):
         '''
         This method will create the needed profiles directly in Geni
