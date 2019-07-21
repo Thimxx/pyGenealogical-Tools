@@ -112,6 +112,18 @@ class gen_profile(object):
             else:
                 self.gen_data[event_name] = new_event
             return True
+    def setCheckedDateWithDates(self, event_name, date1, accuracy= "EXACT", date2 = None):
+        '''
+        This function will allow easy transition to the new function for allowing simple transfer of data with date
+        function
+        '''
+        if date2:
+            self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy, 
+                year_end = date2.year ,month_end = date2.month, day_end = date2.day)
+        else:
+            self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy, 
+                year_end = None, month_end = None, day_end = None)
+            
     def setNewEvent(self,event):
         '''
         When the event is already available there is no need to perform the checked date, we just include the event
@@ -216,11 +228,11 @@ class gen_profile(object):
                         if (key_data == "name"):
                             name1 = get_splitted_name_from_complete_name(self.getName(), language=language)
                             name2 = get_splitted_name_from_complete_name(profile.getName(), language=language)
-                            if (len(name2) > len(name1)): self.set_name(profile.getName())  
+                            if (len(name2) > len(name1)): self.set_name(profile.getName())
                         elif (key_data == "surname"):
                             surname1 = get_splitted_name_from_complete_name(self.getSurname(), language=language)
                             surname2 = get_splitted_name_from_complete_name(profile.getSurname(), language=language)
-                            if (len(surname2[0]) > len(surname1[0])): self.set_surname(profile.getSurname()) 
+                            if (len(surname2[0]) > len(surname1[0])): self.set_surname(profile.getSurname())
                         elif (key_data == "comments"):
                             self.gen_data["comments"] += "\n" + profile.gen_data["comments"]
                         elif (key_data in DATA_LISTS):

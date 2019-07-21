@@ -52,7 +52,8 @@ class rootsmagic_profile(common_profile.gen_profile):
         This function will provide all present events inside the profile
         '''
         all_events = []
-        events = self.database.execute("SELECT * FROM EventTable WHERE OwnerId=" + str(self.person_id) )
+        input_database = "SELECT * FROM EventTable WHERE OwnerId= ?" 
+        events = self.database.execute(input_database, (str(self.person_id),) )
         loop_fetch = True
         while loop_fetch:
             this_event = events.fetchone()
