@@ -88,10 +88,11 @@ class gen_profile(object):
         are available:
         M = Male
         F = Female
+        U = Unknown
         Returns a True if the value has been properly introduced, and False if the value
         is not correct
         '''
-        if(gender == "M" or gender == "F"):
+        if(gender == "M" or gender == "F" or gender == "U"):
             self.gen_data["gender"] = gender
             return True
         else:
@@ -121,9 +122,8 @@ class gen_profile(object):
             self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy, 
                 year_end = date2.year ,month_end = date2.month, day_end = date2.day)
         else:
-            self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy, 
+            self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy,
                 year_end = None, month_end = None, day_end = None)
-            
     def setNewEvent(self,event):
         '''
         When the event is already available there is no need to perform the checked date, we just include the event

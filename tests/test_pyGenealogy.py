@@ -19,6 +19,7 @@ class Test(unittest.TestCase):
         profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
         assert(profile.setCheckedGender("F"))
         assert(profile.setCheckedGender("M"))
+        assert(profile.setCheckedGender("U"))
         assert(profile.gen_data["name_to_show"] == ACTUAL_NAME + " " + FATHER_SURNAME)
         self.assertFalse(profile.setCheckedGender("J"))
     

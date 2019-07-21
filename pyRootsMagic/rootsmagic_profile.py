@@ -46,13 +46,13 @@ class rootsmagic_profile(common_profile.gen_profile):
             else: return "U"
     '''
     Functions not overwritten: getComments, getName2Show
-    '''      
+    '''
     def getEvents(self):
         '''
         This function will provide all present events inside the profile
         '''
         all_events = []
-        input_database = "SELECT * FROM EventTable WHERE OwnerId= ?" 
+        input_database = "SELECT * FROM EventTable WHERE OwnerId= ?"
         events = self.database.execute(input_database, (str(self.person_id),) )
         loop_fetch = True
         while loop_fetch:
@@ -68,9 +68,9 @@ class rootsmagic_profile(common_profile.gen_profile):
         This function will provide the date and related event data of the date
         by looking to the database for this specific data
         '''
-        events = self.database.execute("SELECT * FROM EventTable WHERE OwnerId=" + str(self.person_id) + " AND  EventType=" +
-                                       DATE_EVENT_ID[event_name])
-        
+        input_events = "SELECT * FROM EventTable WHERE OwnerId=? AND  EventType=?"
+        events = self.database.execute(input_events, (str(self.person_id),DATE_EVENT_ID[event_name],) )
+        #Now let's fetch the first value
         date_data = events.fetchone()
         if date_data:
             return self.return_event_from_database_info(date_data)
@@ -83,13 +83,15 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         Common function used to get the table with table of PersonTable used for gender
         '''
-        person_info = self.database.execute("SELECT * FROM PersonTable WHERE PersonID=" + str(self.person_id) )
+        input_person = "SELECT * FROM PersonTable WHERE PersonID=?"
+        person_info = self.database.execute( input_person, (str(self.person_id),) )
         return person_info.fetchone()
     def return_person_data_in_NameTable(self):
         '''
         Common function used to get the table with the NameTable, used for name and surname
         '''
-        name_info = self.database.execute("SELECT * FROM NameTable WHERE OwnerID=" + str(self.person_id) )
+        input_person = "SELECT * FROM NameTable WHERE OwnerID=?"
+        name_info = self.database.execute( input_person, (str(self.person_id),) )
         loop_database = True
         while loop_database:
             name_data = name_info.fetchone()
@@ -128,7 +130,8 @@ class rootsmagic_profile(common_profile.gen_profile):
         event_output.setDate(year, month, day, accuracy_value, year_end, month_end, day_end)
         if not event_in_database[5] == 0:
             #The only valid place is actually when is an entry in the PlaceTbale
-            place = self.database.execute("SELECT * FROM PlaceTable WHERE PlaceID={}".format(str(event_in_database[5])) )
+            place_input = "SELECT * FROM PlaceTable WHERE PlaceID=?"
+            place = self.database.execute(place_input, (str(event_in_database[5]), )  )
             place_info = place.fetchone()
             event_output.setLocation(place_info[2])
             if int(place_info[5]) != 0 and int(place_info[6]) != 0:
