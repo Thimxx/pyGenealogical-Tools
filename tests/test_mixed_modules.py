@@ -7,7 +7,7 @@ import unittest, os
 from pyGeni import profile, set_token
 from tests.FIXTURES import MAIN_SANDBOX_PROFILE
 from pyGedcom.gedcom_profile import gedcom_profile
-from gedcom import Element
+
 class TestMixedModules(unittest.TestCase):
     '''
     This module will test mixed operations between the different existing modules

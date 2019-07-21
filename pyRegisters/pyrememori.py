@@ -155,12 +155,12 @@ class RememoryPersonParser(HTMLParser):
                 result = re.search('en(.*)a los', data)
                 self.location = result.group(1).strip()
                 result = re.search('a los(.*)años', data)
-                if not (result == None): 
+                if not (result == None):
                     age = result.group(1).strip()
                     if age.isdigit(): self.age = int(result.group(1).strip())
             elif ("en" in data):
                 self.location = data.split("en",1)[1].strip()
-            elif  ("a los" in data) and ("años" in data): 
+            elif  ("a los" in data) and ("años" in data):
                 result = re.search('a los(.*)años', data)
                 age = result.group(1).strip()
                 if age.isdigit(): self.age = int(result.group(1).strip())

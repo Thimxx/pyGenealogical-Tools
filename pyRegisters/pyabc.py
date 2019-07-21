@@ -36,7 +36,7 @@ class abc_reader(object):
         #Accents are not accepted by the webpage url call, they shall be removed prior to reading
         name = unicodedata.normalize('NFD', profile.getName()).encode('ascii', 'ignore').decode('ascii')
         surname = unicodedata.normalize('NFD', profile.getSurname()).encode('ascii', 'ignore').decode('ascii')
-        
+        #Let's create now the url for the search call
         url = BASE_ABC_NAME + name.strip().replace(" ", "+")
         url += BASE_ABC_SURNAME + surname.strip().replace(" ", "+") + BASE_ABC_END
         data = requests.get(url)

@@ -19,10 +19,10 @@ class database_rm(object):
         self.right_read = False
         #Open database and get it as part of the class
         self.database = sqlite3.connect(db_file)
-        res_names = self.database.execute("SELECT * FROM NameTable")
+        res_names = self.database.execute("SELECT * FROM PersonTable")
         self.profiles = []
         for name in res_names:
-            prof = rootsmagic_profile(name[3], name[2], name[0], name[1], self.database)
+            prof = rootsmagic_profile(name[0], self.database)
             self.profiles.append(prof)
     def close_db(self):
         '''

@@ -9,8 +9,6 @@ import unittest, gedcom
 
 from pyGedcom.gedcom_profile import gedcom_profile
 from pyGenealogy.common_profile import gen_profile
-from datetime import date
-
 
 class Test(unittest.TestCase):
 

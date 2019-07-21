@@ -9,23 +9,34 @@ All these functionalities are independent of the rest of the code
 '''
 from pyGenealogy.gen_utils import checkDateConsistency, getBestDate, get_formatted_location, get_name_surname_from_complete_name
 from datetime import date
+from pyGenealogy.common_event import event_profile
 
-birth_date = date(1900,1,1)
-residence_date = date(1910,1,1)
-baptism_date = date(1901,1,12)
-marriage_date = date(1930,6,1)
-death_date = date(1970,1,1)
-burial_date = date(1970,1,2)
+all_events = []
+
+birth_event = event_profile("birth")
+birth_event.setDate(1900,1,1)
+all_events.append(birth_event)
+residence_event = event_profile("residence")
+residence_event.setDate(1910,1,1)
+all_events.append(residence_event)
+baptism_event = event_profile("baptism")
+baptism_event.setDate(1901,1,12)
+all_events.append(baptism_event)
+marriage_event = event_profile("marriage")
+marriage_event.setDate(1930,6,1)
+all_events.append(marriage_event)
+death_event = event_profile("death")
+death_event.setDate(1970,1,1)
+all_events.append(death_event)
+burial_event = event_profile("burial")
+burial_event.setDate(1970,1,2)
+all_events.append(burial_event)
 
 #This function will provide a True if the dates are consistent (i.e. your are not getting baptised before being born of after dying)
-checkDateConsistency(birth_date, residence_date, baptism_date, marriage_date, death_date, burial_date,
-                         accuracy_birth = "EXACT", accuracy_residence = "EXACT", accuracy_baptism = "EXACT",
-                         accuracy_marriage = "EXACT", accuracy_death = "EXACT", accuracy_burial = "EXACT")
-
-
+checkDateConsistency(all_events)
 
 #This function will provide the best date, taking 2 dates. In the following case, it will take reisdence date as being more accurate
-getBestDate(birth_date, "AFTER", residence_date, "EXACT")
+getBestDate(date(1910,2,1), "AFTER",date(1910,5,1), "EXACT")
 
 GENERIC_PLACE_STRING = "Portillo,Valladolid,Castile and Leon,Spain"
 #This function provides a generic location in standard location format. It is using MAPBOX API in behind

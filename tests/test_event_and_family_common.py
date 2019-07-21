@@ -102,7 +102,7 @@ class Test(unittest.TestCase):
         event2.setDate(2013, 6, 26, "EXACT")
         assert(event1.get_difference_in_days(event2) == 133)
         event2.setDate(2013, accuracy="EXACT")
-        print(event1.get_difference_in_days(event2) == 43)
+        assert(event1.get_difference_in_days(event2) == 43)
         
 
 if __name__ == "__main__":

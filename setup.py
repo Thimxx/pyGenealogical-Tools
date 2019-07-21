@@ -15,6 +15,6 @@ setup(name='pyGenealogicalTools',
       url='https://github.com/Thimxx/pyGenealogical-Tools',
       license='GPL-3.0',
       install_requires = ['requests', 'openpyxl', 'pyexcel', 'pyexcel-xls',
-                          'python-Levenshtein', 'pyexcel-xlsx', 'gedcompy'
+                          'python-Levenshtein', 'pyexcel-xlsx', 'gedcompy', 'metaphone'
                           ],
       )

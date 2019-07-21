@@ -286,9 +286,9 @@ class gen_profile(object):
         '''
         It will return the accuracy of an event in the profile
         '''
-        return self.gen_data[event].get_accuracy()
+        return self.get_specific_event(event).get_accuracy()
     def get_location_event(self, event):
         '''
         It will return the location of an event in the profile
         '''
-        return self.gen_data[event].get_location()
+        return self.get_specific_event(event).get_location()

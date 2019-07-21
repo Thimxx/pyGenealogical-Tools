@@ -125,7 +125,7 @@ class NorteCastillaParser(HTMLParser):
             if (self.age_here):
                 self.age_here = False
                 #Just in case we have not extracted the right age of the person
-                if (self.age.isdigit()): 
+                if (self.age.isdigit()):
                     birth = date(self.death_date.year - int(self.age),1,1)
                     profile.setCheckedDate("birth_date", birth, "ABOUT")
             if (self.location_here):

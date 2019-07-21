@@ -33,10 +33,13 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         event_birth = prof.get_specific_event("birth")
         assert(event_birth.get_date() == date(1860,7,15))
         assert(event_birth.get_accuracy() == "EXACT")
+        assert(prof.get_accuracy_event("birth") == "EXACT")
+        
         event_death = prof.get_specific_event("death")
         assert(event_death.get_year() == 1950)
         assert(event_death.get_accuracy() == "EXACT")
         assert(prof.getGender() == "F")
+        assert(len(prof.getEvents()) == 2)
         
         #This profile has a date "ABOUT"
         prof2 = db.profiles[2]
