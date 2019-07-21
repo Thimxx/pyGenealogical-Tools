@@ -41,3 +41,21 @@ class family_profile(object):
         Assigning the event of the marriage
         '''
         if marriage: self.marriage = marriage
+#===============================================================================
+#         GET methods: common get methods used for all families
+#===============================================================================
+    def getFather(self):
+        '''
+        It will return the ID of the father
+        '''
+        return self.father
+    def getMother(self):
+        '''
+        It will return the ID of the mother
+        '''
+        return self.mother
+    def getChildren(self):
+        '''
+        It will a list with the IDs of the children
+        '''
+        return self.children

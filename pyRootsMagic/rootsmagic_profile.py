@@ -26,14 +26,12 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         We get the name from the name table directly
         '''
-        name, surname = self.return_person_data_in_NameTable()
-        return name
+        return self.return_person_data_in_NameTable()[0]
     def getSurname(self):
         '''
         Function to return the surname
         '''
-        name, surname = self.return_person_data_in_NameTable()
-        return surname
+        return self.return_person_data_in_NameTable()[1]
     def getGender(self):
         '''
         Method override in order to access directly to the gender of the profile
@@ -74,7 +72,7 @@ class rootsmagic_profile(common_profile.gen_profile):
         date_data = events.fetchone()
         if date_data:
             return self.return_event_from_database_info(date_data)
-        else: 
+        else:
             return None
 #===============================================================================
 #         Repetitive methods to be used inside the other functions

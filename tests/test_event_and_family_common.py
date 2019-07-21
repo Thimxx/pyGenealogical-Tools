@@ -7,7 +7,6 @@ import unittest
 from pyGenealogy.common_event import event_profile
 from pyGenealogy.common_family import family_profile
 from pyGenealogy.common_profile import gen_profile
-from asyncio.events import new_event_loop
 
 class Test(unittest.TestCase):
 
@@ -43,14 +42,16 @@ class Test(unittest.TestCase):
         event1 = event_profile("birth")
         assert(event1.setDate(2013,month = 2, accuracy="ABOUT"))
         
-        family1 = family_profile(child = child1)
-        assert(len(family1.children) == 1)
+        family1 = family_profile(child = 3)
+        assert(len(family1.getChildren()) == 1)
 
-        family2 = family_profile(child = [child1, child2])
-        assert(len(family2.children) == 2)
+        family2 = family_profile(child = [1, 2])
+        assert(len(family2.getChildren()) == 2)
         
-        family3 = family_profile(child = [child1, child2], father = father, mother = mother, marriage = event1)
+        family3 = family_profile(child = [1, 2], father = 3, mother = 4, marriage = event1)
         assert(family3.father and family3.mother and family3.children and family3.marriage)
+        assert(family3.getFather() == 3)
+        assert(family3.getMother() == 4)
     
     def test_date_checker(self):
         '''
