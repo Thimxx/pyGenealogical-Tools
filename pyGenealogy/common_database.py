@@ -6,7 +6,7 @@ Created on 22 jul. 2019
 
 class gen_database(object):
     '''
-    Base database for containing overall profiles handled in the genealogy. 
+    Base database for containing overall profiles handled in the genealogy.
     Will contain base functions for all database to be adapted per kind of database
     (Geni, GEDCOM, RootsMagic or internal)
     '''
@@ -35,4 +35,3 @@ class gen_database(object):
             return self.families[id_family]
         else:
             return None
-        

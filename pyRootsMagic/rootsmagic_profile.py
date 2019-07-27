@@ -42,9 +42,9 @@ class rootsmagic_profile(common_profile.gen_profile):
             if gender == 0: return "M"
             elif gender == 1: return "F"
             else: return "U"
-    '''
-    Functions not overwritten: getComments, getName2Show
-    '''
+#===============================================================================
+#    These functions are left in the base function: getComments, getName2Show
+#===============================================================================
     def getEvents(self):
         '''
         This function will provide all present events inside the profile

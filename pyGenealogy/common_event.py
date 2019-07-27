@@ -145,6 +145,11 @@ class event_profile(object):
         Just provide the year
         '''
         return self.year
+    def get_year_end(self):
+        '''
+        Just provide the year
+        '''
+        return self.year_end
     def get_accuracy(self):
         '''
         Get the accuracy of the value
@@ -168,11 +173,21 @@ class event_profile(object):
         Just provide the month
         '''
         return self.month
+    def get_month_end(self):
+        '''
+        Just provide the month
+        '''
+        return self.month_end
     def get_day(self):
         '''
         Just provide the day
         '''
         return self.day
+    def get_day_end(self):
+        '''
+        Just provide the day
+        '''
+        return self.day_end
     def get_gedcom_date(self):
         '''
         This function will provide a date in the format needed for format of gedcom

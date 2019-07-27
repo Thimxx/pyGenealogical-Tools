@@ -119,7 +119,7 @@ class gen_profile(object):
         function
         '''
         if date2:
-            self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy, 
+            self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy,
                 year_end = date2.year ,month_end = date2.month, day_end = date2.day)
         else:
             self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy,

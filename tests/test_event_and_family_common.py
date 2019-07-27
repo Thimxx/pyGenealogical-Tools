@@ -29,6 +29,9 @@ class Test(unittest.TestCase):
         self.assertRaises(ValueError, lambda:event_profile("wrong_data"))
         event1.setLocation("Madrid, Spain")
         assert(event1.location["place_name"] == "Madrid")
+        #Let's check introducing a lower date in the end day
+        assert(event1.setDate(2015,month = 2, day = 1, accuracy="BETWEEN", year_end = 2013, month_end = 2, day_end = 5))
+        assert(event1.year == 2013)
     
     def test_family(self):
         '''

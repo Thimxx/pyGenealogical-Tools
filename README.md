@@ -56,7 +56,6 @@ In order to use the tools you will need to install the following modules:
 * pyexcel pyexcel-xls pyexcel-xlsx (only used for transforming xls into xlsx)
 * python-Levenshtein
 * gedcompy https://pypi.python.org/pypi/gedcompy | https://github.com/rory/gedcompy/
-* googlemaps
 
 All the previous modules are available in the requirements.txt file, but wxpython needs to be manually installed, visit wxpython page for further info.
 

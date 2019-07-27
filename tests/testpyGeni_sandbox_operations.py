@@ -5,7 +5,6 @@ Created on 29 ago. 2017
 '''
 import unittest
 from pyGeni import profile, set_token
-from datetime import date
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.common_event import event_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
@@ -50,6 +49,7 @@ class Test(unittest.TestCase):
         child_profile.set_name_2_show(ACTUAL_NAME)
         child_profile.setCheckedDate("birth", 2017, month =  11, day = 20, accuracy = "ABOUT")
         child_profile.setCheckedDate("death", 2017, month =  12, day = 1)
+        child_profile.setCheckedDate("burial", 2017, month =  12, day = 2, accuracy = "BETWEEN", year_end = 2017, month_end = 12, day_end = 3)
         child_profile.add_nickname("my_nickname")
         profile.profile.create_as_a_child(child_profile, union = UNION_MAIN_PROFILE )
         
@@ -66,6 +66,8 @@ class Test(unittest.TestCase):
         assert(child_profile.data["death"]["date"]["year"] == 2017)
         assert(child_profile.data["death"]["date"]["month"] == 12)
         assert(child_profile.data["death"]["date"]["day"] == 1)
+        assert(child_profile.data["burial"]["date"]["year"] == 2017)
+        assert(child_profile.data["burial"]["date"]["end_day"] == 3)
         assert(child_profile.data["public"] == False)
         assert("my_nickname" in child_profile.data["nicknames"] )
         prof_relations = profile.profile(MAIN_SANDBOX_PROFILE, type_geni="")

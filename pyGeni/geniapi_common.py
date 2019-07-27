@@ -55,6 +55,9 @@ class geni_calls():
         year = None
         month = None
         day = None
+        year_end = None
+        month_end = None
+        day_end = None
         if (data_dict.get("year",None) != None):
             year = data_dict.get("year")
             month = data_dict.get("month", None)
@@ -63,7 +66,12 @@ class geni_calls():
         if (data_dict.get("circa", "false") == "true"): accuracy = "ABOUT"
         elif (data_dict.get("range", "") == "before"): accuracy = "BEFORE"
         elif (data_dict.get("range", "") == "after"): accuracy = "AFTER"
+        elif (data_dict.get("range", "") == "between"):
+            accuracy = "BETWEEN"
+            year_end = data_dict.get("end_year", None)
+            month_end = data_dict.get("end_month", None)
+            day_end = data_dict.get("end_day", None)
         else: accuracy = "EXACT"
         #Now we transfer everything to the profile
-        my_event.setDate(year, month, day, accuracy)
+        my_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)
         return my_event

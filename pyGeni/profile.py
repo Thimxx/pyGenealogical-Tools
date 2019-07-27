@@ -308,6 +308,11 @@ def getDateStructureGeni(event):
                 data_values['range'] = "before"
             elif accuracy == "AFTER":
                 data_values['range'] = "after"
+            elif accuracy == "BETWEEN":
+                data_values['range'] = "between"
+                if (event.get_year_end()) : data_values['end_year'] = event.get_year_end()
+                if (event.get_month_end()) : data_values['end_month'] = event.get_month_end()
+                if (event.get_day_end()) : data_values['end_day'] = event.get_day_end()
     return data_values
 def getLocationStructureGeni(location):
     '''
