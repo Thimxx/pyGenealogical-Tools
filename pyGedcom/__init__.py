@@ -1,4 +1,4 @@
-__all__ = ["gedcom_profile", "gedcompy_wrapper", "gedcom_database", "gedcom_family"]
+__all__ = ["gedcom_profile", "gedcom_database", "gedcom_family"]
 
 EQUIVALENCE_PROFILE = {"birth" : "BIRT", "death" : "DEAT", "baptism" : "BAPM", "burial" : "BURI", "residence" : "RESI"}
 EQUIVALENCE = EQUIVALENCE_PROFILE
@@ -31,14 +31,12 @@ def get_date_info_from_ged(date_ged):
         day_end, month_end, year_end =  get_date_components(new_split[1])
     else:
         day, month, year =  get_date_components(date_ged)
-    
     return year, month, day, accuracy, year_end, month_end, day_end
-
 def get_date_components(date_string):
     '''
     This function will be used to extract the year, month and day of an string
     notice that as day or even month might be missing, this cannot be achieved
-    with strptime 
+    with strptime
     '''
     day = None
     month = None
@@ -50,4 +48,3 @@ def get_date_components(date_string):
     elif len(date_divided) == 2:
         month = list(GEDCOM_MONTH.keys())[list(GEDCOM_MONTH.values()).index(date_divided[0])]
     return day, month, year
-        

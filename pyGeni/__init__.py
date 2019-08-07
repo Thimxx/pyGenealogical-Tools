@@ -82,5 +82,3 @@ def get_profile_id_from_address(prof_url):
     Function to extract the profile from the address
     '''
     return re.sub(r".*profile", "profile", prof_url)
-    
-    

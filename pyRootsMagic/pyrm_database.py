@@ -37,3 +37,6 @@ class database_rm(gen_database):
         Closes the database
         '''
         self.database.close()
+#===============================================================================
+#         GET methods: all methods compatible with common_database
+#===============================================================================

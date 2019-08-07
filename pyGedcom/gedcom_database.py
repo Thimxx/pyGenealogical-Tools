@@ -163,16 +163,14 @@ def database_2_gedcom(ged_dict, level):
         if key != "VALUE":
             #Notice that listing tags will contain a list of parameters, and shall be written in a different approach
             if not key in listing_tags:
-                line = str(level) + " " + key + " " + ged_dict.get(key).get("VALUE", "") 
+                line = str(level) + " " + key + " " + ged_dict.get(key).get("VALUE", "")
                 output.append(line)
             else:
                 #We need to perform a loop here.
                 for list_tag in ged_dict.get(key).get("VALUE", []):
-                    line = str(level) + " " + key + " " + list_tag 
+                    line = str(level) + " " + key + " " + list_tag
                     output.append(line)
             #If there are lower lines we need to add them
             lower_lines = database_2_gedcom(ged_dict.get(key), level +1)
             output += lower_lines
     return output
-    
-        

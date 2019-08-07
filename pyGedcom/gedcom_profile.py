@@ -94,27 +94,8 @@ class gedcom_profile(common_profile.gen_profile):
                 if key in location.keys():
                     output["ADDR"][LOCATION_EQUIVALENCE[key]] = {"VALUE" : location[key]}
         return output
-    def get_gedcom_formatted_date(self, event):
-        '''
-        This function will provide a formatted date with GEDCOM format
-        '''
-        ged_date_string = ""
-        full_date =  event.get_gedcom_date()
-        if full_date:
-            if event.get_accuracy() == "ABOUT":
-                ged_date_string = "ABT " + full_date
-            elif event.get_accuracy() == "EXACT":
-                ged_date_string = full_date
-            elif event.get_accuracy() == "BEFORE":
-                ged_date_string = "BEF " + full_date
-            elif event.get_accuracy() == "AFTER":
-                ged_date_string = "AFT " + full_date
-            elif event.get_accuracy() == "BETWEEN":
-                ged_date_string = "BET " + full_date + " AND " + event.get_gedcom_end_date()
-            return ged_date_string
-        else: return None
 #===============================================================================
-#         GET methods: for compatibility with Common_profile profile 
+#         GET methods: for compatibility with Common_profile profile
 #        Methods kept original: getName, getSurname, getName2Show, get_accuracy_event, get_location_event
 #        Value that will require some thinking: getComments
 #===============================================================================
@@ -145,7 +126,7 @@ class gedcom_profile(common_profile.gen_profile):
             if self.individual.get(EQUIVALENCE[event_name]).get("PLAC", {}).get("VALUE"):
                 new_event.setParameterInLocation("place_name", self.individual.get(EQUIVALENCE[event_name]).get("PLAC", {}).get("VALUE"))
             for key in LOCATION_EQUIVALENCE:
-                if self.individual.get(EQUIVALENCE[event_name]).get("ADDR", {}).get(LOCATION_EQUIVALENCE[key], {}).get("VALUE"): 
+                if self.individual.get(EQUIVALENCE[event_name]).get("ADDR", {}).get(LOCATION_EQUIVALENCE[key], {}).get("VALUE"):
                     new_event.setParameterInLocation(key, self.individual.get(EQUIVALENCE[event_name]).get("ADDR", {}).get(LOCATION_EQUIVALENCE[key], {}).get("VALUE"))
             return new_event
         else:
@@ -163,8 +144,30 @@ class gedcom_profile(common_profile.gen_profile):
         if value:
             self.individual[EQUIVALENCE_PROFILE[event_name]] = self.extract_gedcom_input_from_gedcom(self.gen_data[event_name])
         return value
-    def set_id(self, id_ged):
+    def set_id(self, id_profile):
         """
         The id is introduced, this method should ideally only be used by database
         """
-        self.gen_data["id"] = str(id_ged)
+        self.gen_data["id"] = str(id_profile)
+#===============================================================================
+#         Axuliary functions and methods
+#===============================================================================
+def get_gedcom_formatted_date(event):
+    '''
+    This function will provide a formatted date with GEDCOM format
+    '''
+    ged_date_string = ""
+    full_date =  event.get_gedcom_date()
+    if full_date:
+        if event.get_accuracy() == "ABOUT":
+            ged_date_string = "ABT " + full_date
+        elif event.get_accuracy() == "EXACT":
+            ged_date_string = full_date
+        elif event.get_accuracy() == "BEFORE":
+            ged_date_string = "BEF " + full_date
+        elif event.get_accuracy() == "AFTER":
+            ged_date_string = "AFT " + full_date
+        elif event.get_accuracy() == "BETWEEN":
+            ged_date_string = "BET " + full_date + " AND " + event.get_gedcom_end_date()
+        return ged_date_string
+    else: return None

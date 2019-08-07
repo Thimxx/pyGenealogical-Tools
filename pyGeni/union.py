@@ -51,14 +51,13 @@ class union(geni_calls, family_profile):
                 if not ("marriage" in self.union_data.keys()): self.union_data["marriage"] = event_profile("marriage")
                 self.union_data["marriage"].setLocationAlreadyProcessed(place_data)
             if key_value == "status": self.union_data["status"] = data[key_value]
-            if key_value == "partners": 
+            if key_value == "partners":
                 self.union_data["partners"] = data[key_value]
                 self.setFather(geni.get_profile_id_from_address(data[key_value][0]))
                 if len(data.get(key_value, None)) > 1: self.setMother(geni.get_profile_id_from_address(data[key_value][1]))
-            if key_value == "children": 
+            if key_value == "children":
                 self.union_data["children"] = data[key_value]
                 children = []
                 for child in data[key_value]:
                     children.append(geni.get_profile_id_from_address(child))
                 self.setChild(children)
-            
