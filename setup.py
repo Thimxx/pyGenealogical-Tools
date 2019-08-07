@@ -21,8 +21,9 @@ setuptools.setup(name='pyGenealogicalTools',
       license='GPL-3.0',
       classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GPL License",
-        "Operating System :: OS Independent",],
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Operating System :: OS Independent",
+        "Topic :: Sociology :: Genealogy",],
       install_requires = ['requests', 'openpyxl', 'pyexcel', 'pyexcel-xls',
                           'python-Levenshtein', 'pyexcel-xlsx', 'metaphone'
                           ],
