@@ -1,4 +1,3 @@
-from fuzzywuzzy.string_processing import string
 __all__ = ["gedcom_profile", "gedcompy_wrapper", "gedcom_database", "gedcom_family"]
 
 EQUIVALENCE_PROFILE = {"birth" : "BIRT", "death" : "DEAT", "baptism" : "BAPM", "burial" : "BURI", "residence" : "RESI"}
