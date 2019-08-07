@@ -146,14 +146,6 @@ def recursive_analysis(listed_data, level):
     if value: next_dict["VALUE"] = value
     output_dict[key] =  next_dict
     return output_dict
-def accuracy_data(data):
-    '''
-    This functions will provide the accuracy data for input
-    '''
-    if "ABT" in data: return "ABOUT"
-    elif "BEF" in data: return "BEFORE"
-    elif "AFT" in data: return "AFTER"
-    else: return "EXACT"
 def database_2_gedcom(ged_dict, level):
     '''
     This function will transform the current database dictionary into a gedcom writable format

@@ -8,7 +8,9 @@ This function tests the new profile that includes the GedCom from Common profile
 import unittest, os
 
 from pyGedcom.gedcom_profile import gedcom_profile
+from pyGedcom.gedcom_profile import get_gedcom_formatted_date
 from pyGenealogy.common_profile import gen_profile
+from pyGenealogy.common_event import event_profile
 from pyGedcom.gedcom_database import db_gedcom
 from pyGedcom import get_date_info_from_ged
 from datetime import date
@@ -124,6 +126,12 @@ class Test(unittest.TestCase):
         assert(len(no_gedcom.gedcom["@F1@"]["CHIL"]["VALUE"]) == 2)
         profs = no_gedcom.get_all_profiles()
         assert(len(profs) == 4)
+    def test_wrong_event(self):
+        '''
+        Test introducing a wrong event
+        '''
+        event = event_profile("birth")
+        assert( get_gedcom_formatted_date(event) == None)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

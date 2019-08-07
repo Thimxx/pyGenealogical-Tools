@@ -52,11 +52,3 @@ def print_out(message, file):
     logging.info(message)
     if not file == None:
         file.write(message + "\n")
-def accuracy_data(data):
-    '''
-    This functions will provide the accuracy data for input
-    '''
-    if "ABT" in data: return "ABOUT"
-    elif "BEF" in data: return "BEFORE"
-    elif "AFT" in data: return "AFTER"
-    else: return "EXACT"

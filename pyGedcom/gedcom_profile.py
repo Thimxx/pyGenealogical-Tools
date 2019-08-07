@@ -82,8 +82,8 @@ class gedcom_profile(common_profile.gen_profile):
         This function will provide a dictionary input that can be used inside the internal conversions
         '''
         output = {}
-        if self.get_gedcom_formatted_date(event):
-            output["DATE"] = { "VALUE" : self.get_gedcom_formatted_date(event)}
+        if get_gedcom_formatted_date(event):
+            output["DATE"] = { "VALUE" : get_gedcom_formatted_date(event)}
         location = event.get_location()
         if location:
             if "raw" in location.keys(): output["PLAC"] = {"VALUE":location["raw"]}
