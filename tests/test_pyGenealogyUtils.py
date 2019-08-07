@@ -301,8 +301,6 @@ class Test(unittest.TestCase):
         '''
         Test comparison of dates with scoring
         '''
-        date1 = date(2018,1,1)
-        date2 = date(2018,2,6)
         event1 = event_profile("birth")
         event1.setDate(2018,1,1)
         event2 = event_profile("birth")

@@ -30,6 +30,10 @@ class Test(unittest.TestCase):
         assert(un1.union_data["marriage"].get_location()["county"] == 'Madrid')
         assert(len(un1.union_data["partners"]) == 2)
         assert(len(un1.union_data["children"]) == 4)
+        #Testing base function
+        assert(len(un1.getChildren()) == 4)
+        assert(un1.getFather() == "profile-403")
+        assert(un1.getMother() == "profile-404")
 
 
 if __name__ == "__main__":

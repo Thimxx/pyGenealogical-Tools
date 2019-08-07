@@ -1,0 +1,24 @@
+0 HEAD
+1 SOUR
+2 NAME gedcompy
+2 VERS 0.2.9
+1 CHAR UNICODE
+1 GEDC
+2 VERS 5.5
+2 FORM LINEAGE-LINKED
+0 @I1@ INDI
+1 NAME Francisco/Sanz Sanz/
+2 GIVN Francisco
+2 SURN Sanz Sanz
+1 BIRT
+2 DATE 02 APR 1960
+2 PLAC Gallegos, Castile and León, Spain
+2 ADDR 
+3 CITY Gallegos
+3 STAE Castile and León
+3 CTRY Spain
+1 DEAT
+2 DATE 12 FEB 2017
+1 BAPM
+2 DATE 02 APR 1970
+0 TRLR

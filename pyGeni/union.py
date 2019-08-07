@@ -7,8 +7,9 @@ Created on 19 sept. 2017
 import pyGeni as geni
 from pyGeni.geniapi_common import geni_calls
 from pyGenealogy.common_event import event_profile
+from pyGenealogy.common_family import family_profile
 
-class union(geni_calls):
+class union(geni_calls, family_profile):
     '''
     This class will be extracting data about unions in Geni
     '''
@@ -18,6 +19,7 @@ class union(geni_calls):
         '''
         #We initiate the base classes
         geni_calls.__init__(self)
+        family_profile.__init__(self)
         data = ""
         if (union_id in geni.GENI_CALLED_UNIONS):
             #In order to save calls we try to save the different calls
@@ -49,6 +51,14 @@ class union(geni_calls):
                 if not ("marriage" in self.union_data.keys()): self.union_data["marriage"] = event_profile("marriage")
                 self.union_data["marriage"].setLocationAlreadyProcessed(place_data)
             if key_value == "status": self.union_data["status"] = data[key_value]
-            if key_value == "partners": self.union_data["partners"] = data[key_value]
-            if key_value == "children": self.union_data["children"] = data[key_value]
+            if key_value == "partners": 
+                self.union_data["partners"] = data[key_value]
+                self.setFather(geni.get_profile_id_from_address(data[key_value][0]))
+                if len(data.get(key_value, None)) > 1: self.setMother(geni.get_profile_id_from_address(data[key_value][1]))
+            if key_value == "children": 
+                self.union_data["children"] = data[key_value]
+                children = []
+                for child in data[key_value]:
+                    children.append(geni.get_profile_id_from_address(child))
+                self.setChild(children)
             

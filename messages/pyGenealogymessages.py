@@ -11,7 +11,7 @@ NO_VALID_DEATH_AND_BURIAL = "Death cannot be after Burial date"
 #Utils errors
 NO_VALID_CONVENTION = "The selected naming convention is not supported"
 NO_VALID_ACCURACY = "The provided accuracy definition of the date is not supported"
-NO_VALID_LOCATION = "The provided location is not found in Google Maps. Skipping, it can be manually added in google maps"
+NO_VALID_LOCATION = "The provided location is not found in MapBox"
 NO_VALID_KEY = "The key introduced for MapBox is not valid"
 
 #Event error

@@ -304,3 +304,8 @@ class gen_profile(object):
         It will return the location of an event in the profile
         '''
         return self.get_specific_event(event).get_location()
+    def get_id(self):
+        """
+        Returns the profile id.
+        """
+        return self.gen_data.get("id", None)

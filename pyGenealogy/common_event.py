@@ -7,8 +7,8 @@ from pyGenealogy import EVENT_TYPE, VALUES_ACCURACY
 from messages.pyGenealogymessages import NO_VALID_EVENT_START, NO_VALID_EVENT_END
 from pyGenealogy.gen_utils import get_formatted_location
 from datetime import date
+from pyGedcom import GEDCOM_MONTH
 MONTH_DAYS = { 1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6:30, 7:31, 8:31, 9: 30, 10: 31, 11:30, 12:31, None:31}
-GEDCOM_MONTH = { 1:"JAN", 2:"FEB", 3:"MAR", 4:"APR", 5:"MAY", 6:"JUN", 7:"JUL", 8:"AUG", 9:"SEP", 10:"OCT", 11:"NOV", 12:"DEC"}
 
 class event_profile(object):
     '''
@@ -192,14 +192,12 @@ class event_profile(object):
         '''
         This function will provide a date in the format needed for format of gedcom
         '''
-        string_day = ""
-        if self.day:
-            if self.day < 10: string_day = "0" + str(self.day) + " "
-            else: string_day = str(self.day) + " "
-        string_month = GEDCOM_MONTH.get(self.month, "") + " "
-        string_year = ""
-        if self.year: string_year = str(self.year)
-        return (string_day + string_month + string_year).strip()
+        return convert_date_to_gedcom_format(self.year, self.month, self.day)
+    def get_gedcom_end_date(self):
+        '''
+        This function will provide the end date in the format of gedcom
+        '''
+        return convert_date_to_gedcom_format(self.year_end, self.month_end, self.day_end)
     def is_full_date_available(self):
         '''
         Returns true if the full data of the date is avialable
@@ -239,3 +237,18 @@ class event_profile(object):
         date2, date2b = other_event._get_date_for_comparison()
         #We return the minimum difference between all dates
         return (min(abs((date1-date2).days), abs((date1-date2b).days), abs((date1b-date2).days), abs((date1b-date2b).days) ))
+
+def convert_date_to_gedcom_format(year, month, day):
+    '''
+    This function transforms a date in day, month and year into gedcom format
+    '''
+    string_day = ""
+    if day:
+        if day < 10: string_day = "0" + str(day) + " "
+        else: string_day = str(day) + " "
+    string_month = GEDCOM_MONTH.get(month, "") + " "
+    string_year = ""
+    if year: string_year = str(year)
+    if len((string_day + string_month + string_year).strip()) == 0: return None
+    else : return (string_day + string_month + string_year).strip()
+    

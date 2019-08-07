@@ -3,7 +3,7 @@ Created on 26 mar. 2018
 
 @author: Val
 '''
-import unittest, os, gedcom
+import unittest, os
 from pyGeni import profile, set_token, geni2gedcom
 from tests.FIXTURES import GRANDFATHER_SANDBOX
 
@@ -30,13 +30,12 @@ class Test(unittest.TestCase):
         if os.path.exists(file_ged): os.remove(file_ged)
         prof = profile.profile(GRANDFATHER_SANDBOX)
         tester = geni2gedcom.geni2gedcom(prof)
-        gedcomfile = tester.get_gedcom(file_ged)
+        geddb = tester.get_gedcom(file_ged)
         
         #gedcomfile = gedcom.parse(file_ged)
         counts = 0
-        for person in gedcomfile.individuals:
-            firstname, lastname = person.name
-            if "Avoid Duplicate in Gedcom" in firstname: counts += 1
+        for person in geddb.get_all_profiles():
+            if "Avoid Duplicate in Gedcom" in person.getName2Show(): counts += 1
         assert(counts == 1)
         
         if os.path.exists(file_ged): os.remove(file_ged)

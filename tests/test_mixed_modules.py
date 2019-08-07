@@ -23,14 +23,10 @@ class TestMixedModules(unittest.TestCase):
         prof = profile.profile(MAIN_SANDBOX_PROFILE, type_geni="")
         assert( "Testing" in prof.nameLifespan())
         gedcom_profile.convert_gedcom(prof)
-        data_event = prof.get_event_element("birth")
-        element_top = data_event[1]
-        element_sub = element_top.child_elements[1]
+        location = prof.get_location_event("birth")
         #We crosscheck the value is properly included in the file
-        assert(element_sub.tag == "PLAC")
-        assert("Gallegos" in element_sub.value)
-        
-
+        assert("STAE" in prof.individual["BIRT"]["ADDR"].keys())
+        assert(location["city"] == "Gallegos")
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

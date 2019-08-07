@@ -1,6 +1,6 @@
-__all__ = ["profile", "data_models", "immediate_family", "geniapi_common", "union", "geni2gedcom"]
+__all__ = ["profile", "data_models", "immediate_family", "geniapi_common", "union", "geni2gedcom", "interface_geni_database"]
 
-import requests, logging
+import requests, logging, re
 from messages.pygeni_messages import ERROR_REQUESTS
 
 
@@ -77,4 +77,10 @@ def geni_request_post(url, data_input=None):
         #Ok, now we know we have an error, we need to inform the user!
         logging.error(ERROR_REQUESTS + str(data.json()))
     return data
+def get_profile_id_from_address(prof_url):
+    '''
+    Function to extract the profile from the address
+    '''
+    return re.sub(r".*profile", "profile", prof_url)
+    
     

@@ -29,8 +29,9 @@ It is mainly offering the following capabilities:
 * Rememori: https://www.rememori.com
 * Obituary from this newspaper: http://esquelas.elnortedecastilla.es/
 * Obituary from this newspaper: https://www.abc.es/esquelas/
-7) Transformation to GEDCOM profile
-* Transforms profile into elements of GEDCOM, allows to create a GEDCOM
+7) GEDCOM file wrapper
+* It allows to read gedcomfiles and operated them (add new profiles)
+* It allows to transform data from other sources (Geni, RootsMagic) into GEDCOM.
 8) Automatic investigation
 * For those interfaces avaialble, it can found potential matches in a GEDCOM.
 9) RootsMagic interface
@@ -55,7 +56,6 @@ In order to use the tools you will need to install the following modules:
 * openpyxl (notice that there is a regression on this library. Tested on 2.6.2)
 * pyexcel pyexcel-xls pyexcel-xlsx (only used for transforming xls into xlsx)
 * python-Levenshtein
-* gedcompy https://pypi.python.org/pypi/gedcompy | https://github.com/rory/gedcompy/
 
 All the previous modules are available in the requirements.txt file, but wxpython needs to be manually installed, visit wxpython page for further info.
 

@@ -35,7 +35,7 @@ class family_profile(object):
         Just defining the children of hte family
         '''
         if isinstance(child, list): self.children = child
-        else: self.children.append(child)
+        elif child: self.children.append(child)
     def setMarriage(self, marriage):
         '''
         Assigning the event of the marriage

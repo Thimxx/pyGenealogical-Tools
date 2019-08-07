@@ -5,4 +5,3 @@ pyexcel
 pyexcel-xls 
 python-Levenshtein
 pyexcel-xlsx
-gedcompy

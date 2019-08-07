@@ -17,8 +17,6 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
             self.filelocation = location1
         else:
             self.filelocation = location2
-
-
     def test_open_dabatase_and_read(self):
         '''
         Test accessing the RootsMagic database and basic information access

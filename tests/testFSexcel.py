@@ -100,6 +100,7 @@ class Test(unittest.TestCase):
         if os.path.exists(file_ged): os.remove(file_ged)
         #This one will create the gedcomfile
         fsclass.create_gedcom_file(file_ged)
+        assert(os.path.exists(file_ged))
         if os.path.exists(file_ged): os.remove(file_ged)
     def test_not_existing_file(self):
         '''

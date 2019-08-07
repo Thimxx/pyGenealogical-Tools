@@ -16,8 +16,8 @@ from pyGenealogy import NOT_KNOWN_VALUE
 import os
 
 from pyGedcom.gedcom_profile import gedcom_profile
-from pyGedcom.gedcompy_wrapper import gedcom_file
 from pyGeni.geniapi_common import geni_calls
+from pyGedcom.gedcom_database import db_gedcom
 
 DIFFERNCE_BIRTH_BAPT = 90
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name", "easy_unique_id", "record_url", "subcollection_id"]
@@ -348,6 +348,50 @@ class getFSfamily(object):
             logging.error(NO_GENI_EXECUTION)
             return False
         else:
+            #We create first the database, a Gedcom one
+            dbged = db_gedcom()
+            #We make father and mother a gedcom_profile
+            gedcom_profile.convert_gedcom(self.father_profile)
+            gedcom_profile.convert_gedcom(self.mother_profile)
+            #We add now the father and mother to the database
+            id_father = dbged.add_profile(self.father_profile)
+            id_mother = dbged.add_profile(self.mother_profile)
+            #We prepare the children adding
+            children_ged = []
+            for profile_obtained in self.profiles:
+                #We convert each profile into the gedcom profile
+                profile_temp = profile_obtained
+                gedcom_profile.convert_gedcom(profile_temp)
+                id_child = dbged.add_profile(profile_temp)
+                children_ged.append(id_child)
+                if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
+                    id_of_marriage = profile_obtained.gen_data["marriage_link"]
+                    #We capture the partner
+                    partner = self.related_profiles[id_of_marriage]
+                    gedcom_profile.convert_gedcom(partner)
+                    #We add the partner
+                    id_partner = dbged.add_profile(partner)
+                    #We need to create a family here of both partners
+                    if profile_obtained.gen_data["gender"] == "M":
+                        dbged.add_family(father = id_child, mother = id_partner)
+                    else:
+                        dbged.add_family(father = id_partner, mother = id_child)
+                    if id_of_marriage in self.parents_profiles.keys():
+                        father = self.parents_profiles[id_of_marriage][0]
+                        mother = self.parents_profiles[id_of_marriage][1]
+                        #We now convert the profiles into the profile
+                        gedcom_profile.convert_gedcom(father)
+                        gedcom_profile.convert_gedcom(mother)
+                        #We add them to the file
+                        id_partner_father = dbged.add_profile(father)
+                        id_partner_mother = dbged.add_profile(mother)
+                        #And the family!!!
+                        dbged.add_family(father = id_partner_father, mother = id_partner_mother, children = [id_partner])
+                        
+            #We create here the family
+            dbged.add_family(father = id_father, mother = id_mother, children = children_ged)
+            dbged.save_gedcom_file(output)
+            '''
             new_gedcom = gedcom_file()
             #We make father and mother a profile
             gedcom_profile.convert_gedcom(self.father_profile)
@@ -370,8 +414,7 @@ class getFSfamily(object):
                     gedcom_profile.convert_gedcom(partner)
                     #We add the partner
                     new_gedcom.add_element(partner.individual)
-                    #We need to create a family here of both partners
-                    if profile_obtained.gen_data["gender"] == "M":
+                    #We need to create a family here of both partners                    if profile_obtained.gen_data["gender"] == "M":
                         new_gedcom.create_family(profile_temp, partner, [])
                     else:
                         new_gedcom.create_family(partner, profile_temp, [])
@@ -386,7 +429,8 @@ class getFSfamily(object):
                         new_gedcom.add_element(mother.individual)
                         #And the family!!!
                         new_gedcom.create_family(father, mother, [partner])
+                        
             #We create here the family
             new_gedcom.create_family(self.father_profile, self.mother_profile, children_ged)
             new_gedcom.save(output)
-            
+            '''
