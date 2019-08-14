@@ -5,6 +5,7 @@ Created on 8 jul. 2019
 '''
 import unittest
 from pyGenealogy.common_event import event_profile
+from pyGenealogy.common_event import is_first_date_lower
 from pyGenealogy.common_family import family_profile
 from pyGenealogy.common_profile import gen_profile
 
@@ -62,15 +63,15 @@ class Test(unittest.TestCase):
         '''
         new_event = event_profile("birth")
         
-        self.assertFalse(new_event.is_first_date_lower(2012, None, None, 2010, None, None))
-        assert(new_event.is_first_date_lower(1910, None, None, 1912, None, None))
-        assert(new_event.is_first_date_lower(2010, 1, None, 2010, None, None) == None)
-        assert(new_event.is_first_date_lower(2010, 1, None, 2010, 2, None))
-        self.assertFalse(new_event.is_first_date_lower(2012, 5, None, 2012, 1, None))
-        assert(new_event.is_first_date_lower(2010, 1, None, 2010, 1, None) == None)
-        assert(new_event.is_first_date_lower(2010, 2, 12, 2010, 2, 22))
-        self.assertFalse(new_event.is_first_date_lower(2012, 5, 12, 2012, 5, 5))
-        assert(new_event.is_first_date_lower(2010, 1, 2, 2010, 1, 2) == "Equal")
+        self.assertFalse(is_first_date_lower(2012, None, None, 2010, None, None))
+        assert(is_first_date_lower(1910, None, None, 1912, None, None))
+        assert(is_first_date_lower(2010, 1, None, 2010, None, None) == None)
+        assert(is_first_date_lower(2010, 1, None, 2010, 2, None))
+        self.assertFalse(is_first_date_lower(2012, 5, None, 2012, 1, None))
+        assert(is_first_date_lower(2010, 1, None, 2010, 1, None) == None)
+        assert(is_first_date_lower(2010, 2, 12, 2010, 2, 22))
+        self.assertFalse(is_first_date_lower(2012, 5, 12, 2012, 5, 5))
+        assert(is_first_date_lower(2010, 1, 2, 2010, 1, 2) == "Equal")
         
         #Testing that the event is smaller or not
         new_event1 = event_profile("birth")

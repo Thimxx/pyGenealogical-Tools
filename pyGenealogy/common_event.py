@@ -41,7 +41,7 @@ class event_profile(object):
         if not self.accuracy in VALUES_ACCURACY: return False
         elif self.accuracy == "BETWEEN":
             if not year_end : return False
-            elif self.is_first_date_lower(year, month, day, year_end, month_end, day_end) == False:
+            elif is_first_date_lower(year, month, day, year_end, month_end, day_end) == False:
                 #We make sure that the first date is the smallest
                 self.year = year_end
                 if month_end:           self.month = month_end
@@ -81,32 +81,6 @@ class event_profile(object):
         When the location is already available (for a web page) the location is easier
         '''
         self.location = location
-    def is_first_date_lower(self, year, month, day, year_end, month_end, day_end):
-        '''
-        Checks 2 dates and confirms which one is the lower one
-        '''
-        #Let's check year by year
-        if year < year_end:
-            return True
-        elif year > year_end:
-            return False
-        elif not (month and month_end):
-            #If we do not have the month and is the same year we cannot have a date between!!!
-            return None
-        elif month < month_end:
-            return True
-        elif month > month_end:
-            return False
-        elif not (day and day_end):
-            #We check if we have the day, of course...
-            return None
-        elif day < day_end:
-            return True
-        elif day > day_end:
-            return False
-        else:
-            #Here the date are exactly the same... do we need a BETWEEN????
-            return "Equal"
     def is_this_event_earlier_or_simultaneous_to_this(self,event):
         '''
         Confirms if the following event is earlier or at the same time as the other
@@ -251,4 +225,29 @@ def convert_date_to_gedcom_format(year, month, day):
     if year: string_year = str(year)
     if len((string_day + string_month + string_year).strip()) == 0: return None
     else : return (string_day + string_month + string_year).strip()
-    
+def is_first_date_lower(year, month, day, year_end, month_end, day_end):
+    '''
+    Checks 2 dates and confirms which one is the lower one
+    '''
+    #Let's check year by year
+    if year < year_end:
+        return True
+    elif year > year_end:
+        return False
+    elif not (month and month_end):
+        #If we do not have the month and is the same year we cannot have a date between!!!
+        return None
+    elif month < month_end:
+        return True
+    elif month > month_end:
+        return False
+    elif not (day and day_end):
+        #We check if we have the day, of course...
+        return None
+    elif day < day_end:
+        return True
+    elif day > day_end:
+        return False
+    else:
+        #Here the date are exactly the same... do we need a BETWEEN????
+        return "Equal"

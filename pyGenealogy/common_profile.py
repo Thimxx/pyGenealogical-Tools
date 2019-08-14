@@ -8,7 +8,6 @@ from pyGenealogy import VALUES_ACCURACY, EVENT_TYPE
 from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS, formated_year
 from pyGenealogy.common_event import event_profile
 
-TOOL_ID = "PY-GENEALOGY"
 DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments", "id", "marriage_link"]
 MERGE_EVENTS = ["birth", "death", "baptism",  "burial", "marriage"]
 DATA_ACCURACY = ["accuracy_birth_date", "accuracy_death_date", "accuracy_baptism_date", "accuracy_residence_date", "accuracy_burial_date", "accuracy_marriage_date"]
@@ -34,12 +33,12 @@ class gen_profile(object):
     This class will include a single genealogical profile common for all tools,
     common information like birth dates, death dates... will be covered here.
     '''
-    def __init__(self, name, surname, name2show=None):
+    def __init__(self, name, surname, name2show=None, id_db=None):
         '''
         Constructor, name and surname as minimal parameters
         '''
-        self.gen_data = {}
-        self.gen_data["id"] = None
+        if not hasattr(self, "gen_data") : self.gen_data = {}
+        if not self.get_id() : self.set_id(id_db)
         self.gen_data["name"] = name
         self.gen_data["surname"] = surname
         self.gen_data["name_to_show"] = self.set_name_2_show(name2show)
@@ -54,7 +53,7 @@ class gen_profile(object):
         """
         Introduce an id for later on compare the data for introduction
         """
-        self.gen_data["id"] = TOOL_ID + str(id_profile)
+        self.gen_data["id"] = str(id_profile)
     def set_marriage_id_link(self, id_partner):
         """
         Sets the link to the id of the partner
@@ -308,4 +307,4 @@ class gen_profile(object):
         """
         Returns the profile id.
         """
-        return self.gen_data.get("id", None)
+        return self.gen_data.get("id",None)

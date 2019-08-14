@@ -46,6 +46,8 @@ class abc_reader(object):
         for deceased in self.parser.records:
             score, factor = deceased.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
             if (score*factor > 2.0):
+                #We add the url used
+                deceased.setWebReference(url)
                 final_profiles.append(deceased)
         return final_profiles
 class ABCParser(HTMLParser):

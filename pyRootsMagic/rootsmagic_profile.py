@@ -10,13 +10,14 @@ DATE_EVENT_ID = {"birth" : "1", "death" : "2", "baptism" : "3",  "burial" : "4",
 
 class rootsmagic_profile(common_profile.gen_profile):
     '''
-    classdocs
+    Profile with direct interface with RootsMagic database
     '''
     def __init__(self, person_id, database):
         '''
         Constructor
         '''
-        self.person_id = person_id
+        self.gen_data = {}
+        self.set_id(person_id)
         self.database = database
         common_profile.gen_profile.__init__(self, self.getName() , self.getSurname())
 #===============================================================================
@@ -51,7 +52,7 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         all_events = []
         input_database = "SELECT * FROM EventTable WHERE OwnerId= ?"
-        events = self.database.execute(input_database, (str(self.person_id),) )
+        events = self.database.execute(input_database, (str(self.get_id()),) )
         loop_fetch = True
         while loop_fetch:
             this_event = events.fetchone()
@@ -67,7 +68,7 @@ class rootsmagic_profile(common_profile.gen_profile):
         by looking to the database for this specific data
         '''
         input_events = "SELECT * FROM EventTable WHERE OwnerId=? AND  EventType=?"
-        events = self.database.execute(input_events, (str(self.person_id),DATE_EVENT_ID[event_name],) )
+        events = self.database.execute(input_events, (str(self.get_id()),DATE_EVENT_ID[event_name],) )
         #Now let's fetch the first value
         date_data = events.fetchone()
         if date_data:
@@ -82,14 +83,14 @@ class rootsmagic_profile(common_profile.gen_profile):
         Common function used to get the table with table of PersonTable used for gender
         '''
         input_person = "SELECT * FROM PersonTable WHERE PersonID=?"
-        person_info = self.database.execute( input_person, (str(self.person_id),) )
+        person_info = self.database.execute( input_person, (str(self.get_id()),) )
         return person_info.fetchone()
     def return_person_data_in_NameTable(self):
         '''
         Common function used to get the table with the NameTable, used for name and surname
         '''
         input_person = "SELECT * FROM NameTable WHERE OwnerID=?"
-        name_info = self.database.execute( input_person, (str(self.person_id),) )
+        name_info = self.database.execute( input_person, (str(self.get_id()),) )
         loop_database = True
         while loop_database:
             name_data = name_info.fetchone()

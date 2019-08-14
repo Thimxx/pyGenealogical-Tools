@@ -73,6 +73,7 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(event_birth3.get_location()["latitude"] < 41.07)
         
         #Now we check that None is provided if there is no profile in
+        assert(db.get_profile_by_ID("dsdf") == None)
         assert(db.get_profile_by_ID(2325) == None)
         
         #Let's check all families

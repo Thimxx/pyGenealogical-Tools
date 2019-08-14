@@ -29,19 +29,11 @@ class testpyGeni(unittest.TestCase):
         assert(self.philip.gen_data["death"].location["city"] == 'El Escorial' )
         assert(self.philip.gen_data["burial"].location["place_name"] == 'San Lorenzo de El Escorial')
         
-    def testUsingIdProfile(self):
-        '''
-        This test checks that using a different input id the id obtained is the same.
-        '''
+        #Simplifies the previous file into only 1 test
+        assert(self.philip.get_id() == PHILIPIVid)
         philip_bis = profile.profile(PHILIPIVget, "")
         assert( philip_bis.get_id() == self.philip.get_id())
    
-    def testgetrightid(self):
-        '''
-        Confirms that the id output is correct
-        '''
-        assert(self.philip.get_id() == PHILIPIVid)
-
 
 if __name__ == '__main__':
     unittest.main()

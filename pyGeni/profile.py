@@ -23,7 +23,7 @@ DATA_LIST_IN_GENI = {"nicknames": "nicknames"}
 NOT_USED = {"name_to_show" : "display_name"}
 EQUIVALENT_SEX = { "male" : "M", "female" : "F"}
 
-
+TOOL_ID = ""
 
 class profile(geni_calls, gen_profile):
     def __init__(self, geni_input, type_geni="g"):  # id int or string
@@ -45,7 +45,7 @@ class profile(geni_calls, gen_profile):
         #Now we can execute the constructor
         if (not "first_name" in data.keys()): data["first_name"] = NOT_KNOWN_VALUE
         if (not "last_name" in data.keys()): data["last_name"] = NOT_KNOWN_VALUE
-        gen_profile.__init__(self, data["first_name"], data["last_name"], )
+        gen_profile.__init__(self, data["first_name"], data["last_name"], id_db=data.get("id", None) )
         if not "error" in data.keys():
             self.existing_in_geni = True
             self.fulldata = data
@@ -74,7 +74,8 @@ class profile(geni_calls, gen_profile):
         '''
         Simple function to get Geni ID
         '''
-        return self.data['id']
+        if hasattr(self, "data") : return self.data.get('id', None)
+        else: return None
     def get_geni_data(self, data):
         '''
         Transfer json geni data into the base profile

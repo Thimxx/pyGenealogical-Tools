@@ -38,7 +38,10 @@ class rememori_reader(object):
         '''
         This function will look in rememory trying to match a profile
         Input shall be a profile of common profile values
+        
+        It will return an array of matches profiles, an empty array or None if the execution was wrong
         '''
+        correct_execution = True
         intermediate_profiles = []
         final_profiles = []
         #Before executing, if the profile is born before any logical date treated in rememory, we stop
@@ -46,6 +49,8 @@ class rememori_reader(object):
             url = SEARCH_LOCATION + profile.getName() + ADDING_CHAR
             url += ADDING_CHAR.join(profile.getSurname().split(" "))
             data = requests.get(url)
+            #We add a check in case the server is down, which happens quite oftenly
+            if ("502 Server Error" in data.text) : correct_execution = False
             self.parser.feed(data.text)
             #This will remove all those matches that are very unlikely to be part
             for deceased in self.parser.records:
@@ -68,7 +73,8 @@ class rememori_reader(object):
                 score, factor = selected_profile.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
                 if (score*factor > 2.0):
                     final_profiles.append(selected_profile)
-        return final_profiles
+        if correct_execution : return final_profiles
+        else: return None
 
 class RememoryParser(HTMLParser):
     '''

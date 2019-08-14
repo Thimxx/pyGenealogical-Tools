@@ -26,14 +26,17 @@ class gen_analyzer(object):
         profiles = database.get_all_profiles()
         self.file = None
         if not output == None: self.file = open(output, "w")
+        print_out("Total number of profiles = " + str(len(profiles)), self.file)
         for person in profiles:
             #We write in the screen the name of the person
-            print_out(person.nameLifespan(), self.file)
+            print_out(str(person.get_id()) + " = "  + person.nameLifespan(), self.file)
             #REMEMORI
             reader = rememori_reader(language=self.language, name_convention=self.name_convention)
             records = reader.profile_is_matched(person)
-            for obtained in records:
-                print_out("  -  " + obtained.nameLifespan() + "  " + obtained.gen_data["web_ref"][0], self.file)
+            #Sometimes Rememori fails in a regular manner,a checking has been introduced.
+            if records:
+                for obtained in records:
+                    print_out("  -  " + obtained.nameLifespan() + "  " + obtained.gen_data["web_ref"][0], self.file)
             #EL NORTE DE CASTILLA
             reader2 = elnortedecastilla_reader(language=self.language, name_convention=self.name_convention)
             records2 = reader2.profile_is_matched(person)

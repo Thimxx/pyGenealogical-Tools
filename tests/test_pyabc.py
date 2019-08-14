@@ -21,8 +21,7 @@ class Test(unittest.TestCase):
         reader = abc_reader()
         records = reader.profile_is_matched(profile)
         assert(len(records) >0 )
-
-
+        assert(len(records[0].gen_data["web_ref"])>0)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_using_abc_records']
     unittest.main()

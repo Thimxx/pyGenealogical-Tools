@@ -148,7 +148,9 @@ class gedcom_profile(common_profile.gen_profile):
         """
         The id is introduced, this method should ideally only be used by database
         """
-        self.gen_data["id"] = str(id_profile)
+        #If the introduced id profile is None, we might be tansforming to string!!
+        if id_profile: self.gen_data["id"] = str(id_profile)
+        else: self.gen_data["id"] = id_profile
 #===============================================================================
 #         Axuliary functions and methods
 #===============================================================================
