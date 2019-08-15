@@ -12,9 +12,9 @@ from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, GENERIC_PLACE_STRING, GE
 class Test(unittest.TestCase):
 
 
-    def test_introducing_gender(self):
+    def test_introducing_gender_living(self):
         '''
-        Testing right introduction of gender in common_profile
+        Testing right introduction of gender and living in common_profile
         '''
         profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
         assert(profile.setCheckedGender("F"))
@@ -22,6 +22,8 @@ class Test(unittest.TestCase):
         assert(profile.setCheckedGender("U"))
         assert(profile.gen_data["name_to_show"] == ACTUAL_NAME + " " + FATHER_SURNAME)
         self.assertFalse(profile.setCheckedGender("J"))
+        profile.setLiving(True)
+        assert(profile.getLiving())
     
     def test_merge_profile(self):
         '''
@@ -54,8 +56,9 @@ class Test(unittest.TestCase):
         assert(profile.gen_data["birth"].get_date() == date(2016,4,23))
         assert(profile.gen_data["birth"].get_accuracy() == "EXACT")
         assert(profile.gen_data["comments"] == "comment1\ncomment2")
-        assert("THIS" in profile.gen_data["web_ref"] )
-        assert("OTHER" in profile.gen_data["web_ref"] )
+        assert("THIS" in profile.get_all_urls() )
+        assert("OTHER" in profile.get_all_urls() )
+        assert(len( profile.get_all_webs()) == 2 )
         assert(profile2.gen_data["death"].get_date() ==  date(2018,8,24))
         assert(profile2.gen_data["death"].get_accuracy() == "EXACT")
         assert(profile2.gen_data["burial"].get_accuracy() == "BETWEEN")
@@ -194,15 +197,19 @@ class Test(unittest.TestCase):
     
     def test_web_reference_adding(self):
         '''
-        Testing adding web reference
+        Testing adding and updating web reference
         '''
         profile = gen_profile("Name", "Surname")
         profile.setWebReference("Myaddress")
         #Wrong declaration in the past created issues
         assert(len(profile.gen_data["web_ref"]) == 1)
-        profile.setWebReference(["Myaddress"])
+        profile.setWebReference(["Myaddress2"])
         #This will check the data types is working
         assert(len(profile.gen_data["web_ref"]) == 2)
+        
+        assert(profile.update_web_ref("Myaddress3", "NEW", "Mynote") == None)
+        
+        assert(profile.update_web_ref("Myaddress2", "NEW", "Mynote"))
     
     def test_comparison_profile(self):
         '''

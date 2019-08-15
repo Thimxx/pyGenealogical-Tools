@@ -238,7 +238,7 @@ class getFSfamily(object):
             if profile_obtained.gen_data.get("marriage_link", None) in self.related_profiles.keys():
                 id_of_marriage = profile_obtained.gen_data["marriage_link"]
                 partner = self.related_profiles[id_of_marriage]
-                partner.setWebReference(profile_obtained.gen_data["web_ref"])
+                partner.setWebReference(profile_obtained.get_all_urls())
                 #It is a partner so we add as opposite sex!
                 partner.setCheckedGender(get_partner_gender(profile_obtained.gen_data["gender"]))
                 partner.setNewEvent(profile_obtained.gen_data["marriage"])
@@ -246,8 +246,8 @@ class getFSfamily(object):
                 if id_of_marriage in self.parents_profiles.keys():
                     father = self.parents_profiles[id_of_marriage][0]
                     mother = self.parents_profiles[id_of_marriage][1]
-                    father.setWebReference(profile_obtained.gen_data["web_ref"])
-                    mother.setWebReference(profile_obtained.gen_data["web_ref"])
+                    father.setWebReference(profile_obtained.get_all_urls())
+                    mother.setWebReference(profile_obtained.get_all_urls())
                     surnames = get_splitted_name_from_complete_name(partner.gen_data["surname"], language=self.language)[0]
                     if (father.gen_data["surname"] == NOT_KNOWN_VALUE):
                         #It might be the case that the surname is empty

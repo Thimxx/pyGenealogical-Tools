@@ -49,95 +49,8 @@ class gen_profile(object):
         Add a nickname
         '''
         self.gen_data["nicknames"].append(nick_name)
-    def set_id(self, id_profile):
-        """
-        Introduce an id for later on compare the data for introduction
-        """
-        self.gen_data["id"] = str(id_profile)
-    def set_marriage_id_link(self, id_partner):
-        """
-        Sets the link to the id of the partner
-        """
-        self.gen_data["marriage_link"] =  id_partner
-    def set_name(self,name):
-        '''
-        Modifies name to show
-        '''
-        self.gen_data["name"] = name
-        self.gen_data["name_to_show"] = self.set_name_2_show(None)
-    def set_surname(self, surname):
-        '''
-        Modified name to show as well
-        '''
-        self.gen_data["surname"] = surname
-        self.gen_data["name_to_show"] = self.set_name_2_show(None)
-    def set_name_2_show(self, name2show):
-        '''
-        Setting the name to be shown if not existing
-        '''
-        if (name2show == None):
-            return self.returnFullName()
-        else:
-            return name2show
     def returnFullName(self):
         return self.getName() + " " + self.getSurname()
-    def setCheckedGender(self, gender):
-        '''
-        This function will set up the gender of the profile, only the following values
-        are available:
-        M = Male
-        F = Female
-        U = Unknown
-        Returns a True if the value has been properly introduced, and False if the value
-        is not correct
-        '''
-        if(gender == "M" or gender == "F" or gender == "U"):
-            self.gen_data["gender"] = gender
-            return True
-        else:
-            return False
-    def setCheckedDate(self, event_name, year, month = None, day = None, accuracy = "EXACT", year_end = None,
-                month_end = None, day_end = None):
-        '''
-        This function will introduce an event with the data related to the dates of the event
-        '''
-        if (not event_name in EVENT_TYPE) or (not accuracy in VALUES_ACCURACY): return False
-        new_event = event_profile(event_name)
-        new_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)
-        if (not self.selfcheckDateConsistency(new_event)):
-            return False
-        else:
-            if event_name in self.gen_data.keys():
-                self.gen_data[event_name].setDate(year, month, day, accuracy, year_end, month_end, day_end)
-            else:
-                self.gen_data[event_name] = new_event
-            return True
-    def setCheckedDateWithDates(self, event_name, date1, accuracy= "EXACT", date2 = None):
-        '''
-        This function will allow easy transition to the new function for allowing simple transfer of data with date
-        function
-        '''
-        if date2:
-            self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy,
-                year_end = date2.year ,month_end = date2.month, day_end = date2.day)
-        else:
-            self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy,
-                year_end = None, month_end = None, day_end = None)
-    def setNewEvent(self,event):
-        '''
-        When the event is already available there is no need to perform the checked date, we just include the event
-        '''
-        if (not self.selfcheckDateConsistency(event)):
-            return False
-        else:
-            self.gen_data[event.get_event_type()] = event
-    def setComments(self, comment):
-        '''
-        Comments are aditive on top of the preivous one
-        '''
-        if (not "comments" in self.gen_data.keys()):
-            self.gen_data["comments"] = ""
-        self.gen_data["comments"] = self.getComments() + comment
     def nameLifespan(self):
         '''
         Function for printing an standard format of naming
@@ -150,25 +63,6 @@ class gen_profile(object):
             return self.getName2Show()
         else:
             return self.getName2Show() + " (" + year_birth + " - " + year_death + ")"
-    def setWebReference(self, address):
-        '''
-        Includes web references for the profile.
-        '''
-        if isinstance(address, list):
-            self.gen_data["web_ref"] += address
-        elif isinstance(address, str):
-            self.gen_data["web_ref"].append(address)
-    def setPlaces(self, event_name, location, language="en" ):
-        '''
-        This function will introduce the location related to each event
-        '''
-        if event_name in EVENT_TYPE:
-            new_event = self.gen_data.get(event_name, event_profile(event_name))
-            new_event.setLocation(location, language)
-            self.gen_data[event_name] = new_event
-            return True
-        else:
-            return False
     def get_earliest_event(self):
         '''
         It will return the earliest event, of course, the birth, but it is already checked,
@@ -250,7 +144,130 @@ class gen_profile(object):
         else:
             return False
 #===============================================================================
-#         GET methods: for compatibility withe RootsMagic profile we shall keep compatibility
+#         SET methods: the value of the profile is modified, all profiles derived
+#        should check these methods
+#===============================================================================
+    def set_id(self, id_profile):
+        """
+        Introduce an id for later on compare the data for introduction
+        """
+        self.gen_data["id"] = str(id_profile)
+    def set_marriage_id_link(self, id_partner):
+        """
+        Sets the link to the id of the partner
+        """
+        self.gen_data["marriage_link"] =  id_partner
+    def set_name(self,name):
+        '''
+        Modifies name to show
+        '''
+        self.gen_data["name"] = name
+        self.gen_data["name_to_show"] = self.set_name_2_show(None)
+    def set_surname(self, surname):
+        '''
+        Modified name to show as well
+        '''
+        self.gen_data["surname"] = surname
+        self.gen_data["name_to_show"] = self.set_name_2_show(None)
+    def set_name_2_show(self, name2show):
+        '''
+        Setting the name to be shown if not existing
+        '''
+        if (name2show == None):
+            return self.returnFullName()
+        else:
+            return name2show
+    def setCheckedGender(self, gender):
+        '''
+        This function will set up the gender of the profile, only the following values
+        are available:
+        M = Male
+        F = Female
+        U = Unknown
+        Returns a True if the value has been properly introduced, and False if the value
+        is not correct
+        '''
+        if(gender == "M" or gender == "F" or gender == "U"):
+            self.gen_data["gender"] = gender
+            return True
+        else:
+            return False
+    def setCheckedDate(self, event_name, year, month = None, day = None, accuracy = "EXACT", year_end = None,
+                month_end = None, day_end = None):
+        '''
+        This function will introduce an event with the data related to the dates of the event
+        '''
+        if (not event_name in EVENT_TYPE) or (not accuracy in VALUES_ACCURACY): return False
+        new_event = event_profile(event_name)
+        new_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)
+        if (not self.selfcheckDateConsistency(new_event)):
+            return False
+        else:
+            if event_name in self.gen_data.keys():
+                self.gen_data[event_name].setDate(year, month, day, accuracy, year_end, month_end, day_end)
+            else:
+                self.gen_data[event_name] = new_event
+            return True
+    def setCheckedDateWithDates(self, event_name, date1, accuracy= "EXACT", date2 = None):
+        '''
+        This function will allow easy transition to the new function for allowing simple transfer of data with date
+        function
+        '''
+        if date2:
+            self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy,
+                year_end = date2.year ,month_end = date2.month, day_end = date2.day)
+        else:
+            self.setCheckedDate(event_name, date1.year, month = date1.month, day = date1.day, accuracy = accuracy,
+                year_end = None, month_end = None, day_end = None)
+    def setNewEvent(self,event):
+        '''
+        When the event is already available there is no need to perform the checked date, we just include the event
+        '''
+        if (not self.selfcheckDateConsistency(event)):
+            return False
+        else:
+            self.gen_data[event.get_event_type()] = event
+    def setComments(self, comment):
+        '''
+        Comments are aditive on top of the preivous one
+        '''
+        if (not "comments" in self.gen_data.keys()):
+            self.gen_data["comments"] = ""
+        self.gen_data["comments"] = self.getComments() + comment
+    def setWebReference(self, url, name=None, notes=None):
+        '''
+        Includes web references for the profile.
+        There are 2 options for introduction:
+        - Introduce a list of urls. In that case only the first argument will be considered
+        - Introduce a single url, with description of names and notes
+        '''
+        #If the introduced values is a list of url, name and notes are ignored
+        if isinstance(url, list):
+            for new_add in url:
+                self.gen_data["web_ref"].append({"url" : new_add})
+        elif isinstance(url, str):
+            new_dict = {"url": url}
+            if name : new_dict["name"] = name
+            if notes : new_dict["notes"] = notes
+            self.gen_data["web_ref"].append(new_dict)
+    def setPlaces(self, event_name, location, language="en" ):
+        '''
+        This function will introduce the location related to each event
+        '''
+        if event_name in EVENT_TYPE:
+            new_event = self.gen_data.get(event_name, event_profile(event_name))
+            new_event.setLocation(location, language)
+            self.gen_data[event_name] = new_event
+            return True
+        else:
+            return False
+    def setLiving(self, alive):
+        '''
+        We set if profile is alive or not
+        '''
+        self.gen_data["living"] = alive
+#===============================================================================
+#         GET methods: for compatibility with other profiles
 #===============================================================================
     def getName(self):
         '''
@@ -308,3 +325,36 @@ class gen_profile(object):
         Returns the profile id.
         """
         return self.gen_data.get("id",None)
+    def get_all_urls(self):
+        '''
+        This function will provide all urls registered inside the profile
+        '''
+        urls = []
+        for weblink in self.get_all_webs():
+            urls.append(weblink['url'])
+        return urls
+    def get_all_webs(self):
+        '''
+        This function will provide all web references
+        '''
+        return self.gen_data["web_ref"]
+    def getLiving(self):
+        '''
+        Returns the living status of a profile
+        '''
+        return self.gen_data["living"]
+#===============================================================================
+#         UPDATE methods: for compatibility with other profiles
+#===============================================================================
+    def update_web_ref(self, url, name = None, notes = None):
+        '''
+        This function will update a given web reference
+        '''
+        #This will mean that exists... so we can continue
+        if url in self.get_all_urls():
+            index = self.get_all_urls().index(url)
+            if name : self.gen_data["web_ref"][index]["name"] = name
+            if notes : self.gen_data["web_ref"][index]["notes"] = notes
+            return True
+        else:
+            return None

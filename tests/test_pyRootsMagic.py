@@ -6,7 +6,8 @@ Created on 6 jul. 2019
 import unittest, os
 from pyRootsMagic.pyrm_database import database_rm
 from datetime import date
-
+from shutil import copyfile
+from tests.FIXTURES import TEST_FACEBOOK, TEST_GOOGLE, TEST_WIKIPEDIA
 
 class Test_use_and_access_RootsMagic(unittest.TestCase):
     def setUp(self):
@@ -38,6 +39,7 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(event_death.get_accuracy() == "EXACT")
         assert(prof.getGender() == "F")
         assert(len(prof.getEvents()) == 3)
+        assert(prof.getLiving() == False)
         
         #This profile has a date "ABOUT"
         prof2 = db.get_profile_by_ID(3)
@@ -46,6 +48,8 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(event_birth2.get_accuracy() == "ABOUT")
         event_death2 = prof2.get_specific_event("death")
         assert(not event_death2)
+        #Also includes web_references
+        assert("familysearch.org/tree/person" in prof2.get_all_urls()[0])
         
         #This profile has a date "BEFORE"
         prof3 = db.get_profile_by_ID(4)
@@ -65,12 +69,15 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(event_death4.year_end == 1821)
         assert(event_death4.month_end == 3)
         self.assertFalse(event_death4.day_end)
+        #Also includes web_references
+        assert(len(prof4.get_all_webs()) == 2)
         
         #This profile has a date BETWEEN
         prof5 = db.get_profile_by_ID(1)
         event_birth3 = prof5.get_specific_event("birth")
         assert(event_birth3.get_location()["county"] == "Segovia")
         assert(event_birth3.get_location()["latitude"] < 41.07)
+        assert(prof5.getLiving())
         
         #Now we check that None is provided if there is no profile in
         assert(db.get_profile_by_ID("dsdf") == None)
@@ -87,7 +94,35 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(db.get_family_by_ID(1).getChildren() == [1, 7])
         assert(len(db.get_family_by_ID(5).getChildren()) == 0)
         
+    
+    def test_insert_methods(self):
+        '''
+        Testing insert methods inside RootsMagic
+        '''
+        initial_file = os.path.join(self.filelocation, "Rootstest.rmgc")
+        working_file = os.path.join(self.filelocation, "Rootstest_insert.rmgc")
+        
+        if os.path.exists(working_file): os.remove(working_file)
+        copyfile(initial_file, working_file)
+        
+        
+        db = database_rm(working_file)
+        
+        
+        prof = db.get_profile_by_ID(5)
+        prof.setWebReference([TEST_GOOGLE, TEST_FACEBOOK])
+        prof.setWebReference(TEST_WIKIPEDIA, name = "Wikipedia", notes="introduced")
+        
+        assert(prof.get_all_webs()[0]["name"] == "")
+        prof.update_web_ref(TEST_GOOGLE, "Google", "A note")
+        assert(prof.get_all_webs()[0]["name"] == "Google")
+        assert(TEST_GOOGLE in prof.get_all_urls())
+        assert(TEST_WIKIPEDIA in prof.get_all_urls())
+        
+        prof.set_task("TEST")
+        
         db.close_db()
+        if os.path.exists(working_file): os.remove(working_file)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

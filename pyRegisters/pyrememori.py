@@ -38,7 +38,6 @@ class rememori_reader(object):
         '''
         This function will look in rememory trying to match a profile
         Input shall be a profile of common profile values
-        
         It will return an array of matches profiles, an empty array or None if the execution was wrong
         '''
         correct_execution = True
@@ -60,7 +59,7 @@ class rememori_reader(object):
             #As takes a significant amount of time to obtain the profiles, in order to improve performance we get the details
             #only in those more suitable candidates, to reduce the number of html calls that will slow down the calculation
             for selected_profile in intermediate_profiles:
-                data = requests.get(selected_profile.gen_data["web_ref"][0])
+                data = requests.get(selected_profile.get_all_urls()[0])
                 self.person_parser.feed(data.text)
                 if (self.person_parser.age):
                     #As the dates in rememory are exact we can freely do this

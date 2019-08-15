@@ -5,6 +5,7 @@ Created on 7 jul. 2019
 '''
 from pyGenealogy import common_profile
 from pyGenealogy.common_event import event_profile
+from pyRootsMagic import collate_temp
 
 DATE_EVENT_ID = {"birth" : "1", "death" : "2", "baptism" : "3",  "burial" : "4", "marriage" : "300", "residence" : "29"}
 
@@ -43,8 +44,17 @@ class rootsmagic_profile(common_profile.gen_profile):
             if gender == 0: return "M"
             elif gender == 1: return "F"
             else: return "U"
+    def getLiving(self):
+        '''
+        Method override in order to access directly to the gender of the profile
+        '''
+        person_data = self.return_person_in_PersonTable()
+        if person_data:
+            living = int(person_data[10])
+            if living == 1: return True
+            else: return False
 #===============================================================================
-#    These functions are left in the base function: getComments, getName2Show
+#    These functions are left in the base function: getComments, getName2Show, get_all_urls
 #===============================================================================
     def getEvents(self):
         '''
@@ -73,6 +83,81 @@ class rootsmagic_profile(common_profile.gen_profile):
         date_data = events.fetchone()
         if date_data:
             return self.return_event_from_database_info(date_data)
+        else:
+            return None
+    def get_all_webs(self):
+        '''
+        This function will provide all web references
+        '''
+        webs = []
+        input_urls = "SELECT * FROM URLTable WHERE OwnerID=?"
+        url_info = self.database.execute( input_urls, (str(self.get_id()),) ).fetchall()
+        for url_data in url_info:
+            web_dict = {}
+            web_dict["name"] = url_data[4]
+            web_dict["url"] = url_data[5]
+            web_dict["notes"] = url_data[6]
+            webs.append(web_dict)
+        fs_urls = "SELECT * FROM LinkTable WHERE rmID=?"
+        fs_info = self.database.execute( fs_urls, (str(self.get_id()),) ).fetchall()
+        for fs_data in fs_info:
+            web_dict = {}
+            web_dict["name"] = "FAMILY-SEARCH-LINK"
+            web_dict["url"] = "https://www.familysearch.org/tree/person/details/" + fs_data[4]
+            webs.append(web_dict)
+        return webs
+#===============================================================================
+#         SET methods: the value of the profile is modified, overwrtting methods
+#        from common_profile
+#===============================================================================
+    def setWebReference(self, url, name=None, notes=None):
+        '''
+        Includes web references for the profile.
+        There are 2 options for introduction:
+        - Introduce a list of urls. In that case only the first argument will be considered
+        - Introduce a single url, with description of names and notes
+        '''
+        #If the introduced values is a list of url, name and notes are ignored
+        if isinstance(url, list):
+            for new_add in url:
+                new_web = "INSERT INTO URLTable(OwnerType,LinkType,OwnerID,URL,Name,Note) VALUES(0,0,?,?,?,?)"
+                self.database.execute( new_web, (str(self.get_id()), str(new_add), "", "") )
+        elif isinstance(url, str):
+            value_name = str(name)
+            value_notes = str(notes)
+            if name == None: value_name = ""
+            if notes == None: value_notes = ""
+            new_web = "INSERT INTO URLTable(OwnerType,LinkType,OwnerID,URL,Name,Note) VALUES(0,0,?,?,?,?)"
+            self.database.execute( new_web, (str(self.get_id()), str(url), value_name, value_notes) )
+        self.database.commit()
+    def set_task(self, task_details, priority=0, details=""):
+        '''
+        Introduces a task linked to the given profile
+        '''
+        empty_value=""
+        self.database.create_collation("RMNOCASE", collate_temp)
+
+        new_task = "INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details) VALUES(0,?,0,?,0,?,?,?,?)"
+        self.database.execute( new_task, (str(self.get_id()),empty_value, str(priority), empty_value, str(task_details), details, ) )
+        self.database.create_collation("RMNOCASE", None)
+        self.database.commit()
+#===============================================================================
+#         UPDATE methods: modified inputs which depend on database
+#===============================================================================
+    def update_web_ref(self, url, name = None, notes = None):
+        '''
+        This function will update a given web reference
+        '''
+        #This will mean that exists... so we can continue
+        if url in self.get_all_urls():
+            if name :
+                update_name = "UPDATE URLTable SET Name = ? WHERE URL=? AND OwnerID=?"
+                self.database.execute( update_name, (str(name), str(url), str(self.get_id()), ) )
+            if notes :
+                update_note = "UPDATE URLTable SET Note = ? WHERE URL=? AND OwnerID=?"
+                self.database.execute( update_note, (str(notes), str(url), str(self.get_id()), ) )
+            self.database.commit()
+            return True
         else:
             return None
 #===============================================================================

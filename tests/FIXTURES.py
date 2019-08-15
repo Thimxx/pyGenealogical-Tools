@@ -71,3 +71,12 @@ GENI_TWO_MARRIAGES_PROFILE_LINK = "https://api.sandbox.geni.com/profile-930"
 #Wrong token for testing execution
 WRONG_TOKEN='iSNPWCfIVKI2vH2HQLUnYppCssIMVN17kpno9ZTe'
 
+#File to delete
+FILE2DELETE = "DeleteMeIfYouSeeMe.out"
+ROOTS_MAGIC_GEN_ANALYZER = "RootsMagicGenAnalyzer.rmgc"
+
+#Examples of ADDRESES
+TEST_GOOGLE = "http://www.google.com"
+TEST_FACEBOOK = "http://www.facebook.com"
+TEST_WIKIPEDIA = "http://www.wikipedia.com"
+

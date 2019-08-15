@@ -21,7 +21,10 @@ class Test_common_database(unittest.TestCase):
         assert(db.add_profile(person1) == "I1")
         assert(db.add_profile(person2) == "I2")
         assert(db.add_family(father = person1, mother = person2) == "F1")
+        assert(db.get_profile_by_ID("I1").getName() == "Name")
         assert(db.get_family_by_ID("F1").getFather().getName() == "Name")
+        assert(db.get_family_by_ID("xxx1") == None)
+        assert(db.get_profile_by_ID("xxx1") == None)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

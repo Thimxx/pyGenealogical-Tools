@@ -245,7 +245,7 @@ class profile(geni_calls, gen_profile):
         if [self.gen_data["web_ref"] != []]:
             msg = ABOUT_ME_MESSAGE
             for value in self.gen_data["web_ref"]:
-                msg += " [" + value + " FamilySearch-link]"
+                msg += " [" + value["url"] + " FamilySearch-link]"
             data["about_me"] = msg
         for event_geni in EVENT_DATA:
             event_value = self.event_value(event_geni)

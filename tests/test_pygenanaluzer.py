@@ -10,7 +10,8 @@ from pyGedcom.gedcom_profile import gedcom_profile
 from pyGedcom.gedcom_database import db_gedcom
 from pyGenealogy.common_database import gen_database
 from pyRootsMagic.pyrm_database import database_rm
-
+from tests.FIXTURES import FILE2DELETE, ROOTS_MAGIC_GEN_ANALYZER
+from shutil import copyfile
 
 class Test(unittest.TestCase):
     '''
@@ -28,6 +29,9 @@ class Test(unittest.TestCase):
         '''
         It will take a gedcom dataclass and perform all executions available
         '''
+        #Just in case the file was created before
+        if os.path.exists(FILE2DELETE): os.remove(FILE2DELETE)
+        if os.path.exists(ROOTS_MAGIC_GEN_ANALYZER): os.remove(ROOTS_MAGIC_GEN_ANALYZER)
         profile = gen_profile("Julián", "Gómez Gómez")
         profile.setCheckedDate("baptism", 1970, 4 ,2)
         profile.setCheckedDate("birth", 1960, 4, 2)
@@ -47,13 +51,25 @@ class Test(unittest.TestCase):
         dbged.add_profile(profile2)
         
         #Test that works with RootsMagic
-        input_file = os.path.join(self.filelocation, "Rootstest.rmgc")
-        dbroots = database_rm(input_file)
+        
+        input_file = os.path.join(self.filelocation, "RootsMagic_analyzer.rmgc")
+        copyfile(input_file , ROOTS_MAGIC_GEN_ANALYZER)
+        dbroots = database_rm(ROOTS_MAGIC_GEN_ANALYZER)
         
         analysis = gen_analyzer()
-        analysis.execute(dbgenea)
+        analysis.execute(dbgenea, FILE2DELETE)
         analysis.execute(dbged)
-        analysis.execute(dbroots)
+        #Threshold will make any analysis to be ignored
+        analysis.execute(dbroots, storage = True, threshold = 360)
+        urls = 0
+        for person in dbroots.get_all_profiles():
+            urls += len(person.get_all_urls())
+        assert(urls > 6)
+        assert(os.path.exists(FILE2DELETE))
+        dbroots.close_db()
+        #We just delete the file once finishes
+        if os.path.exists(FILE2DELETE): os.remove(FILE2DELETE)
+        if os.path.exists(ROOTS_MAGIC_GEN_ANALYZER): os.remove(ROOTS_MAGIC_GEN_ANALYZER)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
