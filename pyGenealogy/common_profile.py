@@ -55,27 +55,20 @@ class gen_profile(object):
         '''
         Function for printing an standard format of naming
         '''
+        all_events = self.getEvents()
+        dict_events = {}
+        for event in all_events:
+            dict_events[event.get_event_type()] = event
         year_birth = "?"
-        if("birth" in self.gen_data.keys()): year_birth = formated_year(self.gen_data["birth"].get_year(), self.gen_data["birth"].get_accuracy())
+        if("birth" in dict_events.keys() and (dict_events["birth"].get_year() != None) ):
+            year_birth = formated_year(dict_events["birth"].get_year(), dict_events["birth"].get_accuracy())
         year_death = "?"
-        if("death" in self.gen_data.keys()): year_death = formated_year(self.gen_data["death"].get_year(), self.gen_data["death"].get_accuracy())
+        if("death" in dict_events.keys() and (dict_events["death"].get_year() != None)):
+            year_death = formated_year(dict_events["death"].get_year(), dict_events["death"].get_accuracy())
         if (year_birth == "?") and (year_death == "?"):
             return self.getName2Show()
         else:
             return self.getName2Show() + " (" + year_birth + " - " + year_death + ")"
-    def get_earliest_event(self):
-        '''
-        It will return the earliest event, of course, the birth, but it is already checked,
-        for simplicity I will not consider that case
-        '''
-        earliest_date = None
-        for event_key in EVENT_TYPE:
-            if event_key in self.gen_data:
-                if earliest_date == None:
-                    earliest_date = self.gen_data[event_key].get_date()
-                elif self.gen_data[event_key].get_date() < earliest_date:
-                    earliest_date = self.gen_data[event_key].get_date()
-        return earliest_date
     def selfcheckDateConsistency(self, new_event):
         '''
         This function is a wrapper for calling the function of checking dates consistencies
@@ -343,6 +336,18 @@ class gen_profile(object):
         Returns the living status of a profile
         '''
         return self.gen_data["living"]
+    def get_earliest_event(self):
+        '''
+        It will return the earliest event, of course, the birth, but it is already checked,
+        for simplicity I will not consider that case
+        '''
+        earliest_date = None
+        for event in self.getEvents():
+            if earliest_date == None:
+                earliest_date = event.get_date()
+            elif event.get_date() and (event.get_date() < earliest_date):
+                earliest_date = event.get_date()
+        return earliest_date
 #===============================================================================
 #         UPDATE methods: for compatibility with other profiles
 #===============================================================================

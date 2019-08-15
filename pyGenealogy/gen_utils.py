@@ -209,7 +209,7 @@ def get_formatted_location(location_string):
         logging.warning(NO_VALID_KEY)
         return output
     else:
-        url = MAPBOX_ADDRESS + location_string +".json?access_token=" + get_mapbox_key()
+        url = MAPBOX_ADDRESS + location_string.replace("?","") +".json?access_token=" + get_mapbox_key()
         r = requests.get(url)
         mapbox_results = r.json()
     if ( (len(mapbox_results) > 0) and ("context" in mapbox_results["features"][0])):
@@ -224,7 +224,8 @@ def get_formatted_location(location_string):
         #In the MapBox API apparently the more accurate location is at the beginning, to make sure overwrites any other
         place_type = mapbox_results["features"][0]["place_type"]
         place_text =  mapbox_results["features"][0]["text"]
-        output[MAPBOX_TRANS_GENITOOLS[place_type[0]]] = place_text
+        if (place_type[0] in MAPBOX_TRANS_GENITOOLS.keys()):
+            output[MAPBOX_TRANS_GENITOOLS[place_type[0]]] = place_text
         return output
     else:
         #Data is not found, let's try removing some
@@ -461,7 +462,7 @@ def formated_year(year, accuracy):
     This function will create a standard formated year
     '''
     if (accuracy == "EXACT"): return str(year)
-    elif (accuracy == "ABOUT"): return "ca " + str(year)
+    elif (accuracy in ["ABOUT", "BETWEEN"]): return "ca " + str(year)
     elif (accuracy == "AFTER"): return "aft. " + str(year)
     elif (accuracy == "BEFORE"): return "bef. " + str(year)
 #====================================================================================

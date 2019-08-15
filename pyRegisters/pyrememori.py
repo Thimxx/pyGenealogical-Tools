@@ -9,17 +9,16 @@ from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name
 from datetime import date
 import datetime
+from pyRegisters.pyCommonRegisters import BaseRegister
 
 BASE_REMEMORY = "https://www.rememori.com"
 SEARCH_LOCATION = BASE_REMEMORY + "/buscar/que:"
 ADDING_CHAR = "%20"
 #First dead record in rememory
 FIRST_YEAR = 2008
-#Maximum life span of a person
-MAXIMUM_LIFESPAN = 123
 
 
-class rememori_reader(object):
+class rememori_reader(BaseRegister):
     '''
     This class analyzes and finds and matches profiles with death records in
     rememory
@@ -34,6 +33,7 @@ class rememori_reader(object):
         self.person_parser = RememoryPersonParser()
         self.language = language
         self.name_convention = name_convention
+        BaseRegister.__init__(self, first_year = FIRST_YEAR)
     def profile_is_matched(self, profile):
         '''
         This function will look in rememory trying to match a profile
@@ -44,7 +44,7 @@ class rememori_reader(object):
         intermediate_profiles = []
         final_profiles = []
         #Before executing, if the profile is born before any logical date treated in rememory, we stop
-        if (not ( (profile.get_earliest_event()) and (profile.get_earliest_event() < date(FIRST_YEAR-MAXIMUM_LIFESPAN,1,1)) )):
+        if self.continue_death_register(profile):
             url = SEARCH_LOCATION + profile.getName() + ADDING_CHAR
             url += ADDING_CHAR.join(profile.getSurname().split(" "))
             data = requests.get(url)

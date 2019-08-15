@@ -31,45 +31,49 @@ class gen_analyzer(object):
         if not output == None: self.file = open(output, "w")
         print_out("Total number of profiles = " + str(len(profiles)), self.file)
         for person in profiles:
+            #Check which analysis will be done
+            check_rememori = continue_analysis(person, "REMEMORI", threshold)
+            check_norte = continue_analysis(person, "ELNORTEDECASTILLA", threshold)
+            check_abc = continue_analysis(person, "ABC", threshold)
+            skipping = ""
+            if (not check_rememori) and (not check_norte) and (not check_abc): skipping = " -- SKIPPED"
             #Variable for urls in tasks
-            urls_task = ""
+            self.urls_task = ""
             #We write in the screen the name of the person
-            print_out(str(person.get_id()) + " = "  + person.nameLifespan(), self.file)
+            print_out(str(person.get_id()) + " = "  + person.nameLifespan() + skipping, self.file)
             #REMEMORI
-            if continue_analysis(person, "REMEMORI", threshold):
+            if check_rememori:
                 reader = rememori_reader(language=self.language, name_convention=self.name_convention)
                 records = reader.profile_is_matched(person)
-                #Sometimes Rememori fails in a regular manner,a checking has been introduced.
-                if records:
-                    for obtained in records:
-                        if storage: store_url_task_in_db(person, obtained.get_all_urls()[0], "REMEMORI")
-                        urls_task += obtained.get_all_urls()[0] + "\n"
-                        print_out("  -  " + obtained.nameLifespan() + "  " + obtained.get_all_urls()[0], self.file)
-                    if len(records) == 0 and not person.getLiving() and storage:
-                        person.setWebReference("Not found in REMEMORI", name="REMEMORI", notes="CLOSED")
+                self.result_analyzer(person, records, storage, "REMEMORI")
             #EL NORTE DE CASTILLA
-            if continue_analysis(person, "ELNORTEDECASTILLA", threshold):
+            if check_norte:
                 reader2 = elnortedecastilla_reader(language=self.language, name_convention=self.name_convention)
                 records2 = reader2.profile_is_matched(person)
-                for obtained in records2:
-                    if storage: store_url_task_in_db(person, obtained.get_all_urls()[0], "ELNORTEDECASTILLA")
-                    urls_task += obtained.get_all_urls()[0] + "\n"
-                    print_out("  -  " + obtained.nameLifespan() + "  " + obtained.get_all_urls()[0], self.file)
-                    if len(records2) == 0 and not person.getLiving() and storage:
-                        person.setWebReference("Not found in ELNORTEDECASTILLA", name="ELNORTEDECASTILLA", notes="CLOSED")
+                self.result_analyzer(person, records2, storage, "ELNORTEDECASTILLA")
             #ABC
-            if continue_analysis(person, "ABC", threshold):
+            if check_abc:
                 reader3 = abc_reader(language=self.language, name_convention=self.name_convention)
                 records3 = reader3.profile_is_matched(person)
-                for obtained in records3:
-                    if storage: store_url_task_in_db(person, obtained.get_all_urls()[0], "ABC")
-                    urls_task += obtained.get_all_urls()[0] + "\n"
-                    print_out("  -  " + obtained.nameLifespan() + "  " + obtained.get_all_urls()[0], self.file)
-                    if len(records3) == 0 and not person.getLiving() and storage:
-                        person.setWebReference("Not found in ABC", name="ABC", notes="CLOSED")
+                self.result_analyzer(person, records3, storage, "ABC")
             #We add a single task for all URLs in the person
-            if storage and urls_task != "": person.set_task("CHECK WEB REFERENCES ", details = urls_task)
+            if storage and self.urls_task != "": person.set_task("CHECK WEB REFERENCES ", details = self.urls_task)
         if not self.file == None: self.file.close()
+    def result_analyzer(self, person, records, storage, web_site):
+        '''
+        Common function between all the functions executed above
+        '''
+        if records != None:
+            for obtained in records:
+                if storage: store_url_task_in_db(person, obtained.get_all_urls()[0], web_site)
+                self.urls_task += obtained.get_all_urls()[0] + "\n"
+                print_out("  -  " + obtained.nameLifespan() + "  " + obtained.get_all_urls()[0], self.file)
+            if len(records) == 0 and storage:
+                if not person.getLiving():
+                    store_url_task_in_db(person, "Not found in " + web_site, web_site, notes_toadd="CLOSED")
+                    print_out("  -  DISCARDED in " + web_site, self.file)
+                else: 
+                    store_url_task_in_db(person, "Not found in " + web_site, web_site)
 def print_out(message, file):
     '''
     Function to be used for printing
@@ -77,12 +81,12 @@ def print_out(message, file):
     logging.info(message)
     if not file == None:
         file.write(message + "\n")
-def store_url_task_in_db(profile, url, web_site):
+def store_url_task_in_db(profile, url, web_site, notes_toadd=None):
     '''
     This function will store the url as weblink, and the task to review
     '''
     today = datetime.date.today().toordinal()
-    notes_toadd = "IDENTIFIED=" + str(today)
+    if not notes_toadd: notes_toadd = "IDENTIFIED=" + str(today)
     if url in profile.get_all_urls():
         profile.update_web_ref(url,  notes = notes_toadd)
     else:
@@ -102,5 +106,3 @@ def continue_analysis(profile, web_site, threshold):
     #If the last analysis is smaller that then threshold, we continue.
     if datetime.date.today().toordinal() - date_last_analysis < threshold: return False
     return True
-        
-    

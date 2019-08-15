@@ -8,15 +8,16 @@ from datetime import datetime, date
 from html.parser import HTMLParser
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name
+from pyRegisters.pyCommonRegisters import BaseRegister
 
 BASE_NORTE = "http://esquelas.elnortedecastilla.es/buscar?keywords="
 END_NORTE ="&location=&date_limit=&date=&type=all_memorial&_fstatus=search&location_id="
 BASE_PERSON = "http://esquelas.elnortedecastilla.es"
 
-#Maximum life span of a person
-MAXIMUM_LIFESPAN = 123
+#First dead record in El Norte de Castilla
+FIRST_YEAR = 2007
 
-class elnortedecastilla_reader(object):
+class elnortedecastilla_reader(BaseRegister):
     '''
     This class analyzes and finds and matches profiles with death records in
     the obituary of the newspaper El Norte de Castilla
@@ -28,6 +29,7 @@ class elnortedecastilla_reader(object):
         self.parser = NorteCastillaParser()
         self.language = language
         self.name_convention = name_convention
+        BaseRegister.__init__(self, first_year = FIRST_YEAR)
     def profile_is_matched(self, profile):
         '''
         This function will look in El Norte de Castilla trying to match a profile
@@ -35,19 +37,20 @@ class elnortedecastilla_reader(object):
         '''
         keywords = profile.gen_data["name"].strip().replace(" ", "+") + "+" + profile.gen_data["surname"].strip().replace(" ", "+")
         url = BASE_NORTE + keywords + END_NORTE
-        data = requests.get(url)
-        self.parser.feed(data.text)
-        final_profiles = []
-        for deceased in self.parser.records:
-            skip_profile = False
-            if "birth_date" in profile.gen_data:
-                if profile.gen_data["birth_date"].year - deceased.gen_data["death_date"].year > MAXIMUM_LIFESPAN:
-                    skip_profile = True
-            if not skip_profile:
-                score, factor = deceased.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
-                if (score*factor > 2.0):
-                    final_profiles.append(deceased)
-        return final_profiles
+        if self.continue_death_register(profile):
+            data = requests.get(url)
+            self.parser.feed(data.text)
+            final_profiles = []
+            for deceased in self.parser.records:
+                skip_profile = False
+                if "birth_date" in profile.gen_data:
+                    if profile.gen_data["birth_date"].year - deceased.gen_data["death_date"].year > self.maximum_lifespan:
+                        skip_profile = True
+                if not skip_profile:
+                    score, factor = deceased.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
+                    if (score*factor > 2.0):
+                        final_profiles.append(deceased)
+            return final_profiles
 class NorteCastillaParser(HTMLParser):
     '''
     This function will parser an specific individual to extract specific data useful for comparison

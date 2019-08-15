@@ -68,7 +68,7 @@ class rootsmagic_profile(common_profile.gen_profile):
             this_event = events.fetchone()
             if this_event:
                 new_event = self.return_event_from_database_info(this_event)
-                all_events.append(new_event)
+                if new_event: all_events.append(new_event)
             else:
                 loop_fetch = False
                 return all_events
@@ -186,32 +186,35 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         This function is used to get info about all events
         '''
+        if not str(event_in_database[1]) in DATE_EVENT_ID.values(): return None
         event_output = event_profile(list(DATE_EVENT_ID.keys())[list(DATE_EVENT_ID.values()).index(str(event_in_database[1]))])
-        year_end = None
-        month_end = None
-        day_end = None
-        accuracy_value = "EXACT"
-        if event_in_database[7][1] == "B":
-            accuracy_value = "BEFORE"
-        elif event_in_database[7][1] == "A":
-            accuracy_value = "AFTER"
-        elif event_in_database[7][1] == "R":
-            #Only in the case of dates between is when we analyze and define the dates after
-            accuracy_value = "BETWEEN"
-            year_end = int(event_in_database[7][14:18])
-            month_end = int(event_in_database[7][18:20])
-            day_end = int(event_in_database[7][20:22])
-            if year_end == 0 : year_end = None
-            if month_end == 0 : month_end = None
-            if day_end == 0 : day_end = None
-        elif event_in_database[7][12] == "C":
-            accuracy_value = "ABOUT"
-        year = int(event_in_database[7][3:7])
-        month = int(event_in_database[7][7:9])
-        day = int(event_in_database[7][9:11])
-        if month == 0: month = None
-        if day == 0: day = None
-        event_output.setDate(year, month, day, accuracy_value, year_end, month_end, day_end)
+        if not ( (event_in_database[7] in [ "."]) or event_in_database[7].startswith("T") ):
+            #This means that the event has a date, as might be empty
+            year_end = None
+            month_end = None
+            day_end = None
+            accuracy_value = "EXACT"
+            if event_in_database[7][1] == "B":
+                accuracy_value = "BEFORE"
+            elif event_in_database[7][1] == "A":
+                accuracy_value = "AFTER"
+            elif event_in_database[7][1] == "R":
+                #Only in the case of dates between is when we analyze and define the dates after
+                accuracy_value = "BETWEEN"
+                year_end = int(event_in_database[7][14:18])
+                month_end = int(event_in_database[7][18:20])
+                day_end = int(event_in_database[7][20:22])
+                if year_end == 0 : year_end = None
+                if month_end == 0 : month_end = None
+                if day_end == 0 : day_end = None
+            elif event_in_database[7][12] == "C":
+                accuracy_value = "ABOUT"
+            year = int(event_in_database[7][3:7])
+            month = int(event_in_database[7][7:9])
+            day = int(event_in_database[7][9:11])
+            if month == 0: month = None
+            if day == 0: day = None
+            event_output.setDate(year, month, day, accuracy_value, year_end, month_end, day_end)
         if not event_in_database[5] == 0:
             #The only valid place is actually when is an entry in the PlaceTbale
             place_input = "SELECT * FROM PlaceTable WHERE PlaceID=?"
