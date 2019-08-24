@@ -29,7 +29,7 @@ class elnortedecastilla_reader(BaseRegister):
         self.parser = NorteCastillaParser()
         self.language = language
         self.name_convention = name_convention
-        BaseRegister.__init__(self, first_year = FIRST_YEAR)
+        BaseRegister.__init__(self, "ELNORTEDECASTILLA", first_year = FIRST_YEAR)
     def profile_is_matched(self, profile):
         '''
         This function will look in El Norte de Castilla trying to match a profile
@@ -37,10 +37,10 @@ class elnortedecastilla_reader(BaseRegister):
         '''
         keywords = profile.gen_data["name"].strip().replace(" ", "+") + "+" + profile.gen_data["surname"].strip().replace(" ", "+")
         url = BASE_NORTE + keywords + END_NORTE
+        final_profiles = []
         if self.continue_death_register(profile):
             data = requests.get(url)
             self.parser.feed(data.text)
-            final_profiles = []
             for deceased in self.parser.records:
                 skip_profile = False
                 if "birth_date" in profile.gen_data:
@@ -50,7 +50,8 @@ class elnortedecastilla_reader(BaseRegister):
                     score, factor = deceased.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
                     if (score*factor > 2.0):
                         final_profiles.append(deceased)
-            return final_profiles
+        #If we do not execute, we also answer with not registers, we are not executing as not relevant.
+        return final_profiles
 class NorteCastillaParser(HTMLParser):
     '''
     This function will parser an specific individual to extract specific data useful for comparison

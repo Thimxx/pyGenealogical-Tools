@@ -33,7 +33,7 @@ class rememori_reader(BaseRegister):
         self.person_parser = RememoryPersonParser()
         self.language = language
         self.name_convention = name_convention
-        BaseRegister.__init__(self, first_year = FIRST_YEAR)
+        BaseRegister.__init__(self, "REMEMORI", first_year = FIRST_YEAR)
     def profile_is_matched(self, profile):
         '''
         This function will look in rememory trying to match a profile
@@ -59,13 +59,12 @@ class rememori_reader(BaseRegister):
             #As takes a significant amount of time to obtain the profiles, in order to improve performance we get the details
             #only in those more suitable candidates, to reduce the number of html calls that will slow down the calculation
             for selected_profile in intermediate_profiles:
-                data = requests.get(selected_profile.get_all_urls()[0])
+                data = requests.get(list(selected_profile.get_all_urls().keys())[0])
                 self.person_parser.feed(data.text)
                 if (self.person_parser.age):
                     #As the dates in rememory are exact we can freely do this
                     death = selected_profile.gen_data["death"].get_date()
-                    birth = date(death.year - self.person_parser.age,1,1)
-                    selected_profile.setCheckedDate("birth", birth.year, accuracy="ABOUT")
+                    selected_profile.setCheckedDate("birth", death.year - self.person_parser.age, accuracy="ABOUT")
                 if (self.person_parser.location):
                     selected_profile.setPlaces("death_place", self.person_parser.location, language="es" )
                 #As we have new data, we crosscheck the information to make sure we do not have profiles we should not have

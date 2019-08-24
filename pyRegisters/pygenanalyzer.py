@@ -19,14 +19,17 @@ class gen_analyzer(object):
         '''
         self.language = language
         self.name_convention = name_convention
-    def execute(self, database, output = None, storage = False, threshold = 360):
+    def execute(self, database, output = None, storage = False, threshold = 360, id_profile = None):
         '''
         This will execute all checkings of data with other sources.
         Database shall be one instance of a database child of common_database
         Output is the optional argument to get the result
         Storage is to store the result in the database
         '''
-        profiles = database.get_all_profiles()
+        if id_profile:
+            profiles = [database.get_profile_by_ID(id_profile)]
+        else:
+            profiles = database.get_all_profiles()
         self.file = None
         if not output == None: self.file = open(output, "w")
         print_out("Total number of profiles = " + str(len(profiles)), self.file)
@@ -65,14 +68,14 @@ class gen_analyzer(object):
         '''
         if records != None:
             for obtained in records:
-                if storage: store_url_task_in_db(person, obtained.get_all_urls()[0], web_site)
-                self.urls_task += obtained.get_all_urls()[0] + "\n"
-                print_out("  -  " + obtained.nameLifespan() + "  " + obtained.get_all_urls()[0], self.file)
+                if storage: store_url_task_in_db(person, list(obtained.get_all_urls().keys())[0], web_site)
+                self.urls_task += list(obtained.get_all_urls().keys())[0] + "\n"
+                print_out("  -  " + obtained.nameLifespan() + "  " + list(obtained.get_all_urls().keys())[0], self.file)
             if len(records) == 0 and storage:
                 if not person.getLiving():
                     store_url_task_in_db(person, "Not found in " + web_site, web_site, notes_toadd="CLOSED")
                     print_out("  -  DISCARDED in " + web_site, self.file)
-                else: 
+                else:
                     store_url_task_in_db(person, "Not found in " + web_site, web_site)
 def print_out(message, file):
     '''
@@ -85,9 +88,10 @@ def store_url_task_in_db(profile, url, web_site, notes_toadd=None):
     '''
     This function will store the url as weblink, and the task to review
     '''
+    all_urls = profile.get_all_urls()
     today = datetime.date.today().toordinal()
     if not notes_toadd: notes_toadd = "IDENTIFIED=" + str(today)
-    if url in profile.get_all_urls():
+    if (url in all_urls.keys()) and (all_urls[url]["notes"] != "CHECKED"):
         profile.update_web_ref(url,  notes = notes_toadd)
     else:
         profile.setWebReference(url, name=web_site, notes=notes_toadd)
@@ -102,7 +106,8 @@ def continue_analysis(profile, web_site, threshold):
             identification_note = web.get("notes", "IDENTIFIED=0")
             if ("CONFIRMED" in identification_note) or ("CLOSED" in identification_note)  :
                 return False
-            date_last_analysis = int(identification_note.replace("IDENTIFIED=", ""))
+            if ("IDENTIFIED" in identification_note):
+                date_last_analysis = int(identification_note.replace("IDENTIFIED=", ""))
     #If the last analysis is smaller that then threshold, we continue.
     if datetime.date.today().toordinal() - date_last_analysis < threshold: return False
     return True

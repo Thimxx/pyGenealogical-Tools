@@ -30,7 +30,7 @@ class abc_reader(BaseRegister):
         self.parser = ABCParser()
         self.language = language
         self.name_convention = name_convention
-        BaseRegister.__init__(self, first_year = FIRST_YEAR)
+        BaseRegister.__init__(self, "ABC", first_year = FIRST_YEAR)
     def profile_is_matched(self, profile):
         '''
         This function will look in ABC obituary trying to match a profile
@@ -42,17 +42,18 @@ class abc_reader(BaseRegister):
         #Let's create now the url for the search call
         url = BASE_ABC_NAME + name.strip().replace(" ", "+")
         url += BASE_ABC_SURNAME + surname.strip().replace(" ", "+") + BASE_ABC_END
+        final_profiles = []
         if self.continue_death_register(profile):
             data = requests.get(url)
             self.parser.feed(data.text)
-            final_profiles = []
             for deceased in self.parser.records:
                 score, factor = deceased.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
                 if (score*factor > 2.0):
                     #We add the url used
                     deceased.setWebReference(url)
                     final_profiles.append(deceased)
-            return final_profiles
+        #If we do not execute, we also answer with not registers, we are not executing as not relevant.
+        return final_profiles
 class ABCParser(HTMLParser):
     '''
     This function will parser an specific individual to extract specific data useful for comparison

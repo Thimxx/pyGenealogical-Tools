@@ -229,6 +229,12 @@ class Test(unittest.TestCase):
         score, factor = profile.comparison_score(profile2)
         assert(score == 4.0)
         assert(factor == 0.5)
+        
+        profile.setCheckedDate("birth", 2012, 1, 23)
+        profile2.setCheckedDate("birth", 1980, accuracy="ABOUT")
+        score, factor = profile.comparison_score(profile2)
+        assert(score > 4)
+        assert(factor < 0.005)
                
     
 if __name__ == "__main__":

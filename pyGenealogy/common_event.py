@@ -85,9 +85,15 @@ class event_profile(object):
         '''
         Confirms if the following event is earlier or at the same time as the other
         '''
-        date_self = date(self.year, self.month if self.month else 1  ,self.day if self.day else 1)
-        date_other = date(event.year, event.month if event.month else 12  ,event.day if event.day else (MONTH_DAYS[event.month] if event.month else 31))
-        return date_self <= date_other
+        date_self = None
+        date_other = None
+        if self.year: date_self = date(self.year, self.month if self.month else 1  ,self.day if self.day else 1)
+        if event.year: date_other = date(event.year, event.month if event.month else 12  ,event.day if event.day else (MONTH_DAYS[event.month] if event.month else 31))
+        if (date_self and date_other):
+            return date_self <= date_other
+        elif date_self: return True
+        elif date_other: return False
+        else: return None
     def is_this_event_later_or_simultaneous_to_this(self,event):
         '''
         Confirms if the following event is later or at the same time as the other

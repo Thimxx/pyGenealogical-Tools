@@ -366,6 +366,12 @@ def get_score_compare_names(name1, surname1, name2, surname2, language="en", con
     met_surname2 = adapted_doublemetaphone(splitted_surname2[0], language=language)
     #Let's calculate the factors
     factor1 = get_jaro_to_list(met_name1, met_name2)
+    #In the specific case of Spanish surnames and having different number of surnames we only check the first one
+    #This will improve the result in case the first name will be the same and will reduce dramatically in case are different
+    if (len(met_surname1) != len(met_surname2)) and language == "es":
+        minimal = min(len(met_surname1) , len(met_surname2))
+        met_surname1 = met_surname1[0:minimal]
+        met_surname2 = met_surname2[0:minimal]
     #We make a difference with spanish language, as we might have 2 surnames, making things easier for comparison
     if ((len(met_surname1) == 4) and (len(met_surname2) == 4) and language=="es"):
         factor_sub1 = get_jaro_to_list(met_surname1[0:2], met_surname2[0:2], factor=0.95)

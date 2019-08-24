@@ -89,9 +89,10 @@ class gen_profile(object):
             else:
                 factor = 0.5*factor
         for event_name in MERGE_EVENTS:
-            if (event_name in self.gen_data.keys()) and (event_name in profile.gen_data.keys()) and self.gen_data[event_name].is_any_date_available() and profile.gen_data[event_name].is_any_date_available():
-                score_temp, factor_temp = get_score_compare_dates(self.gen_data[event_name],
-                                                              profile.gen_data[event_name] )
+            self_event = self.get_specific_event(event_name)
+            other_event = profile.get_specific_event(event_name)
+            if  self_event and other_event and self_event.is_any_date_available() and other_event.is_any_date_available():
+                score_temp, factor_temp = get_score_compare_dates(self_event, other_event )
                 score += score_temp
                 factor = factor*factor_temp
         return score, factor
@@ -322,9 +323,9 @@ class gen_profile(object):
         '''
         This function will provide all urls registered inside the profile
         '''
-        urls = []
+        urls = {}
         for weblink in self.get_all_webs():
-            urls.append(weblink['url'])
+            urls[weblink['url']] = weblink
         return urls
     def get_all_webs(self):
         '''
@@ -341,13 +342,19 @@ class gen_profile(object):
         It will return the earliest event, of course, the birth, but it is already checked,
         for simplicity I will not consider that case
         '''
-        earliest_date = None
+        return self.get_earliest_event_in_event_form().get_date()
+    def get_earliest_event_in_event_form(self):
+        '''
+        It will return the earliest event, of course, the birth, but it is already checked,
+        for simplicity I will not consider that case
+        '''
+        earliest_event = None
         for event in self.getEvents():
-            if earliest_date == None:
-                earliest_date = event.get_date()
-            elif event.get_date() and (event.get_date() < earliest_date):
-                earliest_date = event.get_date()
-        return earliest_date
+            if earliest_event == None:
+                earliest_event = event
+            elif event.is_this_event_earlier_or_simultaneous_to_this(earliest_event):
+                earliest_event = event
+        return earliest_event
 #===============================================================================
 #         UPDATE methods: for compatibility with other profiles
 #===============================================================================
@@ -356,8 +363,8 @@ class gen_profile(object):
         This function will update a given web reference
         '''
         #This will mean that exists... so we can continue
-        if url in self.get_all_urls():
-            index = self.get_all_urls().index(url)
+        if url in self.get_all_urls().keys():
+            index = list(self.get_all_urls().keys()).index(url)
             if name : self.gen_data["web_ref"][index]["name"] = name
             if notes : self.gen_data["web_ref"][index]["notes"] = notes
             return True

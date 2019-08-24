@@ -49,7 +49,10 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         event_death2 = prof2.get_specific_event("death")
         assert(not event_death2)
         #Also includes web_references
-        assert("familysearch.org/tree/person" in prof2.get_all_urls()[0])
+        iswebthere = False
+        for web in prof2.get_all_urls().keys():
+            if "familysearch.org/tree/person" in web: iswebthere = True
+        assert(iswebthere)
         
         #This profile has a date "BEFORE"
         prof3 = db.get_profile_by_ID(4)

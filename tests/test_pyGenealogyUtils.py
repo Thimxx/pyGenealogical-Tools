@@ -156,8 +156,7 @@ class Test(unittest.TestCase):
         previous =  get_mapbox_key()
         
         set_mapbox_key(None)
-        assert(None, get_mapbox_key())
-        
+        assert(None == get_mapbox_key())
         set_mapbox_key(previous)
     
     def test_get_location_data(self):
@@ -284,6 +283,9 @@ class Test(unittest.TestCase):
         score, factor = get_score_compare_names("Juan Antonio", "Gomez Perez", "Juan", "Gómez")
         assert(score > 3.0)
         assert(factor > 0.8)
+        score, factor = get_score_compare_names("Juan Antonio", "Gomez Perez", "Juan", "Gómez", language="es")
+        assert(score > 3.0)
+        assert(factor > 0.8)
         score, factor = get_score_compare_names("Juan José Fernando", "Gomez Perez", "Agustín Juan", "Gómez")
         assert(score > 2.0)
         assert(factor > 0.1)
@@ -296,7 +298,9 @@ class Test(unittest.TestCase):
         score, factor = get_score_compare_names("Juan", "Gómez Martín", "Juan", "Gomez Martin", language="es")
         assert(score == 6.0)
         assert(factor == 1.0)
-    
+        score, factor = get_score_compare_names("Juan", "Gómez", "Juan", "Pérez Gomez", language="es")
+        assert(score > 2.0)
+        assert(factor < 0.1)
     def test_compare_date(self):
         '''
         Test comparison of dates with scoring
