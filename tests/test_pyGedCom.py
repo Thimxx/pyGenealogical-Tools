@@ -55,6 +55,9 @@ class Test(unittest.TestCase):
         assert(profile.get_specific_event("burial").get_accuracy() == "BEFORE")
         assert(profile.get_location_event("birth")["country"] == "Spain")
         assert(profile.get_location_event("birth")["place_name"] == "Portillo")
+        #Testing intoducing a list of gedcoms
+        profile2 = gen_profile("Juana", "Bargas")
+        gedcom_profile.convert_gedcom([profile2])
     def test_gedcom_as_database(self):
         '''
         Test using Gedcom database

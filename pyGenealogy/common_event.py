@@ -5,10 +5,10 @@ Created on 8 jul. 2019
 '''
 from pyGenealogy import EVENT_TYPE, VALUES_ACCURACY
 from messages.pyGenealogymessages import NO_VALID_EVENT_START, NO_VALID_EVENT_END
-from pyGenealogy.gen_utils import get_formatted_location
+from pyGenealogy.gen_utils import get_formatted_location, is_this_date_earlier_or_simultaneous_to_this
 from datetime import date
 from pyGedcom import GEDCOM_MONTH
-MONTH_DAYS = { 1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6:30, 7:31, 8:31, 9: 30, 10: 31, 11:30, 12:31, None:31}
+from pyGenealogy.gen_utils import MONTH_DAYS
 
 class event_profile(object):
     '''
@@ -85,15 +85,8 @@ class event_profile(object):
         '''
         Confirms if the following event is earlier or at the same time as the other
         '''
-        date_self = None
-        date_other = None
-        if self.year: date_self = date(self.year, self.month if self.month else 1  ,self.day if self.day else 1)
-        if event.year: date_other = date(event.year, event.month if event.month else 12  ,event.day if event.day else (MONTH_DAYS[event.month] if event.month else 31))
-        if (date_self and date_other):
-            return date_self <= date_other
-        elif date_self: return True
-        elif date_other: return False
-        else: return None
+        return is_this_date_earlier_or_simultaneous_to_this(self.get_year(), self.get_month(), self.get_day(), 
+                                                            event.get_year(), event.get_month(), event.get_day())
     def is_this_event_later_or_simultaneous_to_this(self,event):
         '''
         Confirms if the following event is later or at the same time as the other
@@ -192,23 +185,7 @@ class event_profile(object):
         '''
         Function for avoiding duplication of code lines
         '''
-        year1 = self.year
-        year1b = self.year
-        if self.month:
-            month1 = self.month
-            month1b = self.month
-        else:
-            month1 = 1
-            month1b = 12
-        if self.day:
-            day1 = self.day
-            day1b = self.day
-        else:
-            day1 = 1
-            day1b = MONTH_DAYS[month1b]
-        date1 = date(year1, month1, day1)
-        date1b = date(year1b, month1b, day1b)
-        return date1, date1b
+        return transform_in_date(self.year, self.month, self.day)
     def get_difference_in_days(self, other_event):
         '''
         This function will provide a difference of days between 2 different events
@@ -217,7 +194,15 @@ class event_profile(object):
         date2, date2b = other_event._get_date_for_comparison()
         #We return the minimum difference between all dates
         return (min(abs((date1-date2).days), abs((date1-date2b).days), abs((date1b-date2).days), abs((date1b-date2b).days) ))
-
+    def get_range_in_between(self):
+        '''
+        It returns the range available within a between
+        '''
+        date1, date1b = self._get_date_for_comparison()
+        date2, date2b = transform_in_date(self.get_year_end(), self.get_month_end(), self.get_day_end())
+        #We return the minimum difference between all dates
+        return (min(abs((date1-date2).days), abs((date1-date2b).days), abs((date1b-date2).days), abs((date1b-date2b).days) ))
+        
 def convert_date_to_gedcom_format(year, month, day):
     '''
     This function transforms a date in day, month and year into gedcom format
@@ -257,3 +242,24 @@ def is_first_date_lower(year, month, day, year_end, month_end, day_end):
     else:
         #Here the date are exactly the same... do we need a BETWEEN????
         return "Equal"
+def transform_in_date(year, month, day):
+    '''
+    Function for avoiding duplication of code lines
+    '''
+    year1 = year
+    year1b = year
+    if month:
+        month1 = month
+        month1b = month
+    else:
+        month1 = 1
+        month1b = 12
+    if day:
+        day1 = day
+        day1b = day
+    else:
+        day1 = 1
+        day1b = MONTH_DAYS[month1b]
+    date1 = date(year1, month1, day1)
+    date1b = date(year1b, month1b, day1b)
+    return date1, date1b

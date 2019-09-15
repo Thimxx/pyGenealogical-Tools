@@ -9,12 +9,20 @@ from pyGeni import set_token
 from pyGeni.profile import profile
 from tests.FIXTURES import PHILIPIVg, FLAVIAg, COUSIN_PROFILE
 from analyzefamily.ancerstors_climb import climb
-
+from pyGeni.interface_geni_database import geni_database_interface
+from pyRootsMagic.pyrm_database import database_rm
 
 class testAncestorsClimb(unittest.TestCase):
 
     def setUp(self):
         set_token(os.environ['GENI_KEY'])
+        #This is used to identify the locationo of the file
+        location1 = os.path.join(os.getcwd(), "fixtures_files")
+        location2 = os.path.join(os.getcwd(), "tests", "fixtures_files")
+        if os.path.exists(location1):
+            self.filelocation = location1
+        else:
+            self.filelocation = location2
  
     def testCountingOfAncestors(self):
         '''
@@ -22,10 +30,12 @@ class testAncestorsClimb(unittest.TestCase):
         having duplicated ancestors, so the number will be lower than the 
         generation count.
         '''
+        #Database creation
+        geni_db = geni_database_interface()
         philip = profile(PHILIPIVg)
         
-        climber = climb(philip)
-        ancestors, profiles = climber.get_ancestors(4)
+        climber = climb(geni_db)
+        ancestors, profiles = climber.get_ancestors(philip, 4)
         i = 0
         for generation in ancestors:
             i = i + len(generation.values())
@@ -36,10 +46,12 @@ class testAncestorsClimb(unittest.TestCase):
         If there are no longer ancestors, the ancestor climb should stop.
         Checking if that works! This profile has only one generation available
         '''
+        #Database creation
+        geni_db = geni_database_interface()
         flavia = profile(FLAVIAg)
         
-        climber = climb(flavia)
-        ancestors = climber.get_ancestors(6)
+        climber = climb(geni_db)
+        ancestors = climber.get_ancestors(flavia, 6)
         
         assert(len(ancestors) == 2)
     
@@ -48,11 +60,13 @@ class testAncestorsClimb(unittest.TestCase):
         We will test the cousins execution in different way. Will be tested by
         number, not by person
         '''
+        #Database creation
+        geni_db = geni_database_interface()
         philip = profile(COUSIN_PROFILE)
         generations = 2
         
-        climber = climb(philip)
-        ancestors, anc_count, profiles = climber.get_cousins(generations)
+        climber = climb(geni_db)
+        ancestors, anc_count, profiles = climber.get_cousins(philip, generations)
         
         total_center = 0
         total_outside = 0
@@ -69,6 +83,18 @@ class testAncestorsClimb(unittest.TestCase):
                 total_final = total_final + anc_count[i][j]
         assert(total_final == 36)
         assert(len(profiles) == 36)
+    
+    def test_using_roots_magic(self):
+        '''
+        Test using climber with RootsMagic database
+        '''
+        file_rm = os.path.join(self.filelocation, "Rootstest.rmgc")
+        rm_db = database_rm(file_rm)
+        #We create the climber with the RM database
+        climber = climb(rm_db)
+        prof = rm_db.get_profile_by_ID(1)
+        #We execute teh ancestors
+        #ancestors, profiles = climber.get_ancestors(prof, 4)
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

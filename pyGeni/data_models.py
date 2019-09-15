@@ -36,3 +36,8 @@ class geni_union:
         Simple function that checks if the given profile is a parent inside the union
         '''
         return profile2check in self.parents
+    def get_id(self):
+        '''
+        Returns the id
+        '''
+        return self.union_id

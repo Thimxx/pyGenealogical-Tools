@@ -7,6 +7,7 @@ import sqlite3
 from pyRootsMagic.rootsmagic_profile import rootsmagic_profile
 from pyRootsMagic.rootsmagic_family import rootsmagic_family
 from pyGenealogy.common_database import gen_database
+from openpyxl.workbook import child
 
 class database_rm(gen_database):
     '''
@@ -65,3 +66,40 @@ class database_rm(gen_database):
             prof = rootsmagic_profile(name[0], self.database)
             profiles[name[0]] = prof
         return profiles.values()
+    def get_family_from_child(self, profile_id):
+        '''
+        It will return the family of a profile where is the child
+        Returns the id of the family and the family object
+        '''
+        family_id = "SELECT * FROM ChildTable WHERE ChildID=?"
+        family_cursor = self.database.execute(family_id, (str(profile_id),) )
+        #Now let's fetch the first value, we are not expecting several fathers
+        is_family_in = family_cursor.fetchone()
+        if is_family_in:
+            return int(is_family_in[2]), self.get_family_by_ID(is_family_in[2])
+        else:
+            return None
+    def get_all_family_ids_is_parent(self, profile_id):
+        '''
+        It will provide all the families where the profile is one of the parents
+        '''
+        families = []
+        family_id = "SELECT * FROM FamilyTable WHERE FatherID=? OR MotherID=?"
+        family_cursor = self.database.execute(family_id, (str(profile_id),str(profile_id),) )
+        #There can be several families
+        for family in family_cursor:
+            families.append(int(family[0]))
+        return families
+    def get_all_children(self, profile_id):
+        '''
+        This function will provide all the children associated to a profile
+        '''
+        children = []
+        #First, we get all families
+        families = self.get_all_family_ids_is_parent(profile_id)
+        for family_id in families:
+            child_db = "SELECT * FROM ChildTable WHERE FamilyID=?"
+            child_cursor = self.database.execute(child_db, (str(family_id),) )
+            for child in child_cursor:
+                children.append(child[1])
+        return children

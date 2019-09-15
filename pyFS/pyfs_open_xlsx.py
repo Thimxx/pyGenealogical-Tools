@@ -387,7 +387,6 @@ class getFSfamily(object):
                         id_partner_mother = dbged.add_profile(mother)
                         #And the family!!!
                         dbged.add_family(father = id_partner_father, mother = id_partner_mother, children = [id_partner])
-                        
             #We create here the family
             dbged.add_family(father = id_father, mother = id_mother, children = children_ged)
             dbged.save_gedcom_file(output)

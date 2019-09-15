@@ -14,8 +14,11 @@ from Levenshtein import jaro
 import math
 import requests
 import pyGenealogy, os, re
+from test.test_bisect import Range
 
 THRESHOLD_JARO = 0.7
+
+MONTH_DAYS = { 1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6:30, 7:31, 8:31, 9: 30, 10: 31, 11:30, 12:31, None:31}
 
 DATA_FOLDER = os.path.join(os.path.dirname(pyGenealogy.__file__), "data")
 
@@ -279,6 +282,7 @@ def get_splitted_name_from_complete_name(complete_name, language="en", include_p
     name_split = complete_name.rstrip().split()
     places_2_join = []
     name_category = []
+    #The check of each different split is a relevant data or a particle
     for i, particle in enumerate(name_split):
         #Let's check if the particle is containing data for next
         if particle.lower() in LANGUAGES_ADDS.get(language, []) + LANGUAGES_ADDS_TITLE.get(language, []):
@@ -317,7 +321,7 @@ def get_splitted_name_from_complete_name(complete_name, language="en", include_p
     for i in reversed(places_2_join):
         name_split[i:i+2] = [" ".join(name_split[i:i+2])]
         name_category[i:i+2] = ["".join(name_category[i:i+2])]
-    return name_split, name_category
+    return [item.strip() for item in name_split], name_category
 
 def get_compared_data_file(data, language="en", data_kind = "surname"):
     '''
@@ -425,6 +429,25 @@ def get_score_compare_dates(event1, event2):
             return 0.75 -0.5*(diff-720)/720, 1.0 -0.5*(diff-720)/720
         else:
             return 0.25*math.pow(1440/diff,2), 0.5*math.pow(1440/diff,2)
+    elif ( ("BETWEEN" in [accuracy1, accuracy2]) and ( ("EXACT" in [accuracy1, accuracy2]) or ("ABOUT" in [accuracy1, accuracy2]) )):
+        if accuracy1 in ["EXACT", "ABOUT"]:
+            event_exact = event1
+            event_between = event2
+        else:
+            event_exact = event2
+            event_between = event1
+        is_about = False
+        if "ABOUT" in [accuracy1, accuracy2]: is_about = True
+        #Too early... the dates do not match!
+        if event_exact.is_this_event_earlier_or_simultaneous_to_this(event_between): return 0.0, 0.0
+        #The date provided is actually later that the range provided
+        elif is_this_date_earlier_or_simultaneous_to_this(event_between.get_year_end(), event_between.get_month_end(), event_between.get_day_end(), 
+                                                          event_exact.get_year(), event_exact.get_month(), event_exact.get_day()):
+            return 0.0, 0.0
+        else:
+            range_bet = event_between.get_range_in_between()
+            if is_about: range_bet = 1.5*range_bet
+            return output_with_range(range_bet)
     elif (accuracy1 == "ABOUT") and (accuracy2 == "ABOUT"):
         diff_years= abs((event1.get_year()-event2.get_year()))
         if (diff_years < 2):
@@ -441,14 +464,40 @@ def get_score_compare_dates(event1, event2):
         else: return 0.0, 0.0
     elif (accuracy1 == "AFTER"):
         if (accuracy2 == "AFTER") : return 0.0, 1.0
+        elif ( (accuracy2 == "BETWEEN") and ( is_this_date_earlier_or_simultaneous_to_this(event1.get_year(), event1.get_month(), event1.get_day(), 
+                            event2.get_year_end(), event2.get_month_end(), event2.get_day_end() )) ):
+            return 0.0, 1.0
         elif (event2.is_this_event_later_or_simultaneous_to_this(event1)): return 0.0, 1.0
         else: return 0.0, 0.0
     elif (accuracy2 == "BEFORE"):
         if (event1.is_this_event_earlier_or_simultaneous_to_this(event2)): return 0.0, 1.0
         else: return 0.0, 0.0
     elif (accuracy2 == "AFTER"):
+        if ( (accuracy1 == "BETWEEN") and is_this_date_earlier_or_simultaneous_to_this(event2.get_year(), event2.get_month(), event2.get_day(), 
+                                event1.get_year_end(), event1.get_month_end(), event1.get_day_end())   ):
+            return 0.0, 1.0
         if (event2.is_this_event_earlier_or_simultaneous_to_this(event1)): return 0.0, 1.0
         else: return 0.0, 0.0
+    elif (accuracy1 == "BETWEEN") and (accuracy2 == "BETWEEN"):
+        #Ok, now both are accuracy BETWEEN
+        if is_this_date_earlier_or_simultaneous_to_this(event1.get_year_end(), event1.get_month_end(), event1.get_day_end(), 
+                            event2.get_year(), event2.get_month(), event2.get_day()):
+            return 0.0, 0.0
+        elif is_this_date_earlier_or_simultaneous_to_this(event2.get_year_end(), event2.get_month_end(), event2.get_day_end(), 
+                            event1.get_year(), event1.get_month(), event1.get_day()):
+            return 0.0, 0.0
+        else:
+            range_bet = event1.get_range_in_between() + event2.get_range_in_between()
+            return output_with_range(range_bet)
+def output_with_range(range_date):
+    '''
+    Avoiding duplication inside functinos
+    '''
+    if range_date < 365: return 1.2, 1.0
+    elif range_date < 730: return 1.0, 1.0
+    elif range_date < 1800: return 0.5, 1.0
+    elif range_date < 3650: return 0.2 + 0.06*(10 - range_date/365), 1.0
+    else: return (0.2*3650*3650)/(range_date*range_date), 1.0
 def get_location_standard(location):
     '''
     This function will provide a standarized comman separated location value
@@ -471,6 +520,19 @@ def formated_year(year, accuracy):
     elif (accuracy in ["ABOUT", "BETWEEN"]): return "ca " + str(year)
     elif (accuracy == "AFTER"): return "aft. " + str(year)
     elif (accuracy == "BEFORE"): return "bef. " + str(year)
+def is_this_date_earlier_or_simultaneous_to_this(year, month, day, year_other, month_other, day_other):
+        '''
+        Confirms if the following date is earlier or at the same time as the other
+        '''
+        date_self = None
+        date_other = None
+        if year: date_self = date(year, month if month else 1  ,day if day else 1)
+        if year_other: date_other = date(year_other, month_other if month_other else 12  ,day_other if day_other else (MONTH_DAYS[month_other] if month_other else 31))
+        if (date_self and date_other):
+            return date_self <= date_other
+        elif date_self: return True
+        elif date_other: return False
+        else: return None
 #====================================================================================
 #Execution of module code
 #====================================================================================

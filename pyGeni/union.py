@@ -61,3 +61,8 @@ class union(geni_calls, family_profile):
                 for child in data[key_value]:
                     children.append(geni.get_profile_id_from_address(child))
                 self.setChild(children)
+    def get_id(self):
+        '''
+        Returns the id from the union id
+        '''
+        return self.union_data["id"]

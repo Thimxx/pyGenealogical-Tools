@@ -45,6 +45,44 @@ class gen_database(object):
         Returns all profiles in the database
         '''
         return self.profiles.values()
+    def get_family_from_child(self, profile_id):
+        '''
+        It will return the family of a profile where is the child
+        Returns the id of the family and the family object
+        '''
+        for family_id in self.families.keys():
+            if self.families[family_id].is_child_in_family(profile_id): return family_id, self.families[family_id]
+        return None, None
+    def get_father_from_child(self, profile_id):
+        '''
+        It will return the father of the profile
+        Returns the id of the profile and the profile object
+        '''
+        family = self.get_family_from_child(profile_id)[1]
+        return family.getFather(), self.get_profile_by_ID(family.getFather())
+    def get_mother_from_child(self, profile_id):
+        '''
+        It will return the mother of the profile
+        Returns the id of the profile and the profile object
+        '''
+        family = self.get_family_from_child(profile_id)[1]
+        return family.getMother(), self.get_profile_by_ID(family.getMother())
+    def get_all_family_ids_is_parent(self, profile_id):
+        '''
+        It will provide all the families where the profile is one of the parents
+        '''
+        families = []
+        for family_id in self.families.keys():
+            if profile_id in self.get_family_by_ID(family_id).get_parents(): families.append(family_id)
+        return families
+    def get_all_children(self, profile_id):
+        '''
+        This function will provide all the children associated to a profile
+        '''
+        children = []
+        for family_id in self.get_all_family_ids_is_parent(profile_id):
+            children += self.get_family_by_ID(family_id).getChildren()
+        return children
 #===============================================================================
 #         ADD methods: Add methods used to include a new profile and new family
 #===============================================================================

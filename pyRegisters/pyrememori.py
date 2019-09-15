@@ -7,7 +7,6 @@ import requests, re
 from html.parser import HTMLParser
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name
-from datetime import date
 import datetime
 from pyRegisters.pyCommonRegisters import BaseRegister
 

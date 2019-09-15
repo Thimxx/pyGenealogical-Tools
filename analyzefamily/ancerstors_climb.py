@@ -11,22 +11,22 @@ class climb(object):
     '''
 
 
-    def __init__(self, source_person):
+    def __init__(self, database):
         '''
-        As input it is needed a class pyGeni.profile already obtained.
+        As input it is needed a database derived from common_database.
         '''
-        self.source_person = source_person
-    def get_ancestors(self, generations):
+        self.database = database
+    def get_ancestors(self, source_person, generations):
         '''
         This functions obtains the ancestors up to the requested generations.
         '''
         #Firstly we initiate the list which will contain all
         ancestors = []
-        current_gen =  {self.source_person.get_id() : self.source_person.relations }
+        current_gen =  {source_person.get_id() : source_person.relations }
         ancestors.append(current_gen)
         #We introduce also a function to check duplications of profile... if they are duplicated, we take them out!
         affected_profiles = []
-        affected_profiles.append(self.source_person.get_id())
+        affected_profiles.append(source_person.get_id())
         for i in range(1, generations + 1):
             #We create an intermediate source version we will store all parents.
             next_gen = {}
@@ -49,7 +49,7 @@ class climb(object):
             current_gen = next_gen
         #We just finish delivering the ancestors back!!
         return ancestors, affected_profiles
-    def get_cousins(self, generations):
+    def get_cousins(self,source_person, generations):
         '''
         This function will create a matrix of cousins, just counting the number
         of affected cousins for a given profile.
@@ -59,7 +59,7 @@ class climb(object):
         cousins_count = [[0 for j in range(generations +1)] for i in range(generations +1)]
         #We need a list for checking duplications:
         affected_profiles = []
-        ancestors, affected_ancestors = self.get_ancestors(generations)
+        ancestors, affected_ancestors = self.get_ancestors(source_person, generations)
         affected_profiles = affected_profiles + affected_ancestors
         for i in range(0, generations+1):
             cousins_array[i][i] = ancestors[i]

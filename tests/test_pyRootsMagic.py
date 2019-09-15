@@ -79,7 +79,7 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         prof5 = db.get_profile_by_ID(1)
         event_birth3 = prof5.get_specific_event("birth")
         assert(event_birth3.get_location()["county"] == "Segovia")
-        assert(event_birth3.get_location()["latitude"] < 41.07)
+        assert(event_birth3.get_location()["latitude"] < 41.08)
         assert(prof5.getLiving())
         
         #Now we check that None is provided if there is no profile in
@@ -96,7 +96,16 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(db.get_family_by_ID(4).getFather() == None)
         assert(db.get_family_by_ID(1).getChildren() == [1, 7])
         assert(len(db.get_family_by_ID(5).getChildren()) == 0)
+        #Check getting the family id from the child
+        assert(db.get_family_from_child(7)[0] == 1)
+        assert(db.get_father_from_child(7)[0] == 2)
+        assert(db.get_mother_from_child(7)[0] == 3)
         
+        #This will provide the children of a given profile
+        assert(2 in db.get_all_family_ids_is_parent(5))
+        children = db.get_all_children(2)
+        assert(1 in children)
+        assert(1 in children)
     
     def test_insert_methods(self):
         '''
