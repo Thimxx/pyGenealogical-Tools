@@ -15,7 +15,7 @@ class testpyGeni(unittest.TestCase):
         '''
         This test checks that the name of philip the IV of Spain is properly detected
         '''
-        assert( "Felipe" in self.philip.nameLifespan())
+        assert( "Philip" in self.philip.nameLifespan())
         assert( "1605" in self.philip.nameLifespan())
         assert( "1665" in self.philip.nameLifespan())
         assert(self.philip.gen_data["birth"].get_date() == date(1605,4,8))

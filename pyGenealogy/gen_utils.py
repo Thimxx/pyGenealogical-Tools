@@ -14,7 +14,6 @@ from Levenshtein import jaro
 import math
 import requests
 import pyGenealogy, os, re
-from test.test_bisect import Range
 
 THRESHOLD_JARO = 0.7
 
@@ -441,7 +440,7 @@ def get_score_compare_dates(event1, event2):
         #Too early... the dates do not match!
         if event_exact.is_this_event_earlier_or_simultaneous_to_this(event_between): return 0.0, 0.0
         #The date provided is actually later that the range provided
-        elif is_this_date_earlier_or_simultaneous_to_this(event_between.get_year_end(), event_between.get_month_end(), event_between.get_day_end(), 
+        elif is_this_date_earlier_or_simultaneous_to_this(event_between.get_year_end(), event_between.get_month_end(), event_between.get_day_end(),
                                                           event_exact.get_year(), event_exact.get_month(), event_exact.get_day()):
             return 0.0, 0.0
         else:
@@ -464,7 +463,7 @@ def get_score_compare_dates(event1, event2):
         else: return 0.0, 0.0
     elif (accuracy1 == "AFTER"):
         if (accuracy2 == "AFTER") : return 0.0, 1.0
-        elif ( (accuracy2 == "BETWEEN") and ( is_this_date_earlier_or_simultaneous_to_this(event1.get_year(), event1.get_month(), event1.get_day(), 
+        elif ( (accuracy2 == "BETWEEN") and ( is_this_date_earlier_or_simultaneous_to_this(event1.get_year(), event1.get_month(), event1.get_day(),
                             event2.get_year_end(), event2.get_month_end(), event2.get_day_end() )) ):
             return 0.0, 1.0
         elif (event2.is_this_event_later_or_simultaneous_to_this(event1)): return 0.0, 1.0
@@ -473,17 +472,17 @@ def get_score_compare_dates(event1, event2):
         if (event1.is_this_event_earlier_or_simultaneous_to_this(event2)): return 0.0, 1.0
         else: return 0.0, 0.0
     elif (accuracy2 == "AFTER"):
-        if ( (accuracy1 == "BETWEEN") and is_this_date_earlier_or_simultaneous_to_this(event2.get_year(), event2.get_month(), event2.get_day(), 
+        if ( (accuracy1 == "BETWEEN") and is_this_date_earlier_or_simultaneous_to_this(event2.get_year(), event2.get_month(), event2.get_day(),
                                 event1.get_year_end(), event1.get_month_end(), event1.get_day_end())   ):
             return 0.0, 1.0
         if (event2.is_this_event_earlier_or_simultaneous_to_this(event1)): return 0.0, 1.0
         else: return 0.0, 0.0
     elif (accuracy1 == "BETWEEN") and (accuracy2 == "BETWEEN"):
         #Ok, now both are accuracy BETWEEN
-        if is_this_date_earlier_or_simultaneous_to_this(event1.get_year_end(), event1.get_month_end(), event1.get_day_end(), 
+        if is_this_date_earlier_or_simultaneous_to_this(event1.get_year_end(), event1.get_month_end(), event1.get_day_end(),
                             event2.get_year(), event2.get_month(), event2.get_day()):
             return 0.0, 0.0
-        elif is_this_date_earlier_or_simultaneous_to_this(event2.get_year_end(), event2.get_month_end(), event2.get_day_end(), 
+        elif is_this_date_earlier_or_simultaneous_to_this(event2.get_year_end(), event2.get_month_end(), event2.get_day_end(),
                             event1.get_year(), event1.get_month(), event1.get_day()):
             return 0.0, 0.0
         else:

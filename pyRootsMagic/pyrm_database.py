@@ -7,7 +7,6 @@ import sqlite3
 from pyRootsMagic.rootsmagic_profile import rootsmagic_profile
 from pyRootsMagic.rootsmagic_family import rootsmagic_family
 from pyGenealogy.common_database import gen_database
-from openpyxl.workbook import child
 
 class database_rm(gen_database):
     '''

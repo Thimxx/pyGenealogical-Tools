@@ -156,7 +156,8 @@ class RememoryPersonParser(HTMLParser):
             self.located = False
             if (("en" in data) and ("a los" in data)):
                 result = re.search('en(.*)a los', data)
-                self.location = result.group(1).strip()
+                if not (result == None):
+                    self.location = result.group(1).strip()
                 result = re.search('a los(.*)años', data)
                 if not (result == None):
                     age = result.group(1).strip()

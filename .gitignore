@@ -111,3 +111,4 @@ ENV/
 /testing_exec.py
 /.pypirc
 /get_gedcom.py
+/RootsAnalysis.out

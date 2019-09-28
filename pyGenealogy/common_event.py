@@ -85,7 +85,7 @@ class event_profile(object):
         '''
         Confirms if the following event is earlier or at the same time as the other
         '''
-        return is_this_date_earlier_or_simultaneous_to_this(self.get_year(), self.get_month(), self.get_day(), 
+        return is_this_date_earlier_or_simultaneous_to_this(self.get_year(), self.get_month(), self.get_day(),
                                                             event.get_year(), event.get_month(), event.get_day())
     def is_this_event_later_or_simultaneous_to_this(self,event):
         '''
@@ -202,7 +202,6 @@ class event_profile(object):
         date2, date2b = transform_in_date(self.get_year_end(), self.get_month_end(), self.get_day_end())
         #We return the minimum difference between all dates
         return (min(abs((date1-date2).days), abs((date1-date2b).days), abs((date1b-date2).days), abs((date1b-date2b).days) ))
-        
 def convert_date_to_gedcom_format(year, month, day):
     '''
     This function transforms a date in day, month and year into gedcom format

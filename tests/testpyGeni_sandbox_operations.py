@@ -111,8 +111,7 @@ class Test(unittest.TestCase):
         '''
         prof3 = profile.profile(OLD_DELETED_SON, type_geni="")
         assert(prof3.geni_specific_data['deleted'])
-        
-        assert(prof3.delete_profile())
+        assert(prof3.delete_profile() == False)
     
     def test_date_structure(self):
         '''

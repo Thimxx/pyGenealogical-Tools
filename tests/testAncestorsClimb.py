@@ -93,7 +93,7 @@ class testAncestorsClimb(unittest.TestCase):
         #We create the climber with the RM database
         climber = climb(rm_db)
         prof = rm_db.get_profile_by_ID(1)
-        #We execute teh ancestors
+        #We execute the ancestors
         #ancestors, profiles = climber.get_ancestors(prof, 4)
         
 if __name__ == "__main__":
