@@ -25,6 +25,7 @@ class Test_common_database(unittest.TestCase):
         assert(db.add_family(father = "I1", mother = "I2", children=["I3"]) == "F1")
         assert(db.get_profile_by_ID("I1").getName() == "Name")
         assert(db.get_family_by_ID("F1").getFather() == "I1")
+        assert(db.get_family_by_ID("F1").get_id() == "F1")
         assert(db.get_family_by_ID("xxx1") == None)
         assert(db.get_profile_by_ID("xxx1") == None)
         

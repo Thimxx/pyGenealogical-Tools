@@ -145,7 +145,7 @@ class gen_profile(object):
         """
         Introduce an id for later on compare the data for introduction
         """
-        self.gen_data["id"] = str(id_profile)
+        self.gen_data["id"] = id_profile
     def set_marriage_id_link(self, id_partner):
         """
         Sets the link to the id of the partner

@@ -22,27 +22,32 @@ class climb(object):
         '''
         #Firstly we initiate the list which will contain all
         ancestors = []
-        current_gen =  {source_person.get_id() : source_person.relations }
+        #The first person is always having the value first
+        current_gen = [source_person.get_id()]
         ancestors.append(current_gen)
         #We introduce also a function to check duplications of profile... if they are duplicated, we take them out!
-        affected_profiles = []
-        affected_profiles.append(source_person.get_id())
+        affected_profiles = {}
+        affected_profiles[source_person.get_id()] = 1
         for i in range(1, generations + 1):
             #We create an intermediate source version we will store all parents.
-            next_gen = {}
+            next_gen = []
             #We iterate in all ancestors in this generation
-            for prof_id in current_gen.keys():
+            for prof_id in current_gen:
                 #Now we go one, by one the parents reflecting the next generation
-                for parent in current_gen[prof_id].parents:
+                ids = self.database.get_parents_from_child(prof_id)[0]
+                for parent in ids:
                     #be careful with duplications!!! we will not repeat it!
-                    if not parent in affected_profiles:
+                    if parent and (not parent in affected_profiles):
                         #Now we get the profile of the parents
-                        next_gen[parent] = immediate_family(parent)
+                        next_gen.append(parent) 
                         #We add it to avoid duplications later on!
-                        affected_profiles.append(parent)
+                        affected_profiles[parent] = affected_profiles[prof_id]/2
+                    elif parent:
+                        #This means the profile is duplicated, so we add the value
+                        affected_profiles[parent] = affected_profiles[parent] + affected_profiles[prof_id]/2
             #If there are no longer ancestors, we should stop!
             if len(next_gen) == 0:
-                return ancestors
+                return ancestors, affected_profiles
             #Now...we append this generation to ancestors
             ancestors.append(next_gen)
             #And now the next generation is the current!!!
@@ -55,32 +60,31 @@ class climb(object):
         of affected cousins for a given profile.
         '''
         #We initiate an array of 0s for calculating
-        cousins_array = [[0 for j in range(generations +1)] for i in range(generations +1)]
         cousins_count = [[0 for j in range(generations +1)] for i in range(generations +1)]
-        #We need a list for checking duplications:
-        affected_profiles = []
-        ancestors, affected_ancestors = self.get_ancestors(source_person, generations)
-        affected_profiles = affected_profiles + affected_ancestors
+        array_of_cousins = [[0 for j in range(generations +1)] for i in range(generations +1)]
+        ancestors2, profiles_scored = self.get_ancestors(source_person, generations)
+        prior_profiles = list(profiles_scored.keys())
         for i in range(0, generations+1):
-            cousins_array[i][i] = ancestors[i]
-            cousins_count[i][i] = len(ancestors[i])
+            cousins_count[i][i] = len(ancestors2[i])
+            array_of_cousins[i][i]  = ancestors2[i]
         #We have finished the list of grand parents, now we need to go down!
         for i in range(1, generations+1):
             #We go down in the matrix, from one we get the previous
             #we are located in the top previous value! so, the first value
             #are the gran-parents of the guy!
             for j in range(i, 0,-1):
-                down_gen = {}
-                #We need to get the childrens from the top guys!
+                generation_below = []
+                #We need to get the children from the top guys!
                 #We iterated in family items
-                for family_item in cousins_array[i][j].values():
-                    #Now we have the family of a single person...
-                    for child in family_item.children:
-                        #And now all the children of that person!
-                        if not child in affected_profiles:
-                            down_gen[child] = immediate_family(child)
-                            #We add it to avoid duplications later on!
-                            affected_profiles.append(child)
-                cousins_array[i][j-1] = down_gen
-                cousins_count[i][j-1] = len(down_gen)
-        return cousins_array, cousins_count, affected_profiles
+                for parental_profile in array_of_cousins[i][j]:
+                    #We analyze child by child to include in the analysis
+                    for child in self.database.get_all_children(parental_profile):
+                        #If the profile is not existing before, we shall include it
+                        if not ( child in profiles_scored.keys()): 
+                            generation_below.append(child)
+                            profiles_scored[child] = 0
+                        if not ( (child in prior_profiles) and (parental_profile in prior_profiles) ):
+                            profiles_scored[child] = profiles_scored[child] + profiles_scored[parental_profile]/2
+                array_of_cousins [i][j-1] = generation_below
+                cousins_count[i][j-1] = len(generation_below)
+        return array_of_cousins, cousins_count, profiles_scored

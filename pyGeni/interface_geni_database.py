@@ -51,8 +51,10 @@ class geni_database_interface(gen_database):
             if self.families[family_id].is_child_in_family(profile_id): return family_id, self.families[family_id]
         #If we arrived here is because the family has not been found
         link_fam = self.get_families_from_profile(profile_id)
-        union_id = link_fam.parent_union[0].get_id()
-        return union_id, self.get_family_by_ID(union_id)
+        if (len(link_fam.parent_union) > 0):
+            union_id = link_fam.parent_union[0].get_id()
+            return union_id, self.get_family_by_ID(union_id)
+        else: return None, None
     def get_all_family_ids_is_parent(self, profile_id):
         '''
         It will provide all the families where the profile is one of the parents

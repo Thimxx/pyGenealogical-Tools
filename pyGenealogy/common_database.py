@@ -59,14 +59,17 @@ class gen_database(object):
         Returns the id of the profile and the profile object
         '''
         family = self.get_family_from_child(profile_id)[1]
-        return family.getFather(), self.get_profile_by_ID(family.getFather())
+        #We may get an empty family...
+        if family: return family.getFather(), self.get_profile_by_ID(family.getFather())
+        else: return None, None
     def get_mother_from_child(self, profile_id):
         '''
         It will return the mother of the profile
         Returns the id of the profile and the profile object
         '''
         family = self.get_family_from_child(profile_id)[1]
-        return family.getMother(), self.get_profile_by_ID(family.getMother())
+        if family: return family.getMother(), self.get_profile_by_ID(family.getMother())
+        else: return None, None
     def get_all_family_ids_is_parent(self, profile_id):
         '''
         It will provide all the families where the profile is one of the parents
@@ -83,6 +86,13 @@ class gen_database(object):
         for family_id in self.get_all_family_ids_is_parent(profile_id):
             children += self.get_family_by_ID(family_id).getChildren()
         return children
+    def get_parents_from_child(self, profile_id):
+        '''
+        It returns the ids and profiles of the parents for the given profile
+        '''
+        f_id, f_profile = self.get_father_from_child(profile_id)
+        m_id, m_profile = self.get_mother_from_child(profile_id)
+        return [f_id, m_id], [f_profile, m_profile]
 #===============================================================================
 #         ADD methods: Add methods used to include a new profile and new family
 #===============================================================================
@@ -102,5 +112,6 @@ class gen_database(object):
         self.count_fam += 1
         id_fam = CHAR_FAM + str(self.count_fam)
         fam = family_profile(father = father, mother = mother, child = children, marriage = marriage)
+        fam.set_id(id_fam)
         self.families[id_fam] = fam
         return id_fam

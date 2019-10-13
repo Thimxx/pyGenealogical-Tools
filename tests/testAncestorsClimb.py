@@ -35,12 +35,10 @@ class testAncestorsClimb(unittest.TestCase):
         philip = profile(PHILIPIVg)
         
         climber = climb(geni_db)
-        ancestors, profiles = climber.get_ancestors(philip, 4)
-        i = 0
-        for generation in ancestors:
-            i = i + len(generation.values())
-        assert(i == 23)
-        assert(len(profiles) == 23)
+        
+        ancest = climber.get_ancestors(philip, 4)
+        assert(len(ancest[1].keys()) == 23)
+        
     def testStopWithNoAncestors(self):
         '''
         If there are no longer ancestors, the ancestor climb should stop.
@@ -51,9 +49,9 @@ class testAncestorsClimb(unittest.TestCase):
         flavia = profile(FLAVIAg)
         
         climber = climb(geni_db)
-        ancestors = climber.get_ancestors(flavia, 6)
         
-        assert(len(ancestors) == 2)
+        ancestors = climber.get_ancestors(flavia, 6)
+        assert(len(ancestors[1].keys())  == 3)
     
     def testCousinsExecution(self):
         '''
@@ -94,7 +92,20 @@ class testAncestorsClimb(unittest.TestCase):
         climber = climb(rm_db)
         prof = rm_db.get_profile_by_ID(1)
         #We execute the ancestors
-        #ancestors, profiles = climber.get_ancestors(prof, 4)
+        ancestors, data_gen = climber.get_ancestors(prof, 4)
+        i = 0
+        for generation in ancestors:
+            i = i + len(generation)
+        assert(i == 7)
+        total = 0
+        for id_value in data_gen.values():
+            total += id_value
+        assert(total == 3.0)
+        
+        cousins, cousins_count, profiles_score = climber.get_cousins(prof, 2)
+        assert(cousins[2][2] == [4,5,8])
+        assert(cousins_count[2][1] == 1)
+        assert(sum(list(profiles_score.values())) == 3.5)
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

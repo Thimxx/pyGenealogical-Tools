@@ -3,7 +3,6 @@ Created on 15 ago. 2019
 
 @author: Val
 '''
-from datetime import date
 
 class BaseRegister(object):
     '''

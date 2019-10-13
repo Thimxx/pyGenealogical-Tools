@@ -77,7 +77,7 @@ class database_rm(gen_database):
         if is_family_in:
             return int(is_family_in[2]), self.get_family_by_ID(is_family_in[2])
         else:
-            return None
+            return None, None
     def get_all_family_ids_is_parent(self, profile_id):
         '''
         It will provide all the families where the profile is one of the parents

@@ -126,10 +126,12 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         prof.setWebReference(TEST_WIKIPEDIA, name = "Wikipedia", notes="introduced")
         
         assert(prof.get_all_webs()[0]["name"] == "")
-        prof.update_web_ref(TEST_GOOGLE, "Google", "A note")
+        assert(prof.update_web_ref(TEST_GOOGLE, "Google", "A note"))
         assert(prof.get_all_webs()[0]["name"] == "Google")
         assert(TEST_GOOGLE in prof.get_all_urls())
         assert(TEST_WIKIPEDIA in prof.get_all_urls())
+        #It does not essent
+        assert(prof.update_web_ref("DOES NOT EXISTS", "Google", "A note") == None)
         
         prof.set_task("TEST")
         
