@@ -3,7 +3,7 @@ Created on 6 July 2019
 
 @author: Val
 '''
-from kivy import event
+
 __all__ = ["pyrm_database", "rootsmagic_family", "rootsmagic_profile", "collate_temp", "return_date_from_event"]
 
 
