@@ -5,7 +5,8 @@ Created on 7 jul. 2019
 '''
 from pyGenealogy import common_profile
 from pyGenealogy.common_event import event_profile
-from pyRootsMagic import collate_temp
+from pyRootsMagic import collate_temp, return_date_from_event
+from datetime import date
 
 DATE_EVENT_ID = {"birth" : "1", "death" : "2", "baptism" : "3",  "burial" : "4", "marriage" : "300", "residence" : "29"}
 
@@ -106,6 +107,42 @@ class rootsmagic_profile(common_profile.gen_profile):
             web_dict["url"] = "https://www.familysearch.org/tree/person/details/" + fs_data[4]
             webs.append(web_dict)
         return webs
+    def get_specific_research_log(self, log_name):
+        '''
+        This function will provide an specific log research log in the database, if existing for the owner id
+        '''
+        self.database.create_collation("RMNOCASE", collate_temp)
+        input_rlog = "SELECT * FROM ResearchTable WHERE OwnerId=? AND  Name=? AND TaskType=2"
+        logs = self.database.execute(input_rlog, (str(self.get_id()),str(log_name),) )
+        #Now let's fetch the first value
+        logs_data = logs.fetchone()
+        self.database.create_collation("RMNOCASE", None)
+        if logs_data:
+            return logs_data
+        else:
+            return None
+    def get_all_research_item(self):
+        '''
+        This function will return all the research logs linked to a given profile
+        '''
+        items = []
+        input_logs = "SELECT * FROM ResearchTable WHERE OwnerID=? AND TaskType=2"
+        logs_info = self.database.execute( input_logs, (str(self.get_id()),) ).fetchall()
+        #With the following code we will obtain all the research logs in place in the profile
+        all_items = []
+        for logs in logs_info:
+            #Now we will obtain all the inputs inside all research logs
+            input_items = "SELECT * FROM ResearchItemTable WHERE LogID=?"
+            item_info = self.database.execute( input_items, (str(logs[0]),) ).fetchall()
+            all_items += item_info
+        #item_info = self.database.execute( input_items ).fetchall()
+        for item in all_items:
+            web_dict = {}
+            web_dict["name"] = item[7]
+            web_dict["url"] = item[5]
+            web_dict["notes"] = item[8]
+            items.append(web_dict)
+        return items
 #===============================================================================
 #         SET methods: the value of the profile is modified, overwrtting methods
 #        from common_profile
@@ -130,16 +167,51 @@ class rootsmagic_profile(common_profile.gen_profile):
             new_web = "INSERT INTO URLTable(OwnerType,LinkType,OwnerID,URL,Name,Note) VALUES(0,0,?,?,?,?)"
             self.database.execute( new_web, (str(self.get_id()), str(url), value_name, value_notes) )
         self.database.commit()
-    def set_task(self, task_details, priority=0, details=""):
+    def set_task(self, task_details, priority=0, details="", task_type = 0):
         '''
         Introduces a task linked to the given profile
+        
+        Task_details: include a list a description of the task or the name of the research log
+        Priority: the priority
+        Details: the details of the task
+        task_type: 0 for a simple item, 2 for a research log
         '''
         empty_value=""
         self.database.create_collation("RMNOCASE", collate_temp)
 
-        new_task = "INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details) VALUES(0,?,0,?,0,?,?,?,?)"
-        self.database.execute( new_task, (str(self.get_id()),empty_value, str(priority), empty_value, str(task_details), details, ) )
+        new_task = "INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details) VALUES(?,?,0,?,0,?,?,?,?)"
+        cursor = self.database.cursor()
+        cursor.execute( new_task, (str(task_type), str(self.get_id()),empty_value, str(priority), empty_value, str(task_details), details, ) )
+        row_data = cursor.lastrowid
         self.database.create_collation("RMNOCASE", None)
+        self.database.commit()
+        return row_data
+    def set_research_item(self, log_id, repository = "", source = "", result = ""):
+        '''
+        This will introduce a new research item inside the given research log
+        log_id is the id of the research log that will contain the research item
+        repository is the location of the research, like a webpage
+        source is the source of hte information
+        result is the final outcome
+        '''
+        #Get the date of today in the form of RootsMagic
+        new_event = event_profile("residence")
+        today = date.today()
+        new_event.setDate(today.year, today.month, today.day, "EXACT")
+        date_of_research = return_date_from_event(new_event)
+        new_item = "INSERT INTO ResearchItemTable(LogID,Date,Repository,Source,Result) VALUES(?,?,?,?,?)"
+        self.database.execute( new_item, (str(log_id), date_of_research, repository, source, result, ) )
+        self.database.commit()
+#===============================================================================
+#         DELETE methods: methods to delete currently existing entries
+#===============================================================================
+    def del_web_ref(self, url):
+        '''
+        This function will delete the existing web reference, using the 
+        url as entry point (assumed to be unique)
+        '''
+        web_del = "DELETE FROM URLTable WHERE URL=? AND OwnerID=?"
+        self.database.execute( web_del, ( url , str(self.get_id()),  ) )
         self.database.commit()
 #===============================================================================
 #         UPDATE methods: modified inputs which depend on database
@@ -160,6 +232,18 @@ class rootsmagic_profile(common_profile.gen_profile):
             return True
         else:
             return None
+    def update_research_item(self, log_id, repository , source = None, result = None):
+        '''
+        This function will update a given web reference
+        '''
+        if source :
+            update_name = "UPDATE ResearchItemTable SET Source = ? WHERE Repository=? AND LogID=?"
+            self.database.execute( update_name, (str(source), str(repository), str(log_id), ) )
+        if result :
+            update_note = "UPDATE ResearchItemTable SET Source = ? WHERE Repository=? AND LogID=?"
+            self.database.execute( update_note, (str(result), str(log_id), str(log_id), ) )
+        self.database.commit()
+        return True
 #===============================================================================
 #         Repetitive methods to be used inside the other functions
 #===============================================================================

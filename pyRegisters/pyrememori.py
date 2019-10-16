@@ -9,6 +9,7 @@ from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name
 import datetime
 from pyRegisters.pyCommonRegisters import BaseRegister
+from pyRegisters import sp_age_location_colector
 
 BASE_REMEMORY = "https://www.rememori.com"
 SEARCH_LOCATION = BASE_REMEMORY + "/buscar/que:"
@@ -154,19 +155,9 @@ class RememoryPersonParser(HTMLParser):
     def handle_data(self, data):
         if self.located:
             self.located = False
-            if (("en" in data) and ("a los" in data)):
-                result = re.search('en(.*)a los', data)
-                if not (result == None):
-                    self.location = result.group(1).strip()
-                result = re.search('a los(.*)años', data)
-                if not (result == None):
-                    age = result.group(1).strip()
-                    if age.isdigit(): self.age = int(result.group(1).strip())
-            elif ("en" in data):
-                self.location = data.split("en",1)[1].strip()
-            elif  ("a los" in data) and ("años" in data):
-                result = re.search('a los(.*)años', data)
-                age = result.group(1).strip()
-                if age.isdigit(): self.age = int(result.group(1).strip())
+            #TODO the way is originally performed comes to this check several times and overwrites one by another, is correct?
+            locationD, ageD = sp_age_location_colector(data)
+            if locationD: self.location = locationD
+            if ageD: self.age = ageD
     def handle_endtag(self, tag):
         pass

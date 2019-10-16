@@ -29,3 +29,13 @@ class BaseRegister(object):
         if self.first_year and event_death and event_death.get_year() and event_death.get_year() < self.first_year:
             continue_exec = False
         return continue_exec
+    def matching_profiles(self, profile, tentative_profiles):
+        '''
+        Common function to be used for checking potential common profiles
+        '''
+        final_profiles = []
+        for selected_profile in tentative_profiles:
+            score, factor = selected_profile.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
+            if (score*factor > 2.0):
+                final_profiles.append(selected_profile)
+        return final_profiles

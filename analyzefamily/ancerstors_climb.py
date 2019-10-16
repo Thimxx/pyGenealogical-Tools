@@ -39,7 +39,7 @@ class climb(object):
                     #be careful with duplications!!! we will not repeat it!
                     if parent and (not parent in affected_profiles):
                         #Now we get the profile of the parents
-                        next_gen.append(parent) 
+                        next_gen.append(parent)
                         #We add it to avoid duplications later on!
                         affected_profiles[parent] = affected_profiles[prof_id]/2
                     elif parent:
@@ -80,7 +80,7 @@ class climb(object):
                     #We analyze child by child to include in the analysis
                     for child in self.database.get_all_children(parental_profile):
                         #If the profile is not existing before, we shall include it
-                        if not ( child in profiles_scored.keys()): 
+                        if not ( child in profiles_scored.keys()):
                             generation_below.append(child)
                             profiles_scored[child] = 0
                         if not ( (child in prior_profiles) and (parental_profile in prior_profiles) ):

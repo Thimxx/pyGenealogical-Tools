@@ -5,6 +5,8 @@ Created on 6 jul. 2019
 '''
 import unittest, os
 from pyRootsMagic.pyrm_database import database_rm
+from pyRootsMagic import return_date_from_event
+from pyGenealogy.common_event import event_profile
 from datetime import date
 from shutil import copyfile
 from tests.FIXTURES import TEST_FACEBOOK, TEST_GOOGLE, TEST_WIKIPEDIA
@@ -130,13 +132,59 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(prof.get_all_webs()[0]["name"] == "Google")
         assert(TEST_GOOGLE in prof.get_all_urls())
         assert(TEST_WIKIPEDIA in prof.get_all_urls())
+        prof.del_web_ref(TEST_WIKIPEDIA)
+        assert(not (TEST_WIKIPEDIA in prof.get_all_urls()))
         #It does not essent
         assert(prof.update_web_ref("DOES NOT EXISTS", "Google", "A note") == None)
         
         prof.set_task("TEST")
+        #Introduce a research log
+        row_id = prof.set_task("TEST_OF_LOG", task_type=2)
+        assert(prof.get_specific_research_log("TEST_OF_LOG"))
+        assert(prof.get_specific_research_log("TEST_NOT_EXISTING") == None)
+        prof.set_research_item(row_id, repository = "www.google.com", source = "GOOGLE", result = "GOOD")
+        
+        prof2 = db.get_profile_by_ID(1)
+        
+        assert(len(prof2.get_all_research_item()) == 2)
+        
+        
+        prof3 = db.get_profile_by_ID(3)
+        
+        assert(len(prof3.get_all_research_item()) == 0)
         
         db.close_db()
         if os.path.exists(working_file): os.remove(working_file)
+    def test_common_init_functions(self):
+        '''
+        This test will be testing those functions included in init file
+        '''
+        my_event = event_profile("birth")
+        
+        assert(return_date_from_event(my_event) == None)
+        
+        my_event.setDate(2019, 5, 3, "EXACT")        
+        #D.+20190503..+00000000..
+        assert(return_date_from_event(my_event) == "D.+20190503..+00000000..")
+        
+        my_event.setDate(1970, accuracy="BEFORE")        
+        #DB+19700000..+00000000..
+        assert(return_date_from_event(my_event) == "DB+19700000..+00000000.." )
+        
+        my_event.setDate(1890, accuracy="AFTER")        
+        #DA+18900000..+00000000..
+        assert(return_date_from_event(my_event) == "DA+18900000..+00000000..")
+        
+        my_event.setDate(1820, accuracy="BETWEEN", year_end = 1821, month_end=3)        
+        #DR+18200000..+18210300..
+        assert(return_date_from_event(my_event) == "DR+18200000..+18210300..")
+        
+        my_event.setDate(1910, accuracy="ABOUT")        
+        #D.+19100000.C+00000000..
+        assert(return_date_from_event(my_event) == "D.+19100000.C+00000000..")
+        
+        
+        #my_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

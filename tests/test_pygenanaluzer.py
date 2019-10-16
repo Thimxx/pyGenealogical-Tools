@@ -63,7 +63,7 @@ class Test(unittest.TestCase):
         analysis.execute(dbroots, storage = True, threshold = 360)
         urls = 0
         for person in dbroots.get_all_profiles():
-            urls += len(person.get_all_urls())
+            urls += len(person.get_all_research_item())
         assert(urls > 6)
         assert(os.path.exists(FILE2DELETE))
         dbroots.close_db()

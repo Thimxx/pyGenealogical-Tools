@@ -7,6 +7,7 @@ from pyRegisters.pyrememori import rememori_reader
 from pyRegisters.pyelnortedecastilla import elnortedecastilla_reader
 from pyRegisters.pyabc import abc_reader
 import logging, datetime
+from messages.pygenanalyzer_messages import RESEARCH_INFO, RESEARCH_LOG
 
 class gen_analyzer(object):
     '''
@@ -34,10 +35,15 @@ class gen_analyzer(object):
         if not output == None: self.file = open(output, "w")
         print_out("Total number of profiles = " + str(len(profiles)), self.file)
         for person in profiles:
+            #Firstly, we need to analyze if we need to add the research log, if does not exist, of course
+            log_loc = None
+            if storage and (not person.get_specific_research_log(RESEARCH_LOG)):
+                log_loc = person.set_task(RESEARCH_LOG, task_type=2, details=RESEARCH_INFO)
+            else: log_loc = person.get_specific_research_log(RESEARCH_LOG)
             #Check which analysis will be done
-            check_rememori = continue_analysis(person, "REMEMORI", threshold)
-            check_norte = continue_analysis(person, "ELNORTEDECASTILLA", threshold)
-            check_abc = continue_analysis(person, "ABC", threshold)
+            check_rememori = continue_analysis(person, "REMEMORI", threshold, log_loc)
+            check_norte = continue_analysis(person, "ELNORTEDECASTILLA", threshold, log_loc)
+            check_abc = continue_analysis(person, "ABC", threshold, log_loc)
             skipping = ""
             if (not check_rememori) and (not check_norte) and (not check_abc): skipping = " -- SKIPPED"
             #Variable for urls in tasks
@@ -48,35 +54,35 @@ class gen_analyzer(object):
             if check_rememori:
                 reader = rememori_reader(language=self.language, name_convention=self.name_convention)
                 records = reader.profile_is_matched(person)
-                self.result_analyzer(person, records, storage, "REMEMORI")
+                self.result_analyzer(person, records, storage, "REMEMORI", log_loc)
             #EL NORTE DE CASTILLA
             if check_norte:
                 reader2 = elnortedecastilla_reader(language=self.language, name_convention=self.name_convention)
                 records2 = reader2.profile_is_matched(person)
-                self.result_analyzer(person, records2, storage, "ELNORTEDECASTILLA")
+                self.result_analyzer(person, records2, storage, "ELNORTEDECASTILLA",log_loc)
             #ABC
             if check_abc:
                 reader3 = abc_reader(language=self.language, name_convention=self.name_convention)
                 records3 = reader3.profile_is_matched(person)
-                self.result_analyzer(person, records3, storage, "ABC")
+                self.result_analyzer(person, records3, storage, "ABC", log_loc)
             #We add a single task for all URLs in the person
             if storage and self.urls_task != "": person.set_task("CHECK WEB REFERENCES ", details = self.urls_task)
         if not self.file == None: self.file.close()
-    def result_analyzer(self, person, records, storage, web_site):
+    def result_analyzer(self, person, records, storage, web_site, log_id):
         '''
         Common function between all the functions executed above
         '''
         if records != None:
             for obtained in records:
-                if storage: store_url_task_in_db(person, list(obtained.get_all_urls().keys())[0], web_site)
+                if storage: store_url_task_in_db(person, list(obtained.get_all_urls().keys())[0], web_site, log_id)
                 self.urls_task += list(obtained.get_all_urls().keys())[0] + "\n"
                 print_out("  -  " + obtained.nameLifespan() + "  " + list(obtained.get_all_urls().keys())[0], self.file)
             if len(records) == 0 and storage:
                 if not person.getLiving():
-                    store_url_task_in_db(person, "Not found in " + web_site, web_site, notes_toadd="CLOSED")
+                    store_url_task_in_db(person, "Not found in " + web_site, web_site, log_id, notes_toadd="CLOSED")
                     print_out("  -  DISCARDED in " + web_site, self.file)
                 else:
-                    store_url_task_in_db(person, "Not found in " + web_site, web_site)
+                    store_url_task_in_db(person, "Not found in " + web_site, web_site, log_id)
 def print_out(message, file):
     '''
     Function to be used for printing
@@ -84,30 +90,37 @@ def print_out(message, file):
     logging.info(message)
     if not file == None:
         file.write(message + "\n")
-def store_url_task_in_db(profile, url, web_site, notes_toadd=None):
+def store_url_task_in_db(profile, url, web_site, log_id, notes_toadd=None):
     '''
     This function will store the url as weblink, and the task to review
     '''
-    all_urls = profile.get_all_urls()
+    all_items = profile.get_all_research_item()
+    all_urls = {}
+    for item in all_items:
+        all_urls[item["url"]] = item
     today = datetime.date.today().toordinal()
     if not notes_toadd: notes_toadd = "IDENTIFIED=" + str(today)
     if (url in all_urls.keys()) and (all_urls[url]["notes"] != "CHECKED"):
-        profile.update_web_ref(url,  notes = notes_toadd)
+        profile.update_research_item(log_id, url , result = notes_toadd)
     else:
-        profile.setWebReference(url, name=web_site, notes=notes_toadd)
-def continue_analysis(profile, web_site, threshold):
+        profile.set_research_item(log_id, repository = url, source = web_site, result = notes_toadd)
+def continue_analysis(profile, web_site, threshold, log_loc):
     '''
-    This function will say if the web site shall be analyzed or not
-    '''
-    webs = profile.get_all_webs()
+    This function will say if the web site shall be analyzed or not, in principle
+    it should not be analyzed if:
+    - It has been confirmed before
+    - It has been identified already and the timing threshold has not passed
+    '''        
+    items = profile.get_all_research_item()
     date_last_analysis = 0
-    for web in webs:
-        if web.get("name", None) == web_site:
-            identification_note = web.get("notes", "IDENTIFIED=0")
+    for item in items:
+        if item.get("name", None) == web_site:
+            identification_note = item.get("notes", "IDENTIFIED=0")
             if ("CONFIRMED" in identification_note) or ("CLOSED" in identification_note)  :
                 return False
             if ("IDENTIFIED" in identification_note):
-                date_last_analysis = int(identification_note.replace("IDENTIFIED=", ""))
+                current_date = int(identification_note.replace("IDENTIFIED=", ""))
+                if current_date > date_last_analysis: date_last_analysis=current_date
     #If the last analysis is smaller that then threshold, we continue.
     if datetime.date.today().toordinal() - date_last_analysis < threshold: return False
     return True

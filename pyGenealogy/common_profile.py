@@ -44,6 +44,7 @@ class gen_profile(object):
         self.gen_data["name_to_show"] = self.set_name_2_show(name2show)
         self.gen_data["web_ref"] = []
         self.gen_data["nicknames"] = []
+        self.gen_data["research_item"] = []
     def add_nickname(self, nick_name):
         '''
         Add a nickname
@@ -332,6 +333,19 @@ class gen_profile(object):
         This function will provide all web references
         '''
         return self.gen_data["web_ref"]
+    def get_all_research_item(self):
+        '''
+        This function will provide all research items
+        '''
+        return self.gen_data["research_item"]
+    def get_specific_research_log(self, item):
+        '''
+        This function will provide the locatino of the research log
+        '''
+        try:
+            return self.gen_data["research_item"].index(item)
+        except:
+            return None
     def getLiving(self):
         '''
         Returns the living status of a profile
