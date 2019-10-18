@@ -536,7 +536,7 @@ class Test(unittest.TestCase):
         Test Capital Letters are fixed
         '''
         output = get_formatted_location(GENERIC_PLACE_CAPITALS)
-        assert(output["place_name"] == "Plaza San Juan Evangelista")
+        assert(output["place_name"] == "Pz San Juan Evangelista")
         assert(output["country"] == "Spain")
     
     def test_compare_with_files(self):

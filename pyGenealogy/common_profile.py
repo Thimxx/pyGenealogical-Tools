@@ -14,17 +14,6 @@ DATA_ACCURACY = ["accuracy_birth_date", "accuracy_death_date", "accuracy_baptism
 DATA_PLACES = ["birth_place", "death_place", "baptism_place", "residence_place", "burial_place", "marriage_place"]
 DATA_LISTS = ["web_ref", "nicknames"]
 
-EVENT_DATA = {"birth" : {"date":"birth_date", "accuracy": "accuracy_birth_date", "location": "birth_place" },
-                   "death" : {"date":"death_date", "accuracy": "accuracy_death_date", "location": "death_place" },
-                   "baptism" : {"date":"baptism_date", "accuracy": "accuracy_baptism_date", "location": "baptism_place" },
-                   "burial" : {"date":"burial_date", "accuracy": "accuracy_burial_date", "location": "burial_place"}
-                   }
-
-EVENT_MARRIAGE = {"marriage" : {"date":"marriage_date", "accuracy": "accuracy_marriage_date", "location": "marriage_place" }}
-EVENT_RESIDENCE = {"residence" : {"date":"residence_date", "accuracy": "accuracy_residence_date", "location": "residence_place" }}
-ALL_EVENT_DATA = dict(EVENT_DATA)
-ALL_EVENT_DATA.update(EVENT_MARRIAGE)
-ALL_EVENT_DATA.update(EVENT_RESIDENCE)
 
 ALL_DATA = DATA_STRING + DATA_LISTS + EVENT_TYPE
 

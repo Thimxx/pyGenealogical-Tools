@@ -7,7 +7,7 @@
 import pyGeni as s
 from pyGeni.geniapi_common import geni_calls
 from pyGeni.immediate_family import immediate_family
-from pyGenealogy.common_profile import gen_profile, EVENT_DATA, EVENT_TYPE
+from pyGenealogy.common_profile import gen_profile, EVENT_TYPE
 from pyGenealogy import NOT_KNOWN_VALUE
 from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS, RESIDENCE_MESSAGE, NO_VALID_UNION_PROFILE
 import logging
@@ -22,6 +22,8 @@ DATA_LIST_IN_GENI = {"nicknames": "nicknames"}
 #TODO: think about a logic for display name...
 NOT_USED = {"name_to_show" : "display_name"}
 EQUIVALENT_SEX = { "male" : "M", "female" : "F"}
+
+GENI_LOCATION_KEYS = ["latitude", "longitude", "county", "country", "city", "place_name", "state"]
 
 TOOL_ID = ""
 
@@ -129,8 +131,10 @@ class profile(geni_calls, gen_profile):
         r = s.geni_request_post(update_marriage, data_input=data_input)
         data = r.json()
         if "error" in data.keys():
-            logging.error(ERROR_REQUESTS + data["error"])
+            logging.error(ERROR_REQUESTS + str(data["error"]))
+            return False
             #TODO: process the data creation and update relations
+        return True
     @classmethod
     def create_internally(cls, geni_input , type_geni):
         return cls(geni_input , type_geni)
@@ -247,7 +251,7 @@ class profile(geni_calls, gen_profile):
             for value in self.gen_data["web_ref"]:
                 msg += " [" + value["url"] + " FamilySearch-link]"
             data["about_me"] = msg
-        for event_geni in EVENT_DATA:
+        for event_geni in EVENT_TYPE:
             event_value = self.event_value(event_geni)
             if (event_value): data[event_geni] = event_value
         event_residence = self.event_value("residence")
@@ -323,7 +327,7 @@ def getLocationStructureGeni(location):
     location_data = {}
     if(location != None):
         for key in location.keys():
-            if (key != "raw"):
+            if (key in GENI_LOCATION_KEYS):
                 location_data[key] = location[key]
     return location_data
 def process_profile_input(profile = None, geni_input = None, type_geni="g"):

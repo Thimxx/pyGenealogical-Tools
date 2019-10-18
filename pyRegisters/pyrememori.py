@@ -3,7 +3,7 @@ Created on 16 sept. 2017
 
 @author: Val
 '''
-import requests, re
+import requests
 from html.parser import HTMLParser
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name

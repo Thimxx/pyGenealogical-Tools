@@ -69,7 +69,7 @@ class Test(unittest.TestCase):
         dbroots.close_db()
         #We just delete the file once finishes
         if os.path.exists(FILE2DELETE): os.remove(FILE2DELETE)
-        if os.path.exists(ROOTS_MAGIC_GEN_ANALYZER): os.remove(ROOTS_MAGIC_GEN_ANALYZER)
+        #if os.path.exists(ROOTS_MAGIC_GEN_ANALYZER): os.remove(ROOTS_MAGIC_GEN_ANALYZER)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

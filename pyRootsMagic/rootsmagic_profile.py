@@ -118,7 +118,7 @@ class rootsmagic_profile(common_profile.gen_profile):
         logs_data = logs.fetchone()
         self.database.create_collation("RMNOCASE", None)
         if logs_data:
-            return logs_data
+            return logs_data[0]
         else:
             return None
     def get_all_research_item(self):
@@ -170,7 +170,6 @@ class rootsmagic_profile(common_profile.gen_profile):
     def set_task(self, task_details, priority=0, details="", task_type = 0):
         '''
         Introduces a task linked to the given profile
-        
         Task_details: include a list a description of the task or the name of the research log
         Priority: the priority
         Details: the details of the task
@@ -178,7 +177,7 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         empty_value=""
         self.database.create_collation("RMNOCASE", collate_temp)
-
+        
         new_task = "INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details) VALUES(?,?,0,?,0,?,?,?,?)"
         cursor = self.database.cursor()
         cursor.execute( new_task, (str(task_type), str(self.get_id()),empty_value, str(priority), empty_value, str(task_details), details, ) )
@@ -207,7 +206,7 @@ class rootsmagic_profile(common_profile.gen_profile):
 #===============================================================================
     def del_web_ref(self, url):
         '''
-        This function will delete the existing web reference, using the 
+        This function will delete the existing web reference, using the
         url as entry point (assumed to be unique)
         '''
         web_del = "DELETE FROM URLTable WHERE URL=? AND OwnerID=?"

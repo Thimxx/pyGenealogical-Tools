@@ -33,7 +33,7 @@ class esquelas_reader(BaseRegister):
         This function will look in Esquelas website trying to match a profile
         Input shall be a profile of common profile values
         '''
-        keywords = profile.gen_data["name"].strip().replace(" ", "+") + "+" + profile.gen_data["surname"].strip().replace(" ", "+")
+        keywords = profile.getName().strip().replace(" ", "+") + "+" + profile.getSurname().strip().replace(" ", "+")
         keywords = keywords.lower().replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u")
         url = BASE_ESQUELAS + keywords
         final_profiles = []
@@ -69,7 +69,6 @@ class EsquelasParser(HTMLParser):
         if (tag == "span") and self.inside_profile:
             if (attrs[0][1] == "text-info x-2 text-right text-nowrap-1"): self.inside_date = True
             if (attrs[0][1] == "text-muted text-nowrap-1"): self.inside_description = True
-            
     def handle_data(self, data):
         if self.inside_date:
             locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
@@ -78,7 +77,7 @@ class EsquelasParser(HTMLParser):
         if self.inside_description:
             self.location, self.age = sp_age_location_colector(data)
     def handle_endtag(self, tag):
-        if self.inside_description: 
+        if self.inside_description:
             name, surname, _ = get_name_surname_from_complete_name(self.name, convention="spanish_surname")
             profile = gen_profile(name, surname)
             profile.setWebReference(self.weblink)

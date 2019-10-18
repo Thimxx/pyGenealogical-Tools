@@ -5,7 +5,7 @@ Created on 16 sept. 2017
 '''
 import re
 
-__all__ = ["pyrememori","pyelnortedecastilla", "pygenanalyzer", "pyabc", "pyCommonRegisters", "pyesquelas"]
+__all__ = ["pyrememori","pyelnortedecastilla", "pygenanalyzer", "pyabc", "pyCommonRegisters", "pyesquelas", "pycementry_valencia"]
 
 def sp_age_location_colector(data):
     '''

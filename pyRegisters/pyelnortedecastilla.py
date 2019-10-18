@@ -35,7 +35,7 @@ class elnortedecastilla_reader(BaseRegister):
         This function will look in El Norte de Castilla trying to match a profile
         Input shall be a profile of common profile values
         '''
-        keywords = profile.gen_data["name"].strip().replace(" ", "+") + "+" + profile.gen_data["surname"].strip().replace(" ", "+")
+        keywords = profile.getName().strip().replace(" ", "+") + "+" + profile.getSurname().strip().replace(" ", "+")
         url = BASE_NORTE + keywords + END_NORTE
         final_profiles = []
         if self.continue_death_register(profile):

@@ -6,8 +6,11 @@ Created on 28 mar. 2018
 from pyRegisters.pyrememori import rememori_reader
 from pyRegisters.pyelnortedecastilla import elnortedecastilla_reader
 from pyRegisters.pyabc import abc_reader
+from pyRegisters.pyesquelas import esquelas_reader
 import logging, datetime
 from messages.pygenanalyzer_messages import RESEARCH_INFO, RESEARCH_LOG
+
+ALL_PARSERS = ["REMEMORI", "ELNORTEDECASTILLA", "ABC", "ESQUELAS" ]
 
 class gen_analyzer(object):
     '''
@@ -41,30 +44,27 @@ class gen_analyzer(object):
                 log_loc = person.set_task(RESEARCH_LOG, task_type=2, details=RESEARCH_INFO)
             else: log_loc = person.get_specific_research_log(RESEARCH_LOG)
             #Check which analysis will be done
-            check_rememori = continue_analysis(person, "REMEMORI", threshold, log_loc)
-            check_norte = continue_analysis(person, "ELNORTEDECASTILLA", threshold, log_loc)
-            check_abc = continue_analysis(person, "ABC", threshold, log_loc)
+            checks_2_perform = {}
+            overall_check = False
+            for parser in ALL_PARSERS:
+                checks_2_perform[parser] = continue_analysis(person, parser, threshold, log_loc)
+                if checks_2_perform[parser]: overall_check = True
             skipping = ""
-            if (not check_rememori) and (not check_norte) and (not check_abc): skipping = " -- SKIPPED"
+            if not overall_check: skipping = " -- SKIPPED"
             #Variable for urls in tasks
             self.urls_task = ""
             #We write in the screen the name of the person
             print_out(str(person.get_id()) + " = "  + person.nameLifespan() + skipping, self.file)
-            #REMEMORI
-            if check_rememori:
-                reader = rememori_reader(language=self.language, name_convention=self.name_convention)
-                records = reader.profile_is_matched(person)
-                self.result_analyzer(person, records, storage, "REMEMORI", log_loc)
-            #EL NORTE DE CASTILLA
-            if check_norte:
-                reader2 = elnortedecastilla_reader(language=self.language, name_convention=self.name_convention)
-                records2 = reader2.profile_is_matched(person)
-                self.result_analyzer(person, records2, storage, "ELNORTEDECASTILLA",log_loc)
-            #ABC
-            if check_abc:
-                reader3 = abc_reader(language=self.language, name_convention=self.name_convention)
-                records3 = reader3.profile_is_matched(person)
-                self.result_analyzer(person, records3, storage, "ABC", log_loc)
+            #We accumulate all readers
+            readers_2_use = {}
+            readers_2_use["REMEMORI"] = rememori_reader(language=self.language, name_convention=self.name_convention)
+            readers_2_use["ELNORTEDECASTILLA"] = elnortedecastilla_reader(language=self.language, name_convention=self.name_convention)
+            readers_2_use["ABC"] = abc_reader(language=self.language, name_convention=self.name_convention)
+            readers_2_use["ESQUELAS"] = esquelas_reader(language=self.language, name_convention=self.name_convention)
+            for parser in ALL_PARSERS:
+                if checks_2_perform[parser]:
+                    records = readers_2_use[parser].profile_is_matched(person)
+                    self.result_analyzer(person, records, storage, parser, log_loc)
             #We add a single task for all URLs in the person
             if storage and self.urls_task != "": person.set_task("CHECK WEB REFERENCES ", details = self.urls_task)
         if not self.file == None: self.file.close()
@@ -110,7 +110,7 @@ def continue_analysis(profile, web_site, threshold, log_loc):
     it should not be analyzed if:
     - It has been confirmed before
     - It has been identified already and the timing threshold has not passed
-    '''        
+    '''
     items = profile.get_all_research_item()
     date_last_analysis = 0
     for item in items:
