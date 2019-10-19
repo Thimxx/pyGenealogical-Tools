@@ -7,10 +7,11 @@ from pyRegisters.pyrememori import rememori_reader
 from pyRegisters.pyelnortedecastilla import elnortedecastilla_reader
 from pyRegisters.pyabc import abc_reader
 from pyRegisters.pyesquelas import esquelas_reader
+from pyRegisters.pycementry_valencia import valencia_reader
 import logging, datetime
 from messages.pygenanalyzer_messages import RESEARCH_INFO, RESEARCH_LOG
 
-ALL_PARSERS = ["REMEMORI", "ELNORTEDECASTILLA", "ABC", "ESQUELAS" ]
+ALL_PARSERS = ["REMEMORI", "ELNORTEDECASTILLA", "ABC", "ESQUELAS", "CEMENTRY VALENCIA" ]
 
 class gen_analyzer(object):
     '''
@@ -61,6 +62,7 @@ class gen_analyzer(object):
             readers_2_use["ELNORTEDECASTILLA"] = elnortedecastilla_reader(language=self.language, name_convention=self.name_convention)
             readers_2_use["ABC"] = abc_reader(language=self.language, name_convention=self.name_convention)
             readers_2_use["ESQUELAS"] = esquelas_reader(language=self.language, name_convention=self.name_convention)
+            readers_2_use["CEMENTRY VALENCIA"] = valencia_reader(language=self.language, name_convention=self.name_convention)
             for parser in ALL_PARSERS:
                 if checks_2_perform[parser]:
                     records = readers_2_use[parser].profile_is_matched(person)
@@ -74,14 +76,20 @@ class gen_analyzer(object):
         '''
         if records != None:
             for obtained in records:
-                if storage: store_url_task_in_db(person, list(obtained.get_all_urls().keys())[0], web_site, log_id)
-                self.urls_task += list(obtained.get_all_urls().keys())[0] + "\n"
-                print_out("  -  " + obtained.nameLifespan() + "  " + list(obtained.get_all_urls().keys())[0], self.file)
+                is_stored = False
+                if storage:
+                    is_stored = store_url_task_in_db(person, list(obtained.get_all_urls().keys())[0], web_site, log_id)
+                #We add all the identified urls for creating a single task later on
+                if is_stored:
+                    self.urls_task += list(obtained.get_all_urls().keys())[0] + "\n"
+                    print_out("  -  " + obtained.nameLifespan() + "  " + list(obtained.get_all_urls().keys())[0], self.file)
             if len(records) == 0 and storage:
                 if not person.getLiving():
+                    #If the person is not living and does not appear in the site, there is no option that will appear anymore, we CLOSE
                     store_url_task_in_db(person, "Not found in " + web_site, web_site, log_id, notes_toadd="CLOSED")
                     print_out("  -  DISCARDED in " + web_site, self.file)
                 else:
+                    #If it is not found, then we keep a record for the future, for continuing reviewing.
                     store_url_task_in_db(person, "Not found in " + web_site, web_site, log_id)
 def print_out(message, file):
     '''
@@ -102,8 +110,12 @@ def store_url_task_in_db(profile, url, web_site, log_id, notes_toadd=None):
     if not notes_toadd: notes_toadd = "IDENTIFIED=" + str(today)
     if (url in all_urls.keys()) and (all_urls[url]["notes"] != "CHECKED"):
         profile.update_research_item(log_id, url , result = notes_toadd)
-    else:
+        return True
+    #We create a new entry either if does not exists before or is not already existing and appears as CHECKED
+    elif (not (url in all_urls.keys())) or (all_urls[url]["notes"] != "CHECKED"):
         profile.set_research_item(log_id, repository = url, source = web_site, result = notes_toadd)
+        return True
+    return False
 def continue_analysis(profile, web_site, threshold, log_loc):
     '''
     This function will say if the web site shall be analyzed or not, in principle
@@ -111,16 +123,44 @@ def continue_analysis(profile, web_site, threshold, log_loc):
     - It has been confirmed before
     - It has been identified already and the timing threshold has not passed
     '''
+    checked_found = False
+    other_non_checked_found = False
     items = profile.get_all_research_item()
     date_last_analysis = 0
     for item in items:
         if item.get("name", None) == web_site:
             identification_note = item.get("notes", "IDENTIFIED=0")
-            if ("CONFIRMED" in identification_note) or ("CLOSED" in identification_note)  :
+            #It can be only CLOSED if it was dead and nothing was found, we stop reivew.
+            #If it is CONFIRMED, that means that the profile has been confirmed linked to the website.
+            if ("CONFIRMED" in identification_note):
                 return False
+            #If closed, the analysis is not longer needed
+            if ("CLOSED" in identification_note) and (not profile.getLiving()):
+                return False
+            #In this case, if closed, is a wrong data introduction. We change to CHECKED
+            if ("CLOSED" in identification_note) and (profile.getLiving()):
+                checked_found = True
+                store_url_task_in_db(profile, item["url"], web_site, log_loc, notes_toadd="CHECKED")
             if ("IDENTIFIED" in identification_note):
+                #In case there is somebody with "IDENTFIED" and "Not Found", it means it turned to be death, so we force analysis
+                if ( ("Not found in " in item["url"]) and (not profile.getLiving())):
+                    return True
+                other_non_checked_found = True
                 current_date = int(identification_note.replace("IDENTIFIED=", ""))
                 if current_date > date_last_analysis: date_last_analysis=current_date
+            #In this case, there was before an IDENTIFIED status that we converted to CHECKED.
+            if ("CHECKED" in identification_note):
+                checked_found = True
+    #If we have only the checked status and no other
+    if (checked_found and (not other_non_checked_found)):
+        #We divide in 2 cases...
+        #If the person lives, we need to create a "Not Found" status
+        if profile.getLiving():
+            store_url_task_in_db(profile, "Not found in " + web_site, web_site, log_loc)
+            return False
+        else:
+            store_url_task_in_db(profile, "Not found in " + web_site, web_site, log_loc, notes_toadd="CLOSED")
+            return False
     #If the last analysis is smaller that then threshold, we continue.
     if datetime.date.today().toordinal() - date_last_analysis < threshold: return False
     return True

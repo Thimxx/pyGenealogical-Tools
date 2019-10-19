@@ -48,5 +48,4 @@ def get_string_from_date(year, month, day):
     day_str = "00"
     if day and day < 10: day_str = "0" + str(day)
     elif day: day_str = str(day)
-    
     return str(year) + month_str + day_str

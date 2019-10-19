@@ -59,13 +59,13 @@ class Test(unittest.TestCase):
         assert("THIS" in profile.get_all_urls() )
         assert("OTHER" in profile.get_all_urls() )
         assert(len( profile.get_all_webs()) == 2 )
-        assert(profile2.gen_data["death"].get_date() ==  date(2018,8,24))
-        assert(profile2.gen_data["death"].get_accuracy() == "EXACT")
-        assert(profile2.gen_data["burial"].get_accuracy() == "BETWEEN")
-        assert(profile2.gen_data["burial"].get_year_end() == 2018)
-        assert(profile2.gen_data["baptism"].get_date() ==  date(2017,1,1))
-        assert(profile2.gen_data["baptism"].get_accuracy() == "ABOUT")
-        assert(profile2.gen_data["birth"].get_location()["city"] == "La Parrilla")
+        assert(profile2.get_specific_event("death").get_date() ==  date(2018,8,24))
+        assert(profile2.get_specific_event("death").get_accuracy() == "EXACT")
+        assert(profile2.get_specific_event("burial").get_accuracy() == "BETWEEN")
+        assert(profile2.get_specific_event("burial").get_year_end() == 2018)
+        assert(profile2.get_specific_event("baptism").get_date() ==  date(2017,1,1))
+        assert(profile2.get_specific_event("baptism").get_accuracy() == "ABOUT")
+        assert(profile2.get_specific_event("birth").get_location()["city"] == "La Parrilla")
     
         profile3 = gen_profile("Juana", "Bargas")
         profile4 = gen_profile("Facundo", "Smith")
@@ -217,6 +217,7 @@ class Test(unittest.TestCase):
         '''
         profile = gen_profile("Name", "Surname")
         profile2 = gen_profile("Name", "Surname")
+        profile3 = gen_profile("Name", "Surname")
         
         profile.setCheckedGender("M")
         profile2.setCheckedGender("M")
@@ -235,6 +236,11 @@ class Test(unittest.TestCase):
         score, factor = profile.comparison_score(profile2)
         assert(score > 4)
         assert(factor < 0.005)
+        
+        profile3.setCheckedDate("birth", 1800)
+        score, factor = profile.comparison_score(profile3)
+        assert(score)
+        assert(factor == 0.0)
                
     
 if __name__ == "__main__":

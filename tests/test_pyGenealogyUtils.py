@@ -9,7 +9,8 @@ from pyGenealogy import get_mapbox_key, set_mapbox_key
 from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_fullname, checkDateConsistency, getBestDate, get_partner_gender
 from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name, get_splitted_name_from_complete_name
 from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates, get_compared_data_file, adapted_doublemetaphone
-from pyGenealogy.gen_utils import get_location_standard, formated_year
+from pyGenealogy.gen_utils import get_location_standard, formated_year, is_this_date_earlier_or_simultaneous_to_this
+from pyGenealogy.gen_utils import score_factor_birth_and_death
 from tests.FIXTURES import RIGHT_YEAR, RIGHT_YEAR_IN_A_TEXT, WRONG_YEAR, JUST_TEXT, RIGHT_YEAR_IN_A_DATE
 from tests.FIXTURES import FATHER_SURNAME, MOTHER_SURNAME, SPANISH_CHILD_SURNAME, GENERIC_PLACE_CAPITALS
 from tests.FIXTURES import FULL_NAME, FULL_NAME_SPANISH, ACTUAL_NAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
@@ -118,7 +119,11 @@ class Test(unittest.TestCase):
         event2bend.setDate(2014,month = 2 , day = 1, accuracy = "BEFORE")
         #Test bug of burial and death
         assert(checkDateConsistency([event4end, event2bend]))
-    
+        
+        #Checking some other methods
+        assert(is_this_date_earlier_or_simultaneous_to_this(1912, 12, 1, None, 12, 1) == True)
+        assert(is_this_date_earlier_or_simultaneous_to_this(None, 12, 1, 1914, 12, 1) == False)
+        assert(is_this_date_earlier_or_simultaneous_to_this(None, 12, 1, None, 12, 1) == None)
     def test_getting_a_date(self):
         '''
         Test the module for merging dates
@@ -579,6 +584,25 @@ class Test(unittest.TestCase):
         assert(formated_year(2016, "ABOUT") == "ca 2016")
         assert(formated_year("2016", "AFTER") == "aft. 2016")
         assert(formated_year(2016, "BEFORE") == "bef. 2016")
+    
+    def test_score_birth_death(self):
+        '''
+        Test the scoring for birth and death
+        '''
+        birth1 = event_profile("birth")
+        birth1.setDate(1900)
+        
+        death1 = event_profile("death")
+        death1.setDate(2090)
+        score1, factor1 = score_factor_birth_and_death(birth1,[death1])
+        assert(score1 == 0)
+        assert(factor1 == 0)
+        score2, factor2 = score_factor_birth_and_death(birth1,[])
+        assert(score2 == 0)
+        assert(factor2 == 1)
+        score3, factor3 = score_factor_birth_and_death(None,[])
+        assert(score3 == 0)
+        assert(factor3 == 1)
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

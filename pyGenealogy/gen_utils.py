@@ -39,6 +39,8 @@ LANGUAGES_FILES = { "es" : {"surname" : "surname_es.txt", "name" : "names_es.txt
 
 LANGUAGES_DATA = {}
 
+MAXIMUM_LIFESPAN = 123
+
 def is_year(my_potential_year):
     '''
     A simple module to detect if a given string is a year. Notice than when using
@@ -532,6 +534,15 @@ def is_this_date_earlier_or_simultaneous_to_this(year, month, day, year_other, m
         elif date_self: return True
         elif date_other: return False
         else: return None
+def score_factor_birth_and_death(event_birth, events):
+    '''
+    This method will provide score and factor for data contained in the profile
+    '''
+    if event_birth and event_birth.get_year():
+        for event in events:
+            if event.get_year() and(event.get_year() - event_birth.get_year() > MAXIMUM_LIFESPAN):
+                return 0,0
+    return 0, 1
 #====================================================================================
 #Execution of module code
 #====================================================================================

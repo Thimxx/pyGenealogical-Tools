@@ -177,7 +177,6 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         empty_value=""
         self.database.create_collation("RMNOCASE", collate_temp)
-        
         new_task = "INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details) VALUES(?,?,0,?,0,?,?,?,?)"
         cursor = self.database.cursor()
         cursor.execute( new_task, (str(task_type), str(self.get_id()),empty_value, str(priority), empty_value, str(task_details), details, ) )
@@ -239,8 +238,8 @@ class rootsmagic_profile(common_profile.gen_profile):
             update_name = "UPDATE ResearchItemTable SET Source = ? WHERE Repository=? AND LogID=?"
             self.database.execute( update_name, (str(source), str(repository), str(log_id), ) )
         if result :
-            update_note = "UPDATE ResearchItemTable SET Source = ? WHERE Repository=? AND LogID=?"
-            self.database.execute( update_note, (str(result), str(log_id), str(log_id), ) )
+            update_note = "UPDATE ResearchItemTable SET Result = ? WHERE Repository=? AND LogID=?"
+            self.database.execute( update_note, (str(result), str(repository), str(log_id), ) )
         self.database.commit()
         return True
 #===============================================================================

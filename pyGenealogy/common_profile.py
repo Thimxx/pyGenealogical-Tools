@@ -5,7 +5,7 @@ Created on 13 ago. 2017
 '''
 from pyGenealogy.gen_utils import checkDateConsistency, get_score_compare_names, get_score_compare_dates
 from pyGenealogy import VALUES_ACCURACY, EVENT_TYPE
-from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS, formated_year
+from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS, formated_year,score_factor_birth_and_death
 from pyGenealogy.common_event import event_profile
 
 DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments", "id", "marriage_link"]
@@ -72,6 +72,11 @@ class gen_profile(object):
         '''
         score, factor = get_score_compare_names(self.getName(), self.getSurname(),
                         profile.getName(), profile.getSurname(), language=data_language, convention=name_convention)
+        #Comparing big differences in events
+        score1, factor1 = score_factor_birth_and_death(self.get_specific_event("birth"), profile.getEvents())
+        score2, factor2 = score_factor_birth_and_death(profile.get_specific_event("birth"), self.getEvents())
+        score += score1 + score2
+        factor = factor*factor1*factor2
         #Comparing gender
         if (self.getGender()) and (profile.getGender()):
             if self.getGender() == profile.getGender():

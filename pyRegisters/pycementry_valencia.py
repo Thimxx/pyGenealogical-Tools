@@ -10,7 +10,7 @@ import requests
 from datetime import datetime
 from pyGenealogy.common_profile import gen_profile
 
-FIRST_YEAR = 1950
+FIRST_YEAR = 1876
 
 DIRECT_LINK = "http://www.valencia.es/ayuntamiento/cementerios.nsf/"
 INIT_ADDRESS = DIRECT_LINK + "fResultadoBusquedaCementerios?ReadForm=&lang=1&nivel=3&bdURL=ayuntamiento%2Fcementerios.nsf&pg=PXMLCE01&fc=FC0&pr=&wd=&idioma=C&apellido1="
@@ -18,7 +18,7 @@ LINK_SURNAME = "&apellido2="
 LINK_NAME = "&nombre="
 END_ADDRESS = "&anodef=&Buscar.x=28&Buscar.y=14&envio=0"
 
-class valencia_parser(BaseRegister):
+class valencia_reader(BaseRegister):
     '''
     This class analyzes and finds and matches profiles with death records in
     the database of the cementry of Valencia
@@ -72,7 +72,7 @@ class CementryValenciaParser(HTMLParser):
                 if att[0] == "href":
                     self.web_ref = DIRECT_LINK + att[1]
     def handle_data(self, data):
-        if self.counter == 1: 
+        if self.counter == 1:
             content = data.split(" ")
             self.surname1 = content[0]
             self.surname2 = content[1]
@@ -86,6 +86,7 @@ class CementryValenciaParser(HTMLParser):
         if self.counter == 3:
             profile = gen_profile(self.name.title().strip(), self.surname1.title().strip() + " " + self.surname2.title().strip())
             if self.web_ref: profile.setWebReference(self.web_ref)
+            else: profile.setWebReference("Not available for : " + self.name+ " " + self.surname1 + " " + self.surname2)
             if self.death_date: profile.setCheckedDate("death", self.death_date.year, self.death_date.month, self.death_date.day, "EXACT")
             self.profiles.append(profile)
             self.initiate_person_data()
