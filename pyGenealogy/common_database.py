@@ -24,6 +24,11 @@ class gen_database(object):
 #===============================================================================
 #         GET methods: to be used by all upper functions or be replace
 #===============================================================================
+    def get_db_kind(self):
+        '''
+        Identified of the kind of database in use
+        '''
+        return "COMMON"
     def get_profile_by_ID(self, id_profile):
         '''
         Returns the profile by the input ID
@@ -60,7 +65,7 @@ class gen_database(object):
         '''
         family = self.get_family_from_child(profile_id)[1]
         #We may get an empty family...
-        if family: return family.getFather(), self.get_profile_by_ID(family.getFather())
+        if (family and family.getFather()): return family.getFather(), self.get_profile_by_ID(family.getFather())
         else: return None, None
     def get_mother_from_child(self, profile_id):
         '''
@@ -68,7 +73,7 @@ class gen_database(object):
         Returns the id of the profile and the profile object
         '''
         family = self.get_family_from_child(profile_id)[1]
-        if family: return family.getMother(), self.get_profile_by_ID(family.getMother())
+        if (family and family.getMother()): return family.getMother(), self.get_profile_by_ID(family.getMother())
         else: return None, None
     def get_all_family_ids_is_parent(self, profile_id):
         '''
@@ -93,6 +98,16 @@ class gen_database(object):
         f_id, f_profile = self.get_father_from_child(profile_id)
         m_id, m_profile = self.get_mother_from_child(profile_id)
         return [f_id, m_id], [f_profile, m_profile]
+    def get_partners_from_profile(self, profile_id):
+        '''
+        It will return all partners associated with the profile
+        '''
+        partners = []
+        for family_id in self.get_all_family_ids_is_parent(profile_id):
+            parents = self.get_family_by_ID(family_id).get_parents()
+            parents.remove(profile_id)
+            partners += parents
+        return partners
 #===============================================================================
 #         ADD methods: Add methods used to include a new profile and new family
 #===============================================================================

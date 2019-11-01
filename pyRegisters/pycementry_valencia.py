@@ -10,7 +10,7 @@ import requests
 from datetime import datetime
 from pyGenealogy.common_profile import gen_profile
 
-FIRST_YEAR = 1876
+FIRST_YEAR = 1856
 
 DIRECT_LINK = "http://www.valencia.es/ayuntamiento/cementerios.nsf/"
 INIT_ADDRESS = DIRECT_LINK + "fResultadoBusquedaCementerios?ReadForm=&lang=1&nivel=3&bdURL=ayuntamiento%2Fcementerios.nsf&pg=PXMLCE01&fc=FC0&pr=&wd=&idioma=C&apellido1="

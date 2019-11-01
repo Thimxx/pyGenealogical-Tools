@@ -42,6 +42,7 @@ class Test(unittest.TestCase):
         families = db_geni.get_all_family_ids_is_parent("profile-403")
         assert("union-155" in families)
         
+        assert('profile-404' in db_geni.get_partners_from_profile("profile-403"))
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

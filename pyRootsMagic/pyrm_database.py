@@ -30,6 +30,11 @@ class database_rm(gen_database):
 #===============================================================================
 #         GET methods: all methods compatible with common_database
 #===============================================================================
+    def get_db_kind(self):
+        '''
+        Identified of the kind of database in use
+        '''
+        return "ROOTSMAGIC"
     def get_profile_by_ID(self, id_profile):
         '''
         Returns the profile by the input ID
@@ -101,4 +106,4 @@ class database_rm(gen_database):
             child_cursor = self.database.execute(child_db, (str(family_id),) )
             for child in child_cursor:
                 children.append(child[1])
-        return children
+        return children        

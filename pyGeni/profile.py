@@ -12,6 +12,9 @@ from pyGenealogy import NOT_KNOWN_VALUE
 from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS, RESIDENCE_MESSAGE, NO_VALID_UNION_PROFILE
 import logging
 
+#TODO: there are some areas in the software where geni provides a wrong input. Until is fixed, I will keep this dirty code
+GENI_SANDBOX_BUG_STRING = "api.sandbox.geni.com/"
+
 SPECIFIC_GENI_STRING = ['id', 'url', 'profile_url', 'creator' ]
 SPECIFIC_GENI_BOOLEAN =  ['public', 'is_alive', 'deleted']
 SPECIFIC_GENI_INTEGER = ['guid', 'created_at', 'updated_at']
@@ -72,12 +75,6 @@ class profile(geni_calls, gen_profile):
         #TODO:This is temporal, only a single marriage is considered
         if (len(self.relations.marriage_events) > 0):
             self.setNewEvent(self.relations.marriage_events[0])
-    def get_id(self):
-        '''
-        Simple function to get Geni ID
-        '''
-        if hasattr(self, "data") : return self.data.get('id', None)
-        else: return None
     def get_geni_data(self, data):
         '''
         Transfer json geni data into the base profile
@@ -278,6 +275,22 @@ class profile(geni_calls, gen_profile):
             if(date_structure) : event_data["date"] = date_structure
             if(location_structure) :event_data["location"] = location_structure
         return event_data
+#===============================================================================
+#         GET methods: overwritting Common_profile methods
+#===============================================================================
+    def get_this_profile_url(self):
+        '''
+        This function is a basic function created in case there is an specific web address for this
+        profile. It exists for profiles like GENI and is a place holder
+        If there is not url (for example local databases) it will provide a None value
+        '''
+        return self.geni_specific_data.get("profile_url", None)
+    def get_id(self):
+        '''
+        Simple function to get Geni ID
+        '''
+        if hasattr(self, "data") : return self.data.get('id', None)
+        else: return None
 #===================================================
 # Util functions
 #===================================================
@@ -285,6 +298,9 @@ def process_geni_input(geni_input, type_geni):
     '''
     This input provides needed input for accessing the profile
     '''
+    #Dirty bug fixing on GENI API.
+    if GENI_SANDBOX_BUG_STRING in str(geni_input):
+        geni_input = geni_input.split(GENI_SANDBOX_BUG_STRING)[1]
     if ("/api" in str(geni_input)):
         return geni_input
     elif ("profile" in str(geni_input)):

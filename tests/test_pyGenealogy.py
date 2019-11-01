@@ -66,6 +66,7 @@ class Test(unittest.TestCase):
         assert(profile2.get_specific_event("baptism").get_date() ==  date(2017,1,1))
         assert(profile2.get_specific_event("baptism").get_accuracy() == "ABOUT")
         assert(profile2.get_specific_event("birth").get_location()["city"] == "La Parrilla")
+        assert(profile2.get_this_profile_url() == None)
     
         profile3 = gen_profile("Juana", "Bargas")
         profile4 = gen_profile("Facundo", "Smith")

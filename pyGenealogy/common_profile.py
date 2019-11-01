@@ -363,6 +363,13 @@ class gen_profile(object):
             elif event.is_this_event_earlier_or_simultaneous_to_this(earliest_event):
                 earliest_event = event
         return earliest_event
+    def get_this_profile_url(self):
+        '''
+        This function is a basic function created in case there is an specific web address for this
+        profile. It exists for profiles like GENI and is a place holder
+        If there is not url (for example local databases) it will provide a None value
+        '''
+        return None
 #===============================================================================
 #         UPDATE methods: for compatibility with other profiles
 #===============================================================================

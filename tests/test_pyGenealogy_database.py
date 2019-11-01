@@ -16,6 +16,7 @@ class Test_common_database(unittest.TestCase):
         Testing basic introduction of new profiles and families.
         '''
         db = gen_database()
+        assert(db.get_db_kind() == "COMMON")
         person1 = gen_profile("Name", "Surname")
         person2 = gen_profile("Name2", "Surname2")
         person3 = gen_profile("Chid", "Surname2")
@@ -41,6 +42,7 @@ class Test_common_database(unittest.TestCase):
         assert(db.get_mother_from_child("I3")[0] == "I2")
         #Get Children function
         assert("I3" in db.get_all_children("I1"))
+        assert("I2" in db.get_partners_from_profile("I1"))
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

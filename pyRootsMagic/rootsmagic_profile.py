@@ -143,6 +143,22 @@ class rootsmagic_profile(common_profile.gen_profile):
             web_dict["notes"] = item[8]
             items.append(web_dict)
         return items
+    def get_all_tasks(self):
+        '''
+        This function will return all tasks associated with a given profile
+        '''
+        input_logs = "SELECT * FROM ResearchTable WHERE OwnerID=? AND TaskType=0"
+        logs_info = self.database.execute( input_logs, (str(self.get_id()),) ).fetchall()
+        #With the following code we will obtain all the research logs in place in the profile
+        all_items = []
+        for logs in logs_info:
+            task_info = {}
+            #Now we will define the task one by one
+            task_info["task_details"] = logs[5]
+            task_info["priority"] = logs[7]
+            task_info["details"] = logs[15]
+            all_items.append(task_info)
+        return all_items
 #===============================================================================
 #         SET methods: the value of the profile is modified, overwrtting methods
 #        from common_profile

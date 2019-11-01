@@ -8,6 +8,7 @@ import pyGeni as geni
 from pyGeni.geniapi_common import geni_calls
 from pyGenealogy.common_event import event_profile
 from pyGenealogy.common_family import family_profile
+from _ctypes import Union
 
 class union(geni_calls, family_profile):
     '''
@@ -61,8 +62,16 @@ class union(geni_calls, family_profile):
                 for child in data[key_value]:
                     children.append(geni.get_profile_id_from_address(child))
                 self.setChild(children)
+#===============================================================================
+#         GET methods: overwritting GET methods
+#===============================================================================
     def get_id(self):
         '''
         Returns the id from the union id
         '''
         return self.union_data["id"]
+    def get_parents(self):
+        '''
+        Returns the parents of the union
+        '''
+        return self.union_data["partners"]

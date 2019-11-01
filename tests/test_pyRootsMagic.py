@@ -26,7 +26,7 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         '''
         input_file = os.path.join(self.filelocation, "Rootstest.rmgc")
         db = database_rm(input_file)
-        
+        assert(db.get_db_kind() == "ROOTSMAGIC")
         #Let's take one profile and test is properly taken
         prof = db.get_profile_by_ID(5)
         assert(prof.getName() == "GrandMother")
@@ -108,6 +108,9 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         children = db.get_all_children(2)
         assert(1 in children)
         assert(1 in children)
+        
+        assert(10 in db.get_partners_from_profile(11))
+        assert(13 in db.get_partners_from_profile(11))
     
     def test_insert_methods(self):
         '''

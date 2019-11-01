@@ -48,6 +48,11 @@ class db_gedcom(gen_database):
 #===============================================================================
 #         GET methods: to be used by all upper functions or be replace
 #===============================================================================
+    def get_db_kind(self):
+        '''
+        Identified of the kind of database in use
+        '''
+        return "GEDCOM"
     def get_profile_by_ID(self, id_profile):
         '''
         Returns the profile by the input ID

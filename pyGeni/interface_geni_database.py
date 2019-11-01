@@ -22,6 +22,11 @@ class geni_database_interface(gen_database):
 #===============================================================================
 #         GET methods: replacing base models
 #===============================================================================
+    def get_db_kind(self):
+        '''
+        Identified of the kind of database in use
+        '''
+        return "GENI"
     def get_profile_by_ID(self, id_profile):
         '''
         Returns the profile by the input ID
@@ -68,8 +73,51 @@ class geni_database_interface(gen_database):
         '''
         It will return all the families where the profile is a parent
         '''
-        link_fam = self.get_families_from_profile(profile_id)
+        link_fam = self.get_families_from_profile(self.equivalence.get(profile_id,profile_id))
         return link_fam.children
+    def get_father_from_child(self, profile_id):
+        '''
+        It will return the father of the profile
+        In the specific case of GENI, the family is not allowing us to differentiate between Father and Mother
+        '''
+        family = self.get_family_from_child(profile_id)[1]
+        #We may get an empty family...
+        if family:
+            for parent in family.get_parents():
+                #We need to check each single partner to see if it is the Father or the Mother
+                parent_prof = self.get_profile_by_ID(parent)
+                if parent_prof.getGender() == "M":
+                    return parent_prof.get_id(), parent_prof
+        return None, None
+    def get_mother_from_child(self, profile_id):
+        '''
+        It will return the mother of the profile
+        In the specific case of GENI, the family is not allowing us to differentiate between Father and Mother
+        '''
+        family = self.get_family_from_child(profile_id)[1]
+        #We may get an empty family...
+        if family:
+            for parent in family.get_parents():
+                #We need to check each single partner to see if it is the Father or the Mother
+                parent_prof = self.get_profile_by_ID(parent)
+                if parent_prof.getGender() == "F":
+                    return parent_prof.get_id(), parent_prof
+        return None, None
+    def get_partners_from_profile(self, profile_id):
+        '''
+        It will return all partners associated with the profile
+        '''
+        partners = []
+        for family_id in self.get_all_family_ids_is_parent(profile_id):
+            parents = self.get_family_by_ID(family_id).get_parents()
+            addapted_parents = []
+            #Due to bug issues in union, we will extract the actual ID.
+            for parent in parents:
+                prof_parent = self.get_profile_by_ID(parent)
+                addapted_parents.append(prof_parent.get_id())
+            addapted_parents.remove(profile_id)
+            partners += addapted_parents
+        return partners
 #===============================================================================
 #        INTERMEDIATE methods: methods avoiding duplications
 #===============================================================================

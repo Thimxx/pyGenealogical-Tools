@@ -65,6 +65,7 @@ class Test(unittest.TestCase):
         #Test using a previous non UTF-8 file
         input_file = os.path.join(self.filelocation, "gedcom_test.gedcom")
         new_ged = db_gedcom(input_file)
+        assert(new_ged.get_db_kind() == "GEDCOM")
         prof = new_ged.get_profile_by_ID("@I1@")
         assert(prof.returnFullName() == "Francisco Sanz Sanz")
         assert(prof.getGender() == "U")
