@@ -125,16 +125,15 @@ class NorteCastillaParser(HTMLParser):
             profile.setCheckedGender(self.sex)
             profile.setWebReference(self.weblink)
             profile.setComments(self.comment)
-            profile.setCheckedDate("death_date", self.death_date, "EXACT")
+            profile.setCheckedDateWithDates("death", self.death_date, "EXACT")
             if (self.age_here):
                 self.age_here = False
                 #Just in case we have not extracted the right age of the person
                 if (self.age.isdigit()):
-                    birth = date(self.death_date.year - int(self.age),1,1)
-                    profile.setCheckedDate("birth_date", birth, "ABOUT")
+                    profile.setCheckedDate("birth", self.death_date.year - int(self.age), accuracy = "ABOUT")
             if (self.location_here):
                 self.location_here = False
-                profile.setPlaces("death_place", self.location, language="es" )
+                profile.setPlaces("death", self.location, language="es" )
             self.records.append(profile)
             #We just mark the end of the profile extraction
             self.ending_citation = False

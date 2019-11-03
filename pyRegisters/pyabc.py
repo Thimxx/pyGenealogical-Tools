@@ -72,7 +72,6 @@ class ABCParser(HTMLParser):
     def handle_data(self, data):
         if self.inname:
             self.inname = False
-            #name,surname, abs(surnames)
             name,surname, _ = get_name_surname_from_complete_name(data, convention="spanish_surname", language="es")
             profile = gen_profile(name, surname)
             self.records.append(profile)

@@ -7,6 +7,7 @@ from pyGenealogy.gen_utils import checkDateConsistency, get_score_compare_names,
 from pyGenealogy import VALUES_ACCURACY, EVENT_TYPE
 from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS, formated_year,score_factor_birth_and_death
 from pyGenealogy.common_event import event_profile
+from messages.pyGenealogymessages import INITIAL_PART_EVENT_ERROR, END_PART_EVENT_ERROR
 
 DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments", "id", "marriage_link"]
 MERGE_EVENTS = ["birth", "death", "baptism",  "burial", "marriage"]
@@ -186,7 +187,9 @@ class gen_profile(object):
         '''
         This function will introduce an event with the data related to the dates of the event
         '''
-        if (not event_name in EVENT_TYPE) or (not accuracy in VALUES_ACCURACY): return False
+        if (not event_name in EVENT_TYPE) or (not accuracy in VALUES_ACCURACY): 
+            raise NameError(INITIAL_PART_EVENT_ERROR + event_name + " or " + accuracy + END_PART_EVENT_ERROR) 
+            return False
         new_event = event_profile(event_name)
         new_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)
         if (not self.selfcheckDateConsistency(new_event)):
@@ -249,6 +252,7 @@ class gen_profile(object):
             self.gen_data[event_name] = new_event
             return True
         else:
+            raise NameError(INITIAL_PART_EVENT_ERROR + event_name + END_PART_EVENT_ERROR)
             return False
     def setLiving(self, alive):
         '''
@@ -334,11 +338,11 @@ class gen_profile(object):
         return self.gen_data["research_item"]
     def get_specific_research_log(self, item):
         '''
-        This function will provide the locatino of the research log
+        This function will provide the location of the research log
         '''
-        try:
+        if item in self.gen_data["research_item"]:
             return self.gen_data["research_item"].index(item)
-        except:
+        else:
             return None
     def getLiving(self):
         '''

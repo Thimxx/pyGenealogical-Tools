@@ -6,11 +6,10 @@ Created on 17 oct. 2019
 
 from pyRegisters.pyCommonRegisters import BaseRegister
 from html.parser import HTMLParser
-import requests
 from datetime import datetime
 from pyGenealogy.common_profile import gen_profile
 
-FIRST_YEAR = 1856
+FIRST_YEAR = 1849
 
 DIRECT_LINK = "http://www.valencia.es/ayuntamiento/cementerios.nsf/"
 INIT_ADDRESS = DIRECT_LINK + "fResultadoBusquedaCementerios?ReadForm=&lang=1&nivel=3&bdURL=ayuntamiento%2Fcementerios.nsf&pg=PXMLCE01&fc=FC0&pr=&wd=&idioma=C&apellido1="
@@ -42,12 +41,7 @@ class valencia_reader(BaseRegister):
         surname1 = profile.getSurname().split(" ")[0]
         surname2 = "+".join(profile.getSurname().split(" ")[1:])
         url = INIT_ADDRESS + surname1 + LINK_SURNAME + surname2 + LINK_NAME + name + END_ADDRESS
-        final_profiles = []
-        if self.continue_death_register(profile):
-            data = requests.get(url)
-            self.parser.feed(data.text)
-            final_profiles = self.matching_profiles(profile, self.parser.profiles)
-        return final_profiles
+        return self.perform_match(profile,url)
 class CementryValenciaParser(HTMLParser):
     '''
     This function will parser an specific individual to extract specific data useful for comparison

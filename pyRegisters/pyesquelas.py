@@ -3,7 +3,7 @@ Created on 15 oct. 2019
 
 @author: Val
 '''
-import requests,  locale
+import locale
 from datetime import datetime
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name
@@ -36,12 +36,7 @@ class esquelas_reader(BaseRegister):
         keywords = profile.getName().strip().replace(" ", "+") + "+" + profile.getSurname().strip().replace(" ", "+")
         keywords = keywords.lower().replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u")
         url = BASE_ESQUELAS + keywords
-        final_profiles = []
-        if self.continue_death_register(profile):
-            data = requests.get(url)
-            self.parser.feed(data.text)
-            final_profiles = self.matching_profiles(profile, self.parser.profiles)
-        return final_profiles
+        return self.perform_match(profile,url)
 class EsquelasParser(HTMLParser):
     '''
     This function will parser an specific individual to extract specific data useful for comparison
@@ -85,7 +80,7 @@ class EsquelasParser(HTMLParser):
             if (self.age):
                 profile.setCheckedDate("birth", self.death_date.year - self.age, accuracy="ABOUT")
             if (self.location):
-                profile.setPlaces("death_place", self.location, language="es" )
+                profile.setPlaces("death", self.location, language="es" )
             self.inside_description = False
             self.initiate_person_data()
             self.profiles.append(profile)

@@ -5,3 +5,5 @@ pyexcel
 pyexcel-xls 
 python-Levenshtein
 pyexcel-xlsx
+langdetect
+mapbox

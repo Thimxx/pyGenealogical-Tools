@@ -14,6 +14,7 @@ from Levenshtein import jaro
 import math
 import requests
 import pyGenealogy, os, re
+from mapbox import Geocoder
 
 THRESHOLD_JARO = 0.7
 
@@ -213,10 +214,9 @@ def get_formatted_location(location_string):
         logging.warning(NO_VALID_KEY)
         return output
     else:
-        url = MAPBOX_ADDRESS + location_string.replace("?","") +".json?access_token=" + get_mapbox_key()
-        r = requests.get(url)
-        mapbox_results = r.json()
-    if ( (len(mapbox_results) > 0) and ("context" in mapbox_results["features"][0])):
+        mapbox_results = Geocoder(access_token=get_mapbox_key()).forward(location_string).json()
+    wrong_message = ("Not Authorized" in mapbox_results.get("message", ""))
+    if ( (not wrong_message) and (len(mapbox_results) > 0) and ("context" in mapbox_results["features"][0])):
         #Received data is ok, we can proceed
         output["latitude"] = mapbox_results["features"][0]["center"][1]
         output["longitude"] = mapbox_results["features"][0]["center"][0]

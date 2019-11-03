@@ -17,7 +17,7 @@ class Test(unittest.TestCase):
         Test use of abc records
         '''
         profile = gen_profile("José", "García Reyes")
-        profile.setCheckedDate("birth_date", date(1931,4,2), "EXACT")
+        profile.setCheckedDateWithDates("birth", date(1931,4,2), "EXACT")
         reader = abc_reader()
         records = reader.profile_is_matched(profile)
         assert(len(records) >0 )

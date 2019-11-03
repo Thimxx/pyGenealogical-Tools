@@ -8,10 +8,11 @@ from pyRegisters.pyelnortedecastilla import elnortedecastilla_reader
 from pyRegisters.pyabc import abc_reader
 from pyRegisters.pyesquelas import esquelas_reader
 from pyRegisters.pycementry_valencia import valencia_reader
+from pyRegisters.pylavanguardia import vanguardia_reader
 import logging, datetime
 from messages.pygenanalyzer_messages import RESEARCH_INFO, RESEARCH_LOG
 
-ALL_PARSERS = ["REMEMORI", "ELNORTEDECASTILLA", "ABC", "ESQUELAS", "CEMENTRY VALENCIA" ]
+ALL_PARSERS = ["REMEMORI", "ELNORTEDECASTILLA", "ABC", "ESQUELAS", "CEMENTRY VALENCIA", "LAVANGUARDIA" ]
 
 class gen_analyzer(object):
     '''
@@ -63,6 +64,7 @@ class gen_analyzer(object):
             readers_2_use["ABC"] = abc_reader(language=self.language, name_convention=self.name_convention)
             readers_2_use["ESQUELAS"] = esquelas_reader(language=self.language, name_convention=self.name_convention)
             readers_2_use["CEMENTRY VALENCIA"] = valencia_reader(language=self.language, name_convention=self.name_convention)
+            readers_2_use["LAVANGUARDIA"] = vanguardia_reader(language=self.language, name_convention=self.name_convention)
             for parser in ALL_PARSERS:
                 if checks_2_perform[parser]:
                     records = readers_2_use[parser].profile_is_matched(person)

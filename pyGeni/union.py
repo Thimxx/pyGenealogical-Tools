@@ -8,7 +8,6 @@ import pyGeni as geni
 from pyGeni.geniapi_common import geni_calls
 from pyGenealogy.common_event import event_profile
 from pyGenealogy.common_family import family_profile
-from _ctypes import Union
 
 class union(geni_calls, family_profile):
     '''

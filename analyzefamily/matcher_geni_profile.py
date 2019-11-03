@@ -28,7 +28,6 @@ class match_single_profile(object):
     def match(self, profile_ID):
         '''
         It executes the match, assumes contains a GENI link in the profile_ID
-        
         It will:
         - Generate a web link to the matched profile
         - Return the following:
@@ -44,7 +43,7 @@ class match_single_profile(object):
         #We confirm is a valid profile, should contain a match
         confirmed = False
         for web_ref in profile_rm.get_all_webs():
-            if web_ref["name"] == self.database_geni.get_db_kind(): 
+            if web_ref["name"] == self.database_geni.get_db_kind():
                 confirmed = True
                 url = web_ref["url"]
         if not confirmed:
@@ -116,12 +115,12 @@ class match_single_profile(object):
         details_info = MATCH_CONFLICT_INFO
         for ids_geni in conflicted_profiles_ids:
             details_info += self.database_geni.get_profile_by_ID(ids_geni).get_this_profile_url() + "     "
-        profile_rm.set_task(MATCH_CONFLICT_TASK, priority=1, details= details_info, task_type = 0)      
+        profile_rm.set_task(MATCH_CONFLICT_TASK, priority=1, details= details_info, task_type = 0)
     def _init_tracking_logs(self):
         '''
         Init to empty for each matching operations
         '''
-        #It will be a dictionary of profiles not matched and their relationship "LEFT side" 
+        #It will be a dictionary of profiles not matched and their relationship "LEFT side"
         self.non_matched_profiles_rm = {}
         #It will be a dictionary of profiles not matched and their relationship "RIGTH side"
         self.non_matched_profiles_geni = {}
@@ -144,7 +143,7 @@ class match_single_profile(object):
                 if score*factor > self.threshold:
                     geni_matches.append(geni_id)
                     if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
-            #If we have a single profile that is matched, 
+            #If we have a single profile that is matched,
             if len(geni_matches) == 0:
                 self.non_matched_profiles_rm[rm_id] = kind_of_match
                 print_out("-    NO MATCH in profile " + str(profile_rm.nameLifespan()) + " Relation = " + kind_of_match)

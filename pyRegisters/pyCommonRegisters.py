@@ -3,6 +3,7 @@ Created on 15 ago. 2019
 
 @author: Val
 '''
+import requests
 
 class BaseRegister(object):
     '''
@@ -38,4 +39,15 @@ class BaseRegister(object):
             score, factor = selected_profile.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
             if (score*factor > 2.0):
                 final_profiles.append(selected_profile)
+        return final_profiles
+    def perform_match(self, profile, url):
+        '''
+        This function takes an url and will obtain the result, for afterwards obtain the
+        matching of profiles
+        '''
+        final_profiles = []
+        if self.continue_death_register(profile):
+            data = requests.get(url)
+            self.parser.feed(data.text)
+            final_profiles = self.matching_profiles(profile, self.parser.profiles)
         return final_profiles

@@ -17,7 +17,7 @@ class Test(unittest.TestCase):
         Test checking el Norte de Castilla parser
         '''
         profile = gen_profile("José Luis", "García Martín")
-        profile.setCheckedDate("birth_date", date(1931,4,2), "EXACT")
+        profile.setCheckedDateWithDates("birth", date(1931,4,2), "EXACT")
         reader = elnortedecastilla_reader()
         records = reader.profile_is_matched(profile)
         assert(len(records) > 0)

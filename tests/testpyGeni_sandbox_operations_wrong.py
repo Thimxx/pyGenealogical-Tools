@@ -6,6 +6,8 @@ Created on 21 oct. 2017
 import unittest
 from tests.FIXTURES import WRONG_TOKEN, MAIN_SANDBOX_PROFILE
 from pyGeni import profile, set_token, geniapi_common
+from pyGenealogy import set_mapbox_key, set_mapbox_key_environmental
+from pyGenealogy.gen_utils import get_formatted_location
 
 
 class Test(unittest.TestCase):
@@ -15,7 +17,6 @@ class Test(unittest.TestCase):
         #We used the sandbox here
         set_token(WRONG_TOKEN)
         profile.s.update_geni_address("https://sandbox.geni.com")
-
 
     def test_wrong_execution(self):
         '''
@@ -30,6 +31,17 @@ class Test(unittest.TestCase):
         '''
         base_geni2 = geniapi_common.geni_calls()
         self.assertFalse(base_geni2.check_valid_genikey())
+    
+    def test_no_valid_mapbox(self):
+        '''
+        Test no valid Mapbox
+        '''
+        set_mapbox_key(WRONG_TOKEN)
+        location1 = get_formatted_location("Madrid, Spain")
+        assert(not "county" in location1.keys())
+        set_mapbox_key_environmental()
+        location2 = get_formatted_location("Madrid, Spain")
+        assert("county" in location2.keys())
 
 
 if __name__ == "__main__":

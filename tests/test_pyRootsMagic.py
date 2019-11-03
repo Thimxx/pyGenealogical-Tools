@@ -146,6 +146,7 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(prof.get_specific_research_log("TEST_OF_LOG"))
         assert(prof.get_specific_research_log("TEST_NOT_EXISTING") == None)
         prof.set_research_item(row_id, repository = "www.google.com", source = "GOOGLE", result = "GOOD")
+        prof.update_research_item(row_id, "www.google.com", source = "GOOGLE2", result = "BAD")
         
         prof2 = db.get_profile_by_ID(1)
         

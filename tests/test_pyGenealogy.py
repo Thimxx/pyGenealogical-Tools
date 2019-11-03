@@ -82,7 +82,8 @@ class Test(unittest.TestCase):
         assert(profile.setCheckedDate("birth", 2016, 10, 20, "BEFORE"))
         assert(profile.setCheckedDate("birth", 2016, 10, 20, "AFTER"))
         assert(profile.setCheckedDate("birth", 2016, 10, 20, "ABOUT"))
-        assert(not profile.setCheckedDate("birth", 2016, 10, 20, "OTHER"))
+        with self.assertRaises(NameError):
+                profile.setCheckedDate("birth", 2016, 10, 20, "OTHER")
         
         assert(profile.setCheckedDate("death", 2016, 12, 31))
         assert(not profile.setCheckedDate("birth", 2017,12,31))
@@ -98,7 +99,8 @@ class Test(unittest.TestCase):
         assert(profile.setCheckedDate("death", 2017, 12, 31, "BEFORE"))
         assert(profile.setCheckedDate("death", 2017, 12, 31, "AFTER"))
         assert(profile.setCheckedDate("death", 2017, 12, 31, "ABOUT"))
-        assert(not profile.setCheckedDate("death", 2017, 12, 31, "OTHER"))
+        with self.assertRaises(NameError):
+            profile.setCheckedDate("death", 2017, 12, 31, "OTHER")
         
         assert(profile.setCheckedDate("birth", 2016, 10, 20))
         assert(not profile.setCheckedDate("death", 2015, 12 ,31))
@@ -115,7 +117,9 @@ class Test(unittest.TestCase):
         
         assert(not profile.setCheckedDate("baptism", 2015,12, 31))
         assert(not profile.setCheckedDate("baptism", 2020,12, 31))
-        assert(not profile.setCheckedDate("baptism", 2016,12, 31,"OTHER"))
+        
+        with self.assertRaises(NameError):
+            profile.setCheckedDate("baptism", 2016,12, 31,"OTHER")
     
     def test_introduce_burial_date(self):
         '''
@@ -129,7 +133,8 @@ class Test(unittest.TestCase):
         assert(not profile.setCheckedDate("burial", 2015,12, 31))
         #Notice that will be ok to introudce a very late burial date
         assert(profile.setCheckedDate("burial", 2020,12, 31))
-        assert(not profile.setCheckedDate("burial", 2019,12, 31,"OTHER"))
+        with self.assertRaises(NameError):
+            profile.setCheckedDate("burial", 2019,12, 31,"OTHER")
      
     def test_introduce_residence_date(self):
         '''
@@ -142,14 +147,16 @@ class Test(unittest.TestCase):
         
         assert(not profile.setCheckedDate("residence",2015,12, 31))
         assert(not profile.setCheckedDate("residence",2020,12, 31))
-        assert(not profile.setCheckedDate("burial",2016,12, 31,"OTHER"))
+        with self.assertRaises(NameError):
+            profile.setCheckedDate("burial",2016,12, 31,"OTHER")
     def test_wrong_input(self):
         '''
         Test wrong input date class
         '''
         birth_date = date(2016,10, 20)
         profile = gen_profile("Name", "Surname")
-        assert(not profile.setCheckedDate("no_valid_date",birth_date))
+        with self.assertRaises(NameError):
+            profile.setCheckedDate("no_valid_date",birth_date)
         
     def test_accuracy_in_dates(self):
         '''
@@ -177,7 +184,8 @@ class Test(unittest.TestCase):
         '''
         profile = gen_profile("Name", "Surname")
         
-        self.assertFalse(profile.setPlaces("notvalid", GENERIC_PLACE_STRING))
+        with self.assertRaises(NameError):
+            profile.setPlaces("notvalid", GENERIC_PLACE_STRING) 
         assert(profile.setPlaces("birth", GENERIC_PLACE_STRING))
         self.assertFalse("death" in profile.gen_data.keys())
         assert("birth" in profile.gen_data.keys())

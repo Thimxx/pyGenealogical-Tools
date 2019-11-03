@@ -66,7 +66,7 @@ class rememori_reader(BaseRegister):
                     death = selected_profile.gen_data["death"].get_date()
                     selected_profile.setCheckedDate("birth", death.year - self.person_parser.age, accuracy="ABOUT")
                 if (self.person_parser.location):
-                    selected_profile.setPlaces("death_place", self.person_parser.location, language="es" )
+                    selected_profile.setPlaces("death", self.person_parser.location, language="es" )
                 #As we have new data, we crosscheck the information to make sure we do not have profiles we should not have
                 score, factor = selected_profile.comparison_score(profile, data_language=self.language, name_convention=self.name_convention)
                 if (score*factor > 2.0):

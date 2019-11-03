@@ -17,3 +17,7 @@ NO_VALID_KEY = "The key introduced for MapBox is not valid"
 #Event error
 NO_VALID_EVENT_START = "The provided event "
 NO_VALID_EVENT_END = " is not correct."
+
+#Location error
+INITIAL_PART_EVENT_ERROR = "The value of event "
+END_PART_EVENT_ERROR = " is not defined."

@@ -1,4 +1,4 @@
-__all__ = ["common_profile", "gen_utils"]
+__all__ = ["common_profile", "gen_utils", "common_database", "common_event", "common_family"]
 
 VALUES_ACCURACY = ["EXACT", "BEFORE", "AFTER", "ABOUT", "BETWEEN"]
 
@@ -11,7 +11,6 @@ from os import environ, getenv
 #The token data
 MAPBOX_KEY = None
 
-if "MAPBOX_API" in environ : MAPBOX_KEY = getenv("MAPBOX_API")
 
 TOKEN = None
 
@@ -26,3 +25,11 @@ def set_mapbox_key(key_value):
     '''
     global MAPBOX_KEY
     MAPBOX_KEY = key_value
+def set_mapbox_key_environmental():
+    '''
+    It will set-up the environmental variable using MAPBOX_API input
+    '''
+    set_mapbox_key(getenv("MAPBOX_API"))
+
+
+if "MAPBOX_API" in environ : set_mapbox_key_environmental()

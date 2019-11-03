@@ -178,7 +178,7 @@ class Test(unittest.TestCase):
         my_event = event_profile("marriage")
         my_event.setDate(2017, 11, 20)
         partner_profile.setCheckedDate("marriage", 2017, 10, 20)
-        partner_profile.setPlaces("marriage_place",GENERIC_PLACE_STRING , language="es")
+        partner_profile.setPlaces("marriage",GENERIC_PLACE_STRING , language="es")
         profile.profile.create_as_a_partner(partner_profile, geni_input = BROTHER_PROFILE_SANDBOX)
         #TODO: add checking of marriage data once is included
         assert(partner_profile.properly_executed)
