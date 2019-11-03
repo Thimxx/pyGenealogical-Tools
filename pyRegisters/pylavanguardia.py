@@ -52,7 +52,7 @@ class VanguardiaParser(HTMLParser):
         self.profiles = []
         self.initiate_data()
     def handle_starttag(self, tag, attrs):
-        if tag == "a": 
+        if tag == "a":
             for attr in attrs:
                 if attr[0] == "class" and attr[1] == "notice_name_link":
                     self.inside_profile = True
@@ -64,7 +64,7 @@ class VanguardiaParser(HTMLParser):
                     self.name = name
                     self.surname = surname
         elif tag == "p" and self.inside_profile: self.inside_data = True
-        elif tag == "meta" and self.inside_profile: 
+        elif tag == "meta" and self.inside_profile:
             itemprop = None
             content = None
             for attr in attrs:
@@ -76,7 +76,7 @@ class VanguardiaParser(HTMLParser):
         if self.inside_data:
             self.location, self.age = sp_age_location_colector(data, detect_lan = True)
             self.inside_data = False
-        if "Publicado en EnMemoria" in data: 
+        if "Publicado en EnMemoria" in data:
             #This means we are at the end of the profile.
             self.inside_profile = False
             prof_record = gen_profile(self.name, self.surname)

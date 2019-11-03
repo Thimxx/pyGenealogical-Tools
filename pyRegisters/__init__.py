@@ -18,7 +18,7 @@ def sp_age_location_colector(data, language = "es", detect_lan = False):
     This is a common function to be used in several parsers which provides
     the location and age from a data source
     '''
-    if detect_lan: 
+    if detect_lan:
         language_temp = detect(data)
         if language_temp in used_strings.keys(): language = language_temp
     str_input = used_strings[language]

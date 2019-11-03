@@ -187,8 +187,8 @@ class gen_profile(object):
         '''
         This function will introduce an event with the data related to the dates of the event
         '''
-        if (not event_name in EVENT_TYPE) or (not accuracy in VALUES_ACCURACY): 
-            raise NameError(INITIAL_PART_EVENT_ERROR + event_name + " or " + accuracy + END_PART_EVENT_ERROR) 
+        if (not event_name in EVENT_TYPE) or (not accuracy in VALUES_ACCURACY):
+            raise NameError(INITIAL_PART_EVENT_ERROR + event_name + " or " + accuracy + END_PART_EVENT_ERROR)
             return False
         new_event = event_profile(event_name)
         new_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)
