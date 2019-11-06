@@ -10,7 +10,7 @@ from pyRegisters.pyesquelas import esquelas_reader
 from pyRegisters.pycementry_valencia import valencia_reader
 from pyRegisters.pylavanguardia import vanguardia_reader
 import logging, datetime
-from messages.pygenanalyzer_messages import RESEARCH_INFO, RESEARCH_LOG
+from messages.pygenanalyzer_messages import RESEARCH_INFO, RESEARCH_LOG, WEB_DETECTED
 
 ALL_PARSERS = ["REMEMORI", "ELNORTEDECASTILLA", "ABC", "ESQUELAS", "CEMENTRY VALENCIA", "LAVANGUARDIA" ]
 
@@ -49,7 +49,7 @@ class gen_analyzer(object):
             checks_2_perform = {}
             overall_check = False
             for parser in ALL_PARSERS:
-                checks_2_perform[parser] = continue_analysis(person, parser, threshold, log_loc)
+                checks_2_perform[parser] = continue_analysis(person, parser, threshold, log_loc, self.file)
                 if checks_2_perform[parser]: overall_check = True
             skipping = ""
             if not overall_check: skipping = " -- SKIPPED"
@@ -118,7 +118,7 @@ def store_url_task_in_db(profile, url, web_site, log_id, notes_toadd=None):
         profile.set_research_item(log_id, repository = url, source = web_site, result = notes_toadd)
         return True
     return False
-def continue_analysis(profile, web_site, threshold, log_loc):
+def continue_analysis(profile, web_site, threshold, log_loc, file):
     '''
     This function will say if the web site shall be analyzed or not, in principle
     it should not be analyzed if:
@@ -135,6 +135,20 @@ def continue_analysis(profile, web_site, threshold, log_loc):
             #It can be only CLOSED if it was dead and nothing was found, we stop reivew.
             #If it is CONFIRMED, that means that the profile has been confirmed linked to the website.
             if ("CONFIRMED" in identification_note):
+                detected = False
+                for web in profile.get_all_webs():
+                    if web["name"] == web_site: detected = True
+                if not detected:
+                    profile.setWebReference(item["url"], name=item["name"], notes=WEB_DETECTED)
+                #If the citation has not been created before, we create it now
+                if not profile.get_citation_with_comments(item["url"]):
+                    source_id = profile.get_source_id_ref(web_site)
+                    if not source_id:
+                        profile.set_source_id(web_site)
+                        source_id = profile.get_source_id_ref(web_site)
+                    #Now we know source_id, let's introduce the citation
+                    profile.set_citation(source_id, details=item["url"])
+                    print_out("Introducing citation from " + web_site + " and location = " + item["url"], file)
                 return False
             #If closed, the analysis is not longer needed
             if ("CLOSED" in identification_note) and (not profile.getLiving()):

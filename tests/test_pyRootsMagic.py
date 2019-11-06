@@ -11,6 +11,7 @@ from datetime import date
 from shutil import copyfile
 from tests.FIXTURES import TEST_FACEBOOK, TEST_GOOGLE, TEST_WIKIPEDIA
 
+
 class Test_use_and_access_RootsMagic(unittest.TestCase):
     def setUp(self):
         "Creation of the different parameters needs for execution, including location of database"
@@ -135,18 +136,27 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(prof.get_all_webs()[0]["name"] == "Google")
         assert(TEST_GOOGLE in prof.get_all_urls())
         assert(TEST_WIKIPEDIA in prof.get_all_urls())
+        
         prof.del_web_ref(TEST_WIKIPEDIA)
         assert(not (TEST_WIKIPEDIA in prof.get_all_urls()))
         #It does not essent
         assert(prof.update_web_ref("DOES NOT EXISTS", "Google", "A note") == None)
         
-        prof.set_task("TEST")
+        prof.set_task("TEST", details="HAHA")
+        
         #Introduce a research log
         row_id = prof.set_task("TEST_OF_LOG", task_type=2)
         assert(prof.get_specific_research_log("TEST_OF_LOG"))
         assert(prof.get_specific_research_log("TEST_NOT_EXISTING") == None)
+        
+        
         prof.set_research_item(row_id, repository = "www.google.com", source = "GOOGLE", result = "GOOD")
         prof.update_research_item(row_id, "www.google.com", source = "GOOGLE2", result = "BAD")
+        #Error when 2 research logs of the same name in the same profile.
+        profb = db.get_profile_by_ID(6)
+        with self.assertLogs("rootsmagic", level="WARNING") as cm:
+            profb.get_specific_research_log("TWICE")
+            assert("TWICE" in cm.output[0])
         
         prof2 = db.get_profile_by_ID(1)
         
@@ -156,6 +166,15 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         prof3 = db.get_profile_by_ID(3)
         
         assert(len(prof3.get_all_research_item()) == 0)
+        
+        #Setting up the sources
+        assert(prof2.get_source_id_ref("TESTING") == None)
+        prof2.set_source_id("TESTING")
+        prof2.setWebReference("http//here.com", "NEW_URL")
+        assert(prof2.get_source_id_ref("TESTING") == 1)
+        assert(prof2.get_citation_with_comments("http://test.com") == None)
+        prof2.set_citation(1, details="http://test.com")
+        assert(prof2.get_citation_with_comments("http://test.com") == 1)
         
         db.close_db()
         if os.path.exists(working_file): os.remove(working_file)

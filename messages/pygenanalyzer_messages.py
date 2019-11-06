@@ -11,3 +11,5 @@ MATCH_PROFILE_ERROR = "Profile provided does not contain the information of the 
 MATCH_GENI = "This match was found automatically by PyGenealogical tools. MATCHED ON="
 MATCH_CONFLICT_TASK = "CHECK GENI MATCH"
 MATCH_CONFLICT_INFO = "This profile does not match with the following geni profile, when should == "
+
+WEB_DETECTED = "Web automatically detected by pyGenealogicalTools"

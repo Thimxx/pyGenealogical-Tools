@@ -6,9 +6,14 @@ Created on 7 jul. 2019
 from pyGenealogy import common_profile
 from pyGenealogy.common_event import event_profile
 from pyRootsMagic import collate_temp, return_date_from_event
+from messages.py_rootsmagic_messages import WARNING_RESEARCH_LOG, PROFILE_RESEARCH_LOG
 from datetime import date
+import logging
+from wx import ID_VIEW_DETAILS
 
 DATE_EVENT_ID = {"birth" : "1", "death" : "2", "baptism" : "3",  "burial" : "4", "marriage" : "300", "residence" : "29"}
+
+logger = logging.getLogger('rootsmagic')
 
 class rootsmagic_profile(common_profile.gen_profile):
     '''
@@ -112,11 +117,14 @@ class rootsmagic_profile(common_profile.gen_profile):
         This function will provide an specific log research log in the database, if existing for the owner id
         '''
         self.database.create_collation("RMNOCASE", collate_temp)
-        input_rlog = "SELECT * FROM ResearchTable WHERE OwnerId=? AND  Name=? AND TaskType=2"
+        input_rlog = "SELECT * FROM ResearchTable WHERE OwnerId=? AND  Name LIKE ? AND TaskType=2"
         logs = self.database.execute(input_rlog, (str(self.get_id()),str(log_name),) )
         #Now let's fetch the first value
         logs_data = logs.fetchone()
-        self.database.create_collation("RMNOCASE", None)
+        if len(logs.fetchmany()) > 0:
+            logger.warning(WARNING_RESEARCH_LOG + str(log_name) + PROFILE_RESEARCH_LOG + str(self.get_id()))
+        else:
+            self.database.create_collation("RMNOCASE", None)
         if logs_data:
             return logs_data[0]
         else:
@@ -159,6 +167,22 @@ class rootsmagic_profile(common_profile.gen_profile):
             task_info["details"] = logs[15]
             all_items.append(task_info)
         return all_items
+    def get_source_id_ref(self, name):
+        '''
+        It will provide back the reference of the source id for internal use
+        '''
+        source_logs = "SELECT * FROM SourceTable WHERE Name LIKE ?"
+        logs_info = self.database.execute( source_logs, (name,) ).fetchone()
+        if logs_info: return logs_info[0]
+        else: return None
+    def get_citation_with_comments(self, comments):
+        '''
+        It will return, if exists, a citatuion wiht specific comments
+        '''
+        citation_logs = "SELECT * FROM CitationTable WHERE OwnerID = ? and Comments LIKE ?"
+        logs_info = self.database.execute( citation_logs, (str(self.get_id()), comments, ) ).fetchone()
+        if logs_info: return logs_info[0]
+        else: return None
 #===============================================================================
 #         SET methods: the value of the profile is modified, overwrtting methods
 #        from common_profile
@@ -183,7 +207,7 @@ class rootsmagic_profile(common_profile.gen_profile):
             new_web = "INSERT INTO URLTable(OwnerType,LinkType,OwnerID,URL,Name,Note) VALUES(0,0,?,?,?,?)"
             self.database.execute( new_web, (str(self.get_id()), str(url), value_name, value_notes) )
         self.database.commit()
-    def set_task(self, task_details, priority=0, details="", task_type = 0):
+    def set_task(self, task_details, priority=1, details="", task_type = 0):
         '''
         Introduces a task linked to the given profile
         Task_details: include a list a description of the task or the name of the research log
@@ -193,9 +217,9 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         empty_value=""
         self.database.create_collation("RMNOCASE", collate_temp)
-        new_task = "INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details) VALUES(?,?,0,?,0,?,?,?,?)"
+        new_task = "INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details, Date1, Date2, Date3, SortDate1, SortDate2, SortDate3) VALUES(?,?,0,?,0,?,?,?,?,?,?,?,9223372036854775807,9223372036854775807,9223372036854775807)"
         cursor = self.database.cursor()
-        cursor.execute( new_task, (str(task_type), str(self.get_id()),empty_value, str(priority), empty_value, str(task_details), details, ) )
+        cursor.execute( new_task, (str(task_type), str(self.get_id()),empty_value, str(priority), empty_value, str(task_details), details,".", ".", ".", ) )
         row_data = cursor.lastrowid
         self.database.create_collation("RMNOCASE", None)
         self.database.commit()
@@ -215,6 +239,29 @@ class rootsmagic_profile(common_profile.gen_profile):
         date_of_research = return_date_from_event(new_event)
         new_item = "INSERT INTO ResearchItemTable(LogID,Date,Repository,Source,Result) VALUES(?,?,?,?,?)"
         self.database.execute( new_item, (str(log_id), date_of_research, repository, source, result, ) )
+        self.database.commit()
+    def set_source_id(self, name, isprivate=0, templateID = 144, fields = None):
+        '''
+        Introduces a new source id inside RootsMagic
+        '''
+        self.database.create_collation("RMNOCASE", collate_temp)
+        if not fields:
+            fields = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Root><Fields><Field><Name>Newspaper</Name><Value>"
+            fields += name
+            fields += "</Value></Field><Field><Name>TranslatedName</Name><Value/></Field><Field><Name>PubPlace</Name><Value/></Field></Fields></Root>"
+        new_item = "INSERT INTO SourceTable(Name, RefNumber, ActualText, Comments, IsPrivate, TemplateID, Fields) VALUES(?,?,?,?,?,?,?)"
+        self.database.execute( new_item, (str(name), "", "", "", str(isprivate), str(templateID), fields,) )
+        self.database.create_collation("RMNOCASE", None)
+        self.database.commit()
+    def set_citation(self, sourceid, isprivate = 0, details = ""):
+        '''
+        Introduces a citation linked to the profile
+        '''
+        data_details = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Root><Fields><Field><Name>ItemID</Name><Value/></Field><Field><Name>Date</Name><Value/></Field><Field><Name>Details</Name><Value>"
+        data_details += details
+        data_details += "</Value></Field><Field><Name>Annotation</Name><Value/></Field></Fields></Root>"
+        new_citation = "INSERT INTO CitationTable(OwnerType, SourceID, OwnerID, Quality, IsPrivate, Comments, ActualText, RefNumber,Flags, Fields) VALUES(0,?,?,?,?,?,?,?,0,?)"
+        self.database.execute( new_citation, (str(sourceid), str(self.get_id()), "~~~", str(isprivate), details, "", "", data_details, ) )
         self.database.commit()
 #===============================================================================
 #         DELETE methods: methods to delete currently existing entries
