@@ -5,13 +5,24 @@ Created on 16 sept. 2017
 '''
 import re
 from langdetect import detect
+from geotext import GeoText
 
-__all__ = ["pyrememori","pyelnortedecastilla", "pygenanalyzer", "pyabc", "pyCommonRegisters", "pyesquelas", "pycementry_valencia", "pylavanguardia"]
+__all__ = ["pyrememori","pyelnortedecastilla", "pygenanalyzer", "pyabc", "pyCommonRegisters", "pyesquelas", "pycementry_valencia", 
+           "pylavanguardia", "get_location_from_text", "sp_age_location_colector"]
 
 used_strings = {
-    "es" : {"IN" : "en ", "AT AGE" : " a los ", "AT THE AGE" : " a la edad de ", "YEARS" : " años"},
-    "ca" : {"IN"  : " a ", "AT AGE" : " als ", "AT THE AGE" : " a l'edat de ", "YEARS" : " anys"}
+    "es" : {"AT AGE" : " a los ", "AT THE AGE" : " a la edad de ", "YEARS" : " años"},
+    "ca" : { "AT AGE" : " als ", "AT THE AGE" : " a l'edat de ", "YEARS" : " anys"}
     }
+
+def get_location_from_text(text):
+    '''
+    This function will provide the location from the text
+    '''
+    result = GeoText(text).cities
+    if len(result) > 0:
+        return result[0]
+    return None
 
 def sp_age_location_colector(data, language = "es", detect_lan = False):
     '''
@@ -22,30 +33,24 @@ def sp_age_location_colector(data, language = "es", detect_lan = False):
         language_temp = detect(data)
         if language_temp in used_strings.keys(): language = language_temp
     str_input = used_strings[language]
-    location = None
     age = None
-    if ((str_input["IN"] in data) and (str_input["AT AGE"] in data)):
-        result = re.search(str_input["IN"] +'(.*)' + str_input["AT AGE"], data)
-        if not (result == None):
-            location = result.group(1).strip()
-        result = re.search(str_input["AT AGE"] + '(.*)' + str_input["YEARS"], data)
-        if not (result == None):
-            aged = result.group(1).strip()
-            if aged.isdigit(): age = int(result.group(1).strip())
-    elif ((str_input["IN"] in data) and (str_input["AT THE AGE"] in data)):
-        result = re.search(str_input["IN"] +'(.*)' + str_input["AT THE AGE"], data)
-        if not (result == None):
-            location = result.group(1).strip()
-        result = re.search(str_input["AT THE AGE"] + '(.*)' + str_input["YEARS"], data)
-        if not (result == None):
-            aged = result.group(1).strip()
-            if aged.isdigit(): age = int(result.group(1).strip())
-    elif (str_input["IN"] in data):
-        location = data.split(str_input["IN"],1)[1].strip()
-    elif  (str_input["AT AGE"] in data) and (str_input["YEARS"] in data):
+    if  (str_input["AT AGE"] in data) and (str_input["YEARS"] in data):
         result = re.search(str_input["AT AGE"] + '(.*)' + str_input["YEARS"], data)
         if result:
             aged = result.group(1).strip()
             if aged.isdigit(): age = int(result.group(1).strip())
+    elif (str_input["AT AGE"] in data):
+        result = re.search(str_input["AT AGE"] + '(.*)' + str_input["YEARS"], data)
+        if not (result == None):
+            aged = result.group(1).strip()
+            if aged.isdigit(): age = int(result.group(1).strip())
+    elif  (str_input["AT THE AGE"] in data):
+        result = re.search(str_input["AT THE AGE"] + '(.*)' + str_input["YEARS"], data)
+        if not (result == None):
+            aged = result.group(1).strip()
+            if aged.isdigit(): age = int(result.group(1).strip())
+    location = None
     if location: location = re.split(" |,|[.]", location)[0]
+    #For location we will use the function get_location
+    location = get_location_from_text(data)
     return location, age

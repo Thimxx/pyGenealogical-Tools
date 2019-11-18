@@ -7,7 +7,7 @@
 import pyGeni as s
 from pyGeni.geniapi_common import geni_calls
 from pyGeni.immediate_family import immediate_family
-from pyGenealogy.common_profile import gen_profile, EVENT_TYPE
+from pyGenealogy.common_profile import gen_profile, EVENT_TYPE, NO_ARRAY_EVENTS
 from pyGenealogy import NOT_KNOWN_VALUE
 from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS, RESIDENCE_MESSAGE, NO_VALID_UNION_PROFILE
 import logging
@@ -72,9 +72,8 @@ class profile(geni_calls, gen_profile):
         self.children = self.relations.children
         self.parent_union = self.relations.parent_union
         self.marriage_union = self.relations.marriage_union
-        #TODO:This is temporal, only a single marriage is considered
-        if (len(self.relations.marriage_events) > 0):
-            self.setNewEvent(self.relations.marriage_events[0])
+        for marriage in self.relations.marriage_events:
+            self.setNewEvent(marriage)
     def get_geni_data(self, data):
         '''
         Transfer json geni data into the base profile
@@ -248,30 +247,31 @@ class profile(geni_calls, gen_profile):
             for value in self.gen_data["web_ref"]:
                 msg += " [" + value["url"] + " FamilySearch-link]"
             data["about_me"] = msg
-        for event_geni in EVENT_TYPE:
+        for event_geni in NO_ARRAY_EVENTS:
             event_value = self.event_value(event_geni)
             if (event_value): data[event_geni] = event_value
-        event_residence = self.event_value("residence")
-        if (event_residence):
+        for event_residence in self.gen_data["residence"]:
             msg = RESIDENCE_MESSAGE
-            if event_residence.get("date", {}).get("year", None):
-                msg += " Year = " + str(event_residence.get("date", {}).get("year", None))
-            if event_residence.get("date", {}).get("month", None):
-                msg += " Month = " + str(event_residence.get("date", {}).get("month", None))
-            if event_residence.get("date", {}).get("day", None):
-                msg += " Day = " + str(event_residence.get("date", {}).get("day", None))
-            if self.gen_data.get("residence_place", {}).get("raw", None):
-                msg += " Location = " + self.gen_data.get("residence_place", {}).get("raw", None)
+            if event_residence.get_year():
+                msg += " Year = " + str(event_residence.get_year())
+            if event_residence.get_month():
+                msg += " Month = " + str(event_residence.get_month())
+            if event_residence.get_day():
+                msg += " Day = " + str(event_residence.get_day())
+            if event_residence.get_location():
+                msg += " Location = " + str(event_residence.get_location()["raw"])
             data["about_me"] += msg
         return data
-    def event_value(self, event_geni):
+    def event_value(self, event_geni, location_array = 0):
         '''
         Provides event value, uses the function
         '''
         event_data = {}
-        if event_geni in self.gen_data.keys():
-            date_structure = getDateStructureGeni(self.gen_data[event_geni])
-            location_structure = getLocationStructureGeni(self.gen_data[event_geni].get_location())
+        if (event_geni in self.gen_data.keys()) and (self.gen_data[event_geni] != []):
+            event_selected = self.gen_data[event_geni]
+            if not event_geni in NO_ARRAY_EVENTS: event_selected = self.gen_data[event_geni][location_array]
+            date_structure = getDateStructureGeni(event_selected)
+            location_structure = getLocationStructureGeni(event_selected.get_location())
             if(date_structure) : event_data["date"] = date_structure
             if(location_structure) :event_data["location"] = location_structure
         return event_data

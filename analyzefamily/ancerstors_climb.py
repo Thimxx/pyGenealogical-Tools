@@ -3,6 +3,8 @@ Created on 7 ago. 2017
 
 @author: Val
 '''
+import logging
+from messages.pygenanalyzer_messages import TOP_CLIMB
 
 class climb(object):
     '''
@@ -18,6 +20,9 @@ class climb(object):
     def get_ancestors(self, source_person, generations):
         '''
         This functions obtains the ancestors up to the requested generations.
+        
+        - source person: a person in the format of the database data kind
+        - generations: the number of generations to be analyzed.
         '''
         #Firstly we initiate the list which will contain all
         ancestors = []
@@ -27,6 +32,7 @@ class climb(object):
         #We introduce also a function to check duplications of profile... if they are duplicated, we take them out!
         affected_profiles = {}
         affected_profiles[source_person.get_id()] = 1
+        top_generation_found = False
         for i in range(1, generations + 1):
             #We create an intermediate source version we will store all parents.
             next_gen = []
@@ -45,8 +51,9 @@ class climb(object):
                         #This means the profile is duplicated, so we add the value
                         affected_profiles[parent] = affected_profiles[parent] + affected_profiles[prof_id]/2
             #If there are no longer ancestors, we should stop!
-            if len(next_gen) == 0:
-                return ancestors, affected_profiles
+            if (len(next_gen) == 0) and (not top_generation_found):
+                logging.info(TOP_CLIMB + str(i))
+                top_generation_found = True
             #Now...we append this generation to ancestors
             ancestors.append(next_gen)
             #And now the next generation is the current!!!

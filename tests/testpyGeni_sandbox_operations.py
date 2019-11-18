@@ -96,15 +96,6 @@ class Test(unittest.TestCase):
         existing = profile.profile(data_id)
         
         assert(existing.geni_specific_data['deleted'])
-    
-    def test_error_create_child(self):
-        '''
-        Test wrong inputs creating a child
-        '''
-        child_profile = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
-        child_profile.setCheckedGender("M")
-        self.assertFalse(profile.profile.create_as_a_child(child_profile, geni_input = "https://sandbox.geni.com/people/Brother-Profile/1150205" ))
-    
     def test_delete_not_existing_profile(self):
         '''
         Test deleting a not existing profile

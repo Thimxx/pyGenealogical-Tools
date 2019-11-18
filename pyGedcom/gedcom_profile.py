@@ -111,7 +111,8 @@ class gedcom_profile(common_profile.gen_profile):
         all_events = []
         for event_name in EVENT_TYPE:
             event = self.get_specific_event(event_name)
-            if event: all_events.append(event)
+            if event_name in common_profile.ARRAY_EVENTS: all_events += event
+            elif event: all_events.append(event)
         return all_events
     def get_specific_event(self, event_name):
         '''
@@ -128,9 +129,11 @@ class gedcom_profile(common_profile.gen_profile):
             for key in LOCATION_EQUIVALENCE:
                 if self.individual.get(EQUIVALENCE[event_name]).get("ADDR", {}).get(LOCATION_EQUIVALENCE[key], {}).get("VALUE"):
                     new_event.setParameterInLocation(key, self.individual.get(EQUIVALENCE[event_name]).get("ADDR", {}).get(LOCATION_EQUIVALENCE[key], {}).get("VALUE"))
-            return new_event
+            if event_name in common_profile.ARRAY_EVENTS: return [new_event]
+            else: return new_event
         else:
-            return None
+            if event_name in common_profile.ARRAY_EVENTS: return []
+            else: return None
 #===============================================================================
 #         SET methods: for compatibility with Common_profile profile
 #        Only one method has been addressed!!!

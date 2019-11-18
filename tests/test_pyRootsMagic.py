@@ -6,10 +6,11 @@ Created on 6 jul. 2019
 import unittest, os
 from pyRootsMagic.pyrm_database import database_rm
 from pyRootsMagic import return_date_from_event
-from pyGenealogy.common_event import event_profile
+from pyGenealogy.common_profile import gen_profile
 from datetime import date
 from shutil import copyfile
 from tests.FIXTURES import TEST_FACEBOOK, TEST_GOOGLE, TEST_WIKIPEDIA
+from pyGenealogy.common_event import event_profile
 
 
 class Test_use_and_access_RootsMagic(unittest.TestCase):
@@ -41,7 +42,7 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(event_death.get_year() == 1950)
         assert(event_death.get_accuracy() == "EXACT")
         assert(prof.getGender() == "F")
-        assert(len(prof.getEvents()) == 3)
+        assert(len(prof.getEvents()) == 4)
         assert(prof.getLiving() == False)
         
         #This profile has a date "ABOUT"
@@ -59,6 +60,8 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         
         #This profile has a date "BEFORE"
         prof3 = db.get_profile_by_ID(4)
+        event_marriage = prof3.get_specific_event("marriage")
+        assert(event_marriage[0].get_year() == 1880)
         event_death3 = prof3.get_specific_event("death")
         assert(event_death3.get_year() == 1970)
         assert(event_death3.get_accuracy() == "BEFORE")
@@ -80,6 +83,11 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         
         #This profile has a date BETWEEN
         prof5 = db.get_profile_by_ID(1)
+        eventsof1= prof5.getEvents()
+        no_marriage = True
+        for event in eventsof1:
+            if event.get_event_type() == "marriage": no_marriage = False
+        assert(no_marriage)
         event_birth3 = prof5.get_specific_event("birth")
         assert(event_birth3.get_location()["county"] == "Segovia")
         assert(event_birth3.get_location()["latitude"] < 41.08)
@@ -130,10 +138,18 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         prof = db.get_profile_by_ID(5)
         prof.setWebReference([TEST_GOOGLE, TEST_FACEBOOK])
         prof.setWebReference(TEST_WIKIPEDIA, name = "Wikipedia", notes="introduced")
-        
-        assert(prof.get_all_webs()[0]["name"] == "")
+        webs = prof.get_all_webs()
+        google_found = False
+        for web in webs:
+            if web["url"] == "http://www.google.com":
+                if web["name"] == "": google_found = True
+        assert(google_found)
         assert(prof.update_web_ref(TEST_GOOGLE, "Google", "A note"))
-        assert(prof.get_all_webs()[0]["name"] == "Google")
+        google_found = False
+        webs = prof.get_all_webs()
+        for web in webs:
+            if web["name"] == "Google": google_found = True
+        assert(google_found)
         assert(TEST_GOOGLE in prof.get_all_urls())
         assert(TEST_WIKIPEDIA in prof.get_all_urls())
         
@@ -176,6 +192,48 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         prof2.set_citation(1, details="http://test.com")
         assert(prof2.get_citation_with_comments("http://test.com") == 1)
         
+        #Testing the insert of the profiles
+        insert_profile = gen_profile("RootsMagic", "Adding")
+        insert_profile.setCheckedGender("M")
+        insert_profile.setCheckedDate("birth", 1820,accuracy="ABOUT")
+        
+        
+        event_both = event_profile("birth")
+        event_both.setLocationAlreadyProcessed({"formatted_location": "Gallegos, Segovia"})
+        event_both.setDate(1820,accuracy="ABOUT")
+        event_date = event_profile("death")
+        event_date.setDate(1902, month = 2, day = 1, accuracy = "EXACT")
+        event_location = event_profile("burial")
+        event_location.setLocation("Aldealaguna, Segovia, Spain")
+        
+        insert_profile.setNewEvent(event_both)
+        insert_profile.setNewEvent(event_date)
+        insert_profile.setNewEvent(event_location)
+        
+        prof_id = db.add_profile(insert_profile)
+        #Check the results
+        prof_entered = db.get_profile_by_ID(prof_id)
+        assert(prof_entered.getName() == "RootsMagic")
+        assert(prof_entered.get_specific_event("birth").get_year() == 1820)
+        assert(prof_entered.get_specific_event("birth").get_accuracy() == "ABOUT")
+        assert(prof_entered.get_specific_event("birth").get_location()["raw"] == "Gallegos, Segovia")
+        assert(prof_entered.get_specific_event("death").get_year() == 1902)
+        assert(prof_entered.get_specific_event("death").get_accuracy() == "EXACT" )
+        assert(prof_entered.get_specific_event("death").get_location() == None)
+        assert(prof_entered.get_specific_event("burial").get_year() == None)
+        assert(prof_entered.get_specific_event("burial").get_location()["raw"] == 'Aldealaguna, Segovia, Spain')
+        
+        #Now, let's also create a family for this profile
+        insert_wife = gen_profile("RootsMagic", "Wife")
+        insert_wife.setCheckedGender("F")
+        wife_id = db.add_profile(insert_wife)
+        prof_wife = db.get_profile_by_ID(wife_id)
+        event_marriage = event_profile("marriage")
+        event_marriage.setDate(1815, accuracy = "ABOUT")
+        assert(prof_wife.get_specific_event("marriage") == [])
+        fam_id = db.add_family(father = prof_id, mother = wife_id, children = [6], marriage = event_marriage)
+        assert(prof_wife.get_specific_event("marriage")[0].get_year() == 1815)
+        assert(db.get_family_from_child(6)[0] == fam_id)
         db.close_db()
         if os.path.exists(working_file): os.remove(working_file)
     def test_common_init_functions(self):
@@ -204,7 +262,7 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         
         my_event.setDate(1910, accuracy="ABOUT")        
         #D.+19100000.C+00000000..
-        assert(return_date_from_event(my_event) == "D.+19100000.C+00000000..")
+        assert(return_date_from_event(my_event) == "D.+19100000.A+00000000..")
         
         
         #my_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)

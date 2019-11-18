@@ -34,7 +34,7 @@ def return_date_from_event(event_data):
             init_part = "DR+"
             end_part = get_string_from_date(event_data.get_year_end(), event_data.get_month_end(), event_data.get_day_end()) +".."
         elif event_data.get_accuracy() == "ABOUT":
-            mid_part = ".C+"
+            mid_part = ".A+"
         return init_part + date1_part + mid_part + end_part
     #If no data in the event we skip and return None
     return None

@@ -11,5 +11,15 @@ MATCH_PROFILE_ERROR = "Profile provided does not contain the information of the 
 MATCH_GENI = "This match was found automatically by PyGenealogical tools. MATCHED ON="
 MATCH_CONFLICT_TASK = "CHECK GENI MATCH"
 MATCH_CONFLICT_INFO = "This profile does not match with the following geni profile, when should == "
+MATCH_REVIEW_TASK_BEGIN = "CHECK DOUBLE "
+MATCH_REVIEW_TASK_END = " MATCH"
+MATCH_REVIEW_DETAILS = "The following profiles are duplicated linked "
 
 WEB_DETECTED = "Web automatically detected by pyGenealogicalTools"
+
+TOP_CLIMB = "The maximum level of generations have been reached at the generation "
+
+PROCESS_MATCH_NUMBER_OF_IMPACTS_BEGIN = "The number of available matches in "
+PROCESS_MATCH_NUMBER_OF_IMPACTS_END = " is "
+PROCESS_ADD_PROFILE_BEGIN = "Adding the profile "
+PROCESS_ADD_PROFILE_END = " as a "

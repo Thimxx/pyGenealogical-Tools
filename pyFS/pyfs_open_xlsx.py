@@ -11,6 +11,7 @@ from pyGenealogy.gen_utils import get_name_surname_from_complete_name, get_split
 from datetime import datetime
 from messages.pyFS_messages import NO_VALID_NAMING_CONVENTION, ENDED, NO_VALID_FILE, NOT_EXISTING_FILE, NO_GENI_EXECUTION, NO_GENI_KEY
 from messages.pyFS_messages import COLUMN_NOT_FOUND
+from pyGenealogy.common_event import event_profile
 from pyGeni import profile
 from pyGenealogy import NOT_KNOWN_VALUE
 import os
@@ -23,8 +24,8 @@ DIFFERNCE_BIRTH_BAPT = 90
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name", "easy_unique_id", "record_url", "subcollection_id"]
 date_fields = {"birth_date" : "birth" , "burial_date" : "burial", "chr_date" : "baptism",
                "residence_date" : "residence", "death_date" : "death", "marriage_date" : "marriage"}
-LOCATION_EQUIVALENCE = {"birth_place_text" : "birth", "death_place_text" : "death", "residence_place_text" : "residence",
-                        "chr_place_text" : "baptism", "marriage_place_text" : "marriage"}
+LOCATION_EQUIVALENCE = {"birth_place_text" : "birth", "death_place_text" : "death", 
+                        "chr_place_text" : "baptism"}
 
 class getFSfamily(object):
     '''
@@ -154,6 +155,10 @@ class getFSfamily(object):
         #Now we read the complete file
         for row in range(self.initial_row+1, self.loaded_data[self.sheet_title].max_row+1):
             included_profile = gen_profile("TBD", children_surname)
+            event_marriage = event_profile("marriage")
+            is_marriage = False
+            event_residence = event_profile("residence")
+            is_residence = False
             included_right = True
             for column_index in range(self.initial_column,self.loaded_data[self.sheet_title].max_column):
                 column_criteria = current_sheet.cell(row=self.initial_row, column=column_index).value
@@ -164,6 +169,19 @@ class getFSfamily(object):
                     #Ok, now we go one by one each of the different values
                     if(column_criteria == "gender"):
                         this_introduction = included_profile.setCheckedGender(cell_value)
+                    elif (column_criteria == "marriage_place_text"):
+                        event_marriage.setLocation(cell_value, self.language)
+                        is_marriage = True
+                    elif (column_criteria == "residence_place_text"):
+                        event_residence.setLocation(cell_value, self.language)
+                        is_residence = True
+                    elif (column_criteria == "marriage_date"):
+                        mar_date = datetime.strptime(cell_value, "%d %b %Y").date()
+                        event_marriage.setDate(mar_date.year, mar_date.month, mar_date.day, accuracy="EXACT")
+                    elif (column_criteria == "residence_date"):
+                        if(is_year(cell_value)):
+                            event_residence.setDate(datetime.strptime(str(cell_value.replace(" ", "")), "%Y").date().year, accuracy = "ABOUT")
+                            is_residence = True
                     elif (column_criteria in LOCATION_EQUIVALENCE.keys()):
                         included_profile.setPlaces(LOCATION_EQUIVALENCE[column_criteria], cell_value, self.language)
                     elif (column_criteria == "person_url"):
@@ -216,6 +234,8 @@ class getFSfamily(object):
                         logging.warning(COLUMN_NOT_FOUND + column_criteria)
                     if (not this_introduction): included_right = False
                 #This is a way to later on identify the link between the profiles
+            if is_marriage: included_profile.setNewEvent(event_marriage)
+            if is_residence: included_profile.setNewEvent(event_residence)
             id_profiles += 1
             if(not included_right) : correct_introduction = False
             self.profiles.append(included_profile)
@@ -241,8 +261,8 @@ class getFSfamily(object):
                 partner.setWebReference(profile_obtained.get_all_urls())
                 #It is a partner so we add as opposite sex!
                 partner.setCheckedGender(get_partner_gender(profile_obtained.gen_data["gender"]))
-                partner.setNewEvent(profile_obtained.gen_data["marriage"])
-                partner.setPlaces("marriage", profile_obtained.gen_data["marriage"].get_location()["raw"], language=self.language )
+                partner.setNewEvent(profile_obtained.gen_data["marriage"][0])
+                partner.setPlaces("marriage", profile_obtained.gen_data["marriage"][0].get_location()["raw"], language=self.language )
                 if id_of_marriage in self.parents_profiles.keys():
                     father = self.parents_profiles[id_of_marriage][0]
                     mother = self.parents_profiles[id_of_marriage][1]

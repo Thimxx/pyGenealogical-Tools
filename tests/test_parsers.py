@@ -8,7 +8,7 @@ from pyGenealogy.common_profile import gen_profile
 from pyRegisters.pyesquelas import esquelas_reader
 from pyRegisters.pycementry_valencia import valencia_reader
 from pyRegisters.pylavanguardia import vanguardia_reader
-from pyRegisters import sp_age_location_colector
+from pyRegisters import sp_age_location_colector, get_location_from_text
 
 class Test(unittest.TestCase):
 
@@ -18,15 +18,17 @@ class Test(unittest.TestCase):
         Test the operation of the colector
         '''
         assert(sp_age_location_colector("Falleció en Santander, el día 22 de febrero de 1567, a los 61 años de edad, habiendo") == ("Santander", 61))
-        assert(sp_age_location_colector("Falleció en Asturias. Habiendo recibido") == ("Asturias", None))
         assert(sp_age_location_colector("Falleció el día 8 de marzo de 2013, a los 64 años de edad,")== (None, 64))
         assert(sp_age_location_colector("en Madrid") == ("Madrid", None))
         assert(sp_age_location_colector("en Barcelona a los 67 años")== ("Barcelona", 67))
         assert(sp_age_location_colector(" Ha fallecido cristianamente en Barcelona, a la edad de 93 años, el")== ("Barcelona", 93))
+        
+        assert(sp_age_location_colector("Saez Doctor en medicina. Endocrinólogo Ha fallecido en Barcelona, a la edad de 70 años, el día ")== ("Barcelona", 70))
         #With detection
         assert(sp_age_location_colector(" Ha mort a Barcelona, a l'edat de 99 anys, el dia 24 de febrer", detect_lan = True)== ("Barcelona", 99))
-             
-          
+        #Activate when issue https://github.com/elyase/geotext/issues/22 is fixed
+        #assert(sp_age_location_colector("Ha fallecido en Sant Cugat del Vallès, el día 2 de octubre")== ("Barcelona", None))
+        
     def test_esquelas(self):
         '''
         Test checking el Esquelas parser

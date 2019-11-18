@@ -7,3 +7,4 @@ python-Levenshtein
 pyexcel-xlsx
 langdetect
 mapbox
+geotext

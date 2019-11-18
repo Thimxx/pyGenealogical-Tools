@@ -47,8 +47,8 @@ class Test(unittest.TestCase):
         assert(fsclass.profiles[0].gen_data["baptism"].get_location()["city"] == "La Parrilla")
         assert(fsclass.profiles[0].gen_data["death"].get_location()["place_name"] == "La Parrilla")
         assert(len(fsclass.profiles[0].gen_data["web_ref"]) == 3)
-        assert(fsclass.profiles[0].gen_data["residence"].get_year() == 1853)
-        assert(fsclass.profiles[0].gen_data["residence"].get_accuracy() == "ABOUT")
+        assert(fsclass.profiles[0].gen_data["residence"][0].get_year() == 1853)
+        assert(fsclass.profiles[0].gen_data["residence"][0].get_accuracy() == "ABOUT")
         #Wenceslao Potente Asegurado
         assert(fsclass.profiles[2].gen_data["birth"].get_date() == datetime.date(1862,9,28))
         assert(fsclass.profiles[2].gen_data["baptism"].get_date() == datetime.date(1862,10,2))
@@ -57,7 +57,7 @@ class Test(unittest.TestCase):
         assert(fsclass.profiles[2].gen_data["baptism"].get_location()["city"] == "La Parrilla")
         assert(fsclass.profiles[2].gen_data["death"].get_location()["place_name"] == "La Parrilla")
         assert(len(fsclass.profiles[2].gen_data["web_ref"]) == 2)
-        assert(fsclass.profiles[2].gen_data["residence"].get_year() == 1862)
+        assert(fsclass.profiles[2].gen_data["residence"][0].get_year() == 1862)
         #Evarista Potente Asegurado
         assert(fsclass.profiles[4].gen_data["birth"].get_date() == datetime.date(1857,10,26))
         assert(fsclass.profiles[4].gen_data["baptism"].get_date() == datetime.date(1857,11,1))
@@ -65,7 +65,7 @@ class Test(unittest.TestCase):
         assert(fsclass.profiles[4].gen_data["baptism"].get_location()["city"] == "La Parrilla")
         assert(fsclass.profiles[4].gen_data["death"].get_location()["place_name"] == "La Parrilla")
         assert(len(fsclass.profiles[4].gen_data["web_ref"]) == 2)
-        assert(fsclass.profiles[4].gen_data["residence"].get_year() == 1857)
+        assert(fsclass.profiles[4].gen_data["residence"][0].get_year() == 1857)
 
 
     def test_wrong_inputs(self):
@@ -127,8 +127,8 @@ class Test(unittest.TestCase):
         assert(this_profile.gen_data["birth"].get_accuracy() == "EXACT")
         assert(this_profile.gen_data["baptism"].get_date() == datetime.date(1862,10,2))
         assert(this_profile.gen_data["baptism"].get_accuracy() == "EXACT")
-        assert(this_profile.gen_data["residence"].year == 1862)
-        assert(this_profile.gen_data["residence"].get_accuracy() == "ABOUT")
+        assert(this_profile.gen_data["residence"][0].year == 1862)
+        assert(this_profile.gen_data["residence"][0].get_accuracy() == "ABOUT")
         assert(this_profile.gen_data["death"].get_date() == datetime.date(1863,6,28))
         assert(this_profile.gen_data["death"].get_accuracy() == "EXACT")
         assert(this_profile.gen_data["burial"].get_date() == datetime.date(1863,6,28))

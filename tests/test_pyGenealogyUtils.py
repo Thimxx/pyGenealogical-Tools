@@ -194,6 +194,10 @@ class Test(unittest.TestCase):
         assert("raw" in output4)
         self.assertFalse("country" in output4)
         
+        output5 = get_formatted_location("Robert;")
+        assert("raw" in output5)
+        self.assertFalse("country" in output5)
+        
     def test_return_sex(self):
         '''
         Test function returning sex of partner

@@ -11,7 +11,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(name='pyGenealogicalTools',
-      version="0.3.2",
+      version="0.3.4",
       description="Genealogical tools",
       long_description=long_description,
       long_description_content_type="text/markdown",
@@ -26,6 +26,6 @@ setuptools.setup(name='pyGenealogicalTools',
         "Topic :: Sociology :: Genealogy",],
       install_requires = ['requests', 'openpyxl', 'pyexcel', 'pyexcel-xls',
                           'python-Levenshtein', 'pyexcel-xlsx', 'metaphone',
-                          'langdetect', 'mapbox'
+                          'langdetect', 'mapbox', "geotext"
                           ],
       )

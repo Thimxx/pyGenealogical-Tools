@@ -123,6 +123,10 @@ class gen_database(object):
         '''
         It will create and add a new family to the database
         it is better that each database will create their own families
+        
+        father, mother the id of them
+        child should be an string of get_child
+        marriage is an event
         '''
         self.count_fam += 1
         id_fam = CHAR_FAM + str(self.count_fam)

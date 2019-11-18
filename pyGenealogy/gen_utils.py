@@ -215,8 +215,8 @@ def get_formatted_location(location_string):
         return output
     else:
         mapbox_results = Geocoder(access_token=get_mapbox_key()).forward(location_string).json()
-    wrong_message = ("Not Authorized" in mapbox_results.get("message", ""))
-    if ( (not wrong_message) and (len(mapbox_results) > 0) and ("context" in mapbox_results["features"][0])):
+    wrong_message = ("message" in mapbox_results.keys())
+    if ( (not wrong_message) and (len(mapbox_results) > 0) and (len(mapbox_results["features"]) > 0)  and ("context" in mapbox_results["features"][0])):
         #Received data is ok, we can proceed
         output["latitude"] = mapbox_results["features"][0]["center"][1]
         output["longitude"] = mapbox_results["features"][0]["center"][0]

@@ -41,9 +41,9 @@ class Test(unittest.TestCase):
         assert(second_profile.gen_data["name"] == "Lucía")
         married_profile = fsclass.profiles[2]
         assert(married_profile.gen_data["name"] == "Nicasia")
-        assert(married_profile.gen_data["marriage"].get_location()["place_name"] == "Tudela de Duero")
+        assert(married_profile.gen_data["marriage"][0].get_location()["place_name"] == "Tudela de Duero")
         testing_date = datetime.date(1841, 11, 30)
-        assert(married_profile.gen_data["marriage"].get_date() == testing_date)
+        assert(married_profile.gen_data["marriage"][0].get_date() == testing_date)
         
         fsclass.create_profiles_in_Geni(SANDBOX_MAIN_ADDRESS)
         
@@ -53,7 +53,7 @@ class Test(unittest.TestCase):
         for parent_profile in fsclass.parents_geni_profiles:
             assert(parent_profile.delete_profile())
         for partner_profile in fsclass.related_geni_profiles:
-            assert(testing_date == partner_profile.gen_data["marriage"].get_date())
+            assert(testing_date == partner_profile.gen_data["marriage"][0].get_date())
             assert(partner_profile.gen_data["surname"] == "González Ruiz")
             assert(partner_profile.delete_profile())
         for data_profile in fsclass.geni_profiles:

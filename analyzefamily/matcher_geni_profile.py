@@ -5,6 +5,7 @@ Created on 22 oct. 2019
 '''
 import logging, datetime, logging
 from messages.pygenanalyzer_messages import MATCH_PROFILE_ERROR, MATCH_GENI, MATCH_CONFLICT_TASK, MATCH_CONFLICT_INFO
+from messages.pygenanalyzer_messages import MATCH_REVIEW_TASK_BEGIN, MATCH_REVIEW_TASK_END, MATCH_REVIEW_DETAILS
 from analyzefamily import CHILD, FATHER, MOTHER, PARTNER
 
 THRESHOLD_MATCH = 2.0
@@ -97,9 +98,25 @@ class match_single_profile(object):
         if (score*factor > self.threshold):
             #We have a match, so we will create the link as a web link
             notes_to_add = MATCH_GENI + datetime.date.today().strftime("%d-%m-%Y")
-            profile_rm.setWebReference(profile_geni.get_this_profile_url(), name="GENI", notes=notes_to_add)
-            self.matched_profiles[profile_rm.get_id()] = profile_geni.get_id()
-            print_out("-    MATCHED :" + str(profile_rm.nameLifespan()) + " WITH " + str(profile_geni.nameLifespan()))
+            #Prior to add, we need to check is not today in the profile
+            existing = False
+            previous_match = False
+            all_matches = [profile_geni.get_this_profile_url()]
+            webs = profile_rm.get_all_webs()
+            for web in webs:
+                if web["url"] == profile_geni.get_this_profile_url(): existing = True
+                elif (web["name"] ==  self.database_geni.get_db_kind()) and (web["url"] != profile_geni.get_this_profile_url()):
+                    previous_match = True
+                    all_matches.append(web["url"])
+            #If it has not been created before, we create the new match in the profile
+            if not existing:
+                profile_rm.setWebReference(profile_geni.get_this_profile_url(), name=self.database_geni.get_db_kind(), notes=notes_to_add)
+                self.matched_profiles[profile_rm.get_id()] = profile_geni.get_id()
+                print_out("-    MATCHED :" + str(profile_rm.nameLifespan()) + " WITH " + str(profile_geni.nameLifespan()))
+            #If there was a different previous match, we shall inform in the profile for checking    
+            if previous_match:
+                profile_rm.set_task(MATCH_REVIEW_TASK_BEGIN + self.database_geni.get_db_kind() + MATCH_REVIEW_TASK_END, 
+                                    details=MATCH_REVIEW_DETAILS + str(all_matches))
         else:
             #This is a conflict, we should have a single match!!!
             self._conflict_storing(profile_rm, [profile_geni.get_id()])

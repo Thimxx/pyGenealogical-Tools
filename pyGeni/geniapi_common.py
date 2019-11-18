@@ -27,7 +27,7 @@ class geni_calls():
         '''
         Small function delivering back the profile url based on the profile_id
         '''
-        return s.GENI_API + profile_id
+        return s.GENI_API + str(profile_id)
     @classmethod
     def check_valid_genikey(self):
         # Validate access token, connecting to Geni, this might take a while

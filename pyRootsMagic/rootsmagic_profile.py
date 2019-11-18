@@ -7,11 +7,12 @@ from pyGenealogy import common_profile
 from pyGenealogy.common_event import event_profile
 from pyRootsMagic import collate_temp, return_date_from_event
 from messages.py_rootsmagic_messages import WARNING_RESEARCH_LOG, PROFILE_RESEARCH_LOG
-from datetime import date
+from datetime import date, datetime
 import logging
-from wx import ID_VIEW_DETAILS
 
 DATE_EVENT_ID = {"birth" : "1", "death" : "2", "baptism" : "3",  "burial" : "4", "marriage" : "300", "residence" : "29"}
+PERSONAL_EVENTS = ["birth", "death", "baptism", "burial", "residence"]
+ARRAY_EVENTS = ["marriage", "residence"]
 
 logger = logging.getLogger('rootsmagic')
 
@@ -62,12 +63,37 @@ class rootsmagic_profile(common_profile.gen_profile):
 #===============================================================================
 #    These functions are left in the base function: getComments, getName2Show, get_all_urls
 #===============================================================================
+    def getMarriages(self):
+        '''
+        It will provide a list of families ID where this profile is parent
+        '''
+        all_events = []
+        #We get all families of the profile first where is parent
+        families = ""
+        family_id = "SELECT * FROM FamilyTable WHERE FatherID=? OR MotherID=?"
+        family_cursor = self.database.execute(family_id, (str(self.get_id()),str(self.get_id()),) )
+        #There can be several families
+        for family in family_cursor:
+            families += str(int(family[0]))
+        if families != "":
+            #In this case the profile belongs to a family
+            input_marriage = "SELECT * FROM EventTable WHERE OwnerType=1 AND OwnerId IN (?)"
+            events = self.database.execute(input_marriage, (families,) )
+            loop_fetch = True
+            while loop_fetch:
+                this_event = events.fetchone()
+                if this_event:
+                    new_event = self.return_event_from_database_info(this_event)
+                    if new_event: all_events.append(new_event)
+                else:
+                    loop_fetch = False
+        return all_events
     def getEvents(self):
         '''
         This function will provide all present events inside the profile
         '''
-        all_events = []
-        input_database = "SELECT * FROM EventTable WHERE OwnerId= ?"
+        all_events = self.getMarriages()
+        input_database = "SELECT * FROM EventTable WHERE OwnerType=0 AND OwnerId= ?"
         events = self.database.execute(input_database, (str(self.get_id()),) )
         loop_fetch = True
         while loop_fetch:
@@ -83,6 +109,7 @@ class rootsmagic_profile(common_profile.gen_profile):
         This function will provide the date and related event data of the date
         by looking to the database for this specific data
         '''
+        if event_name == "marriage": return self.getMarriages()
         input_events = "SELECT * FROM EventTable WHERE OwnerId=? AND  EventType=?"
         events = self.database.execute(input_events, (str(self.get_id()),DATE_EVENT_ID[event_name],) )
         #Now let's fetch the first value
@@ -183,6 +210,17 @@ class rootsmagic_profile(common_profile.gen_profile):
         logs_info = self.database.execute( citation_logs, (str(self.get_id()), comments, ) ).fetchone()
         if logs_info: return logs_info[0]
         else: return None
+    def get_place_id_by_name(self, name):
+        '''
+        Will provide the place id if existing by the name provided
+        
+        name will be an string separated by commas
+        '''
+        input_place = "SELECT * FROM PlaceTable WHERE Name LIKE ?"
+        logs_info = self.database.execute( input_place, (name, ) ).fetchall()
+        self.database.commit()
+        if len(logs_info) > 0: return logs_info[0][0]
+        return None
 #===============================================================================
 #         SET methods: the value of the profile is modified, overwrtting methods
 #        from common_profile
@@ -263,6 +301,59 @@ class rootsmagic_profile(common_profile.gen_profile):
         new_citation = "INSERT INTO CitationTable(OwnerType, SourceID, OwnerID, Quality, IsPrivate, Comments, ActualText, RefNumber,Flags, Fields) VALUES(0,?,?,?,?,?,?,?,0,?)"
         self.database.execute( new_citation, (str(sourceid), str(self.get_id()), "~~~", str(isprivate), details, "", "", data_details, ) )
         self.database.commit()
+    def set_place_and_get_id(self,event):
+        '''
+        It will obtain or create a place id inside RootsMagic
+        
+        event is an instance of pyGenealogi.common_event, if not location is available will be ignored
+        '''
+        location = event.get_location()
+        place_id = None
+        if location:
+            name_loc = location.get("formatted_location", location.get("raw"))
+            place_id = self.get_place_id_by_name(name_loc)
+            if not place_id:
+                empty_value =""
+                latitude = str(int(location.get("latitude", "0")*10000000))
+                longitude = str(int(location.get("longitude", "0")*10000000))
+                new_item = "INSERT INTO PlaceTable(PlaceType,Name,Abbrev,Normalized,Latitude,Longitude,LatLongExact,MasterID,Note) VALUES(1,?,?,?,?,?,0,0,?)"
+                cursor = self.database.cursor()
+                cursor.execute( new_item, (name_loc,empty_value,empty_value,latitude,longitude,empty_value,) )
+                place_id = cursor.lastrowid
+                self.database.commit()
+        return place_id
+    def setNewEvent(self,event):
+        '''
+        Overwrites the event from common profile adding the event
+        
+        event shall be of pyGenealogy common_event type
+        '''
+        place_id = self.set_place_and_get_id(event)
+        if not place_id: place_id = "0" 
+        dateRTM = return_date_from_event(event)
+        if not dateRTM: dateRTM = "."
+        edit_date_value = str( (datetime.today()- datetime(1899,12,31) ).days +0.0)
+        empty_value =""
+        if event.get_event_type() in PERSONAL_EVENTS:
+            new_event = "INSERT INTO EventTable(EventType, OwnerType, OwnerID,FamilyID,PlaceID,SiteID,Date,IsPrimary,IsPrivate,Proof,Status,EditDate,Sentence,Details,Note) VALUES(?,0,?,0,?,0,?,0,0,0,0,?,?,?,?)"
+            self.database.execute( new_event, (DATE_EVENT_ID[event.get_event_type()], str(self.get_id()),place_id,dateRTM,edit_date_value, empty_value,empty_value,empty_value, ) )
+            self.database.commit()
+    def setNewMarriage(self,event, family_id):
+        '''
+        Overwrites the event from common profile adding the event
+        
+        event shall be of pyGenealogy common_event type and a marriage event
+        '''
+        place_id = self.set_place_and_get_id(event)
+        if not place_id: place_id = "0" 
+        dateRTM = return_date_from_event(event)
+        if not dateRTM: dateRTM = "."
+        edit_date_value = str( (datetime.today()- datetime(1899,12,31) ).days +0.0)
+        empty_value =""
+        if event.get_event_type() == "marriage":
+            new_event = "INSERT INTO EventTable(EventType, OwnerType, OwnerID,FamilyID,PlaceID,SiteID,Date,IsPrimary,IsPrivate,Proof,Status,EditDate,Sentence,Details,Note) VALUES(?,1,?,0,?,0,?,0,0,0,0,?,?,?,?)"
+            self.database.execute( new_event, (DATE_EVENT_ID[event.get_event_type()], str(family_id),place_id,dateRTM,edit_date_value, empty_value,empty_value,empty_value, ) )
+            self.database.commit()
 #===============================================================================
 #         DELETE methods: methods to delete currently existing entries
 #===============================================================================
@@ -352,7 +443,7 @@ class rootsmagic_profile(common_profile.gen_profile):
                 if year_end == 0 : year_end = None
                 if month_end == 0 : month_end = None
                 if day_end == 0 : day_end = None
-            elif event_in_database[7][12] == "C":
+            elif event_in_database[7][12] == "A":
                 accuracy_value = "ABOUT"
             year = int(event_in_database[7][3:7])
             month = int(event_in_database[7][7:9])

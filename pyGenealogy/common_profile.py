@@ -14,6 +14,8 @@ MERGE_EVENTS = ["birth", "death", "baptism",  "burial", "marriage"]
 DATA_ACCURACY = ["accuracy_birth_date", "accuracy_death_date", "accuracy_baptism_date", "accuracy_residence_date", "accuracy_burial_date", "accuracy_marriage_date"]
 DATA_PLACES = ["birth_place", "death_place", "baptism_place", "residence_place", "burial_place", "marriage_place"]
 DATA_LISTS = ["web_ref", "nicknames"]
+ARRAY_EVENTS = ["marriage", "residence"]
+NO_ARRAY_EVENTS = ["birth", "death", "baptism",  "burial"]
 
 
 ALL_DATA = DATA_STRING + DATA_LISTS + EVENT_TYPE
@@ -35,6 +37,8 @@ class gen_profile(object):
         self.gen_data["web_ref"] = []
         self.gen_data["nicknames"] = []
         self.gen_data["research_item"] = []
+        self.gen_data["residence"] = []
+        self.gen_data["marriage"] = []
     def add_nickname(self, nick_name):
         '''
         Add a nickname
@@ -87,10 +91,16 @@ class gen_profile(object):
         for event_name in MERGE_EVENTS:
             self_event = self.get_specific_event(event_name)
             other_event = profile.get_specific_event(event_name)
+            if event_name == "marriage":
+                if len(self_event) > 0: self_event = self_event[0]
+                else: self_event = None
+                if len(other_event) > 0: other_event = other_event[0]
+                else: other_event = None
             if  self_event and other_event and self_event.is_any_date_available() and other_event.is_any_date_available():
                 score_temp, factor_temp = get_score_compare_dates(self_event, other_event )
-                score += score_temp
-                factor = factor*factor_temp
+                if not ((self_event.get_event_type() == "marriage") and ( factor_temp < 1.0)):
+                    score += score_temp
+                    factor = factor*factor_temp
         return score, factor
     def merge_profile(self, profile, language="en", convention="father_surname"):
         '''
@@ -121,6 +131,9 @@ class gen_profile(object):
                         elif (key_data in DATA_LISTS):
                             for info in profile.gen_data[key_data]:
                                 if info not in self.gen_data[key_data] : self.gen_data[key_data].append(info)
+                        elif (key_data in ARRAY_EVENTS):
+                            #In this case we merge both
+                            self.gen_data[key_data] += profile.gen_data[key_data]
                         elif (key_data in EVENT_TYPE):
                             #Merging the data input
                             event_new = profile.gen_data[key_data]
@@ -195,7 +208,9 @@ class gen_profile(object):
         if (not self.selfcheckDateConsistency(new_event)):
             return False
         else:
-            if event_name in self.gen_data.keys():
+            if event_name in ARRAY_EVENTS:
+                self.gen_data[event_name].append(new_event)
+            elif event_name in self.gen_data.keys():
                 self.gen_data[event_name].setDate(year, month, day, accuracy, year_end, month_end, day_end)
             else:
                 self.gen_data[event_name] = new_event
@@ -217,6 +232,11 @@ class gen_profile(object):
         '''
         if (not self.selfcheckDateConsistency(event)):
             return False
+        elif event.get_event_type() in ARRAY_EVENTS:
+            if event.get_event_type() in self.gen_data:
+                self.gen_data[event.get_event_type()].append(event)
+            else:
+                self.gen_data[event.get_event_type()] = [event]
         else:
             self.gen_data[event.get_event_type()] = event
     def setComments(self, comment):
@@ -246,6 +266,11 @@ class gen_profile(object):
         '''
         This function will introduce the location related to each event
         '''
+        if event_name in ARRAY_EVENTS:
+            new_event = event_profile(event_name)
+            new_event.setLocation(location, language)
+            self.gen_data[event_name].append(new_event)
+            return True
         if event_name in EVENT_TYPE:
             new_event = self.gen_data.get(event_name, event_profile(event_name))
             new_event.setLocation(location, language)
@@ -296,7 +321,8 @@ class gen_profile(object):
         '''
         all_events = []
         for event_name in EVENT_TYPE:
-            if event_name in self.gen_data.keys(): all_events.append(self.gen_data[event_name])
+            if event_name in ARRAY_EVENTS: all_events += self.gen_data[event_name]
+            elif event_name in self.gen_data.keys(): all_events.append(self.gen_data[event_name])
         return all_events
     def get_specific_event(self, event_name):
         '''
@@ -347,8 +373,10 @@ class gen_profile(object):
     def getLiving(self):
         '''
         Returns the living status of a profile
+        
+        If the data has not been defined, it will be given as True as more conservative
         '''
-        return self.gen_data["living"]
+        return self.gen_data.get("living", True)
     def get_earliest_event(self):
         '''
         It will return the earliest event, of course, the birth, but it is already checked,

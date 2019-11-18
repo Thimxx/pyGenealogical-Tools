@@ -4,7 +4,7 @@ Created on 1 abr. 2018
 @author: Val
 '''
 import requests, re
-from datetime import datetime, date
+from datetime import datetime
 from html.parser import HTMLParser
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name
