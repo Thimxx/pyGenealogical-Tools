@@ -7,6 +7,7 @@ from pyGenealogy.common_database import gen_database
 from pyGeni.profile import profile
 from pyGeni.union import union
 from pyGeni.immediate_family import immediate_family
+import copy
 
 class geni_database_interface(gen_database):
     '''
@@ -119,6 +120,48 @@ class geni_database_interface(gen_database):
             partners += addapted_parents
         return partners
 #===============================================================================
+#         ADD methods: Add methods used to include a new profile and new family
+#===============================================================================
+    def add_parents(self, child_profile_id = None, father_profile = None, mother_profile= None, marriage_event= None):
+        '''
+        This function will create a new profile using the available functions inside the profile
+        child_profile_id shall be a Geni id, will be handled by the code to detect the right one
+        father_profile and mother_profile shall be a inherited instance of pyGenealogy.common_profile
+        marriage_event shall be an event of pyGenealogy.common_event class
+        '''
+        father_id = None
+        mother_id = None
+        family_id = None
+        #Firstly, let's get the profile
+        child_prof = self.get_profile_by_ID(child_profile_id)
+        #Depending on the situation, we will create the profile or add as a partner of the previous one
+        if father_profile:
+            #We firstly create the a copy, to avoid duplication
+            father_geni = copy.copy(father_profile)
+            father_geni.setComments("Profile added by [https://github.com/Thimxx/pyGenealogical-Tools pyGenealogicalTools]")
+            profile.create_as_a_parent(father_geni, geni_input=child_prof.get_id(), type_geni="" )
+            father_id = father_geni.get_id()
+        if mother_profile:
+            #We firstly create the a copy, to avoid duplication
+            mother_geni = copy.copy(mother_profile)
+            mother_geni.setComments("Profile added by [https://github.com/Thimxx/pyGenealogical-Tools pyGenealogicalTools]")
+            profile.create_as_a_parent(mother_geni, geni_input=child_prof.get_id(), type_geni="" )
+            mother_id = mother_geni.get_id()
+        return father_id, mother_id, family_id
+    def add_partner(self, profile_id, partner_profile, marriage = None):
+        '''
+        Adds a partner to the profile, by firstly creating the partner and afterwards
+        creating the family
+        profile_id shall be the id of the profile
+        partner_profile shall be the partner as a profile derived by pyGenealogy.common_profile
+        marriage shall be an instance of pyGenealogy.common_event
+        '''
+        family_id = None
+        partner_instance = copy.copy(partner_profile)
+        partner_instance.setComments("Profile added by [https://github.com/Thimxx/pyGenealogical-Tools pyGenealogicalTools]")
+        profile.create_as_a_partner(partner_instance, geni_input=profile_id)
+        return partner_instance.get_id(), family_id
+#===============================================================================
 #        INTERMEDIATE methods: methods avoiding duplications
 #===============================================================================
     def get_families_from_profile(self, profile_id):
@@ -126,6 +169,6 @@ class geni_database_interface(gen_database):
         Intermediate function providing families for a profile
         '''
         link_fam = self.inmediate.get(profile_id, immediate_family(profile_id))
-        if not link_fam in self.inmediate.keys(): self.inmediate[profile_id] = link_fam
+        if link_fam not in self.inmediate.keys(): self.inmediate[profile_id] = link_fam
         return link_fam
         

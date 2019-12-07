@@ -1,4 +1,4 @@
-__all__ = ["common_profile", "gen_utils", "common_database", "common_event", "common_family"]
+__all__ = ["common_profile", "gen_utils", "common_database", "common_event", "common_family", "generic_functions"]
 
 VALUES_ACCURACY = ["EXACT", "BEFORE", "AFTER", "ABOUT", "BETWEEN"]
 

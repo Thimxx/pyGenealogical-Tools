@@ -9,8 +9,9 @@ from pyRegisters.pyabc import abc_reader
 from pyRegisters.pyesquelas import esquelas_reader
 from pyRegisters.pycementry_valencia import valencia_reader
 from pyRegisters.pylavanguardia import vanguardia_reader
+from pyGenealogy.generic_functions import get_research_log_id
 import logging, datetime
-from messages.pygenanalyzer_messages import RESEARCH_INFO, RESEARCH_LOG, WEB_DETECTED
+from messages.pygenanalyzer_messages import WEB_DETECTED
 
 ALL_PARSERS = ["REMEMORI", "ELNORTEDECASTILLA", "ABC", "ESQUELAS", "CEMENTRY VALENCIA", "LAVANGUARDIA" ]
 
@@ -41,10 +42,7 @@ class gen_analyzer(object):
         print_out("Total number of profiles = " + str(len(profiles)), self.file)
         for person in profiles:
             #Firstly, we need to analyze if we need to add the research log, if does not exist, of course
-            log_loc = None
-            if storage and (not person.get_specific_research_log(RESEARCH_LOG)):
-                log_loc = person.set_task(RESEARCH_LOG, task_type=2, details=RESEARCH_INFO)
-            else: log_loc = person.get_specific_research_log(RESEARCH_LOG)
+            log_loc = get_research_log_id(person, storage = storage)
             #Check which analysis will be done
             checks_2_perform = {}
             overall_check = False

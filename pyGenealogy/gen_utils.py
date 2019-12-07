@@ -6,13 +6,11 @@ Created on 26 ago. 2017
 import logging
 from messages.pyGenealogymessages import NO_VALID_CONVENTION, NO_VALID_ACCURACY, NO_VALID_LOCATION, NO_VALID_KEY
 from messages.pyGenealogymessages import NO_VALID_BIRTH_DATE, NO_VALID_DEATH_DATE, NO_VALID_DEATH_AND_BURIAL
-from messages.genitools_messages import MAPBOX_ADDRESS
 from datetime import date
 from pyGenealogy import VALUES_ACCURACY, get_mapbox_key
 from metaphone import doublemetaphone
 from Levenshtein import jaro
 import math
-import requests
 import pyGenealogy, os, re
 from mapbox import Geocoder
 
@@ -36,7 +34,7 @@ LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del",  "los", "las"]}
 
 LANGUAGES_NEXUS = {"en" : ["and"], "es" : ["y"]}
 
-LANGUAGES_FILES = { "es" : {"surname" : "surname_es.txt", "name" : "names_es.txt", "normalize" : {"á" : "a", "é" : "e", "í" : "i", "ó" : "o", "ú" : "u", "ñ": "n", "b":"v"}}}
+LANGUAGES_FILES = { "es" : {"surname" : "surname_es.txt", "name" : "names_es.txt", "normalize" : {"á" : "a", "é" : "e", "í" : "i", "ó" : "o", "ú" : "u", "ñ": "n", "b":"v","th":"t", "ph": "f"}}}
 
 LANGUAGES_DATA = {}
 
@@ -233,8 +231,8 @@ def get_formatted_location(location_string):
         return output
     else:
         #Data is not found, let's try removing some
-        logging.warning(NO_VALID_LOCATION)
-        logging.warning(location_string)
+        logging.debug(NO_VALID_LOCATION)
+        logging.debug(location_string)
         if (len(location_string.split(",")) > 3):
             output2 = get_formatted_location(",".join(location_string.split(",")[1:]))
             output2["raw"] = output["raw"]
@@ -393,7 +391,10 @@ def get_jaro_to_list(first4jaro, list4jaro, factor = 0.9):
     loc_j = 0
     for i,item in enumerate(first4jaro):
         for j,data in enumerate(list4jaro):
-            result[i][j] =jaro(item[0],data[0])*jaro(item[1],data[1])
+            if (item[1] == "") or (data[1] == ""):
+                result[i][j] =  jaro(item[0],data[0])
+            else:
+                result[i][j] =jaro(item[0],data[0])*jaro(item[1],data[1])
             if result[i][j]  > loc_data:
                 loc_data = result[i][j]
                 loc_i = i
@@ -413,6 +414,12 @@ def get_score_compare_dates(event1, event2):
     accuracy1 = event1.get_accuracy()
     accuracy2 = event2.get_accuracy()
     if (accuracy1 == "EXACT") and (accuracy2 == "EXACT"):
+        if (not event1.get_day()) or (not event2.get_day()):
+            if (not event1.get_month()) or (not event2.get_month()):
+                diff = diff / 360
+                if diff > 2: diff = 5
+            else:
+                diff = diff / 30
         if (diff == 0):
             return 2.0, 1.0
         elif (diff < 5):
@@ -440,9 +447,9 @@ def get_score_compare_dates(event1, event2):
         is_about = False
         if "ABOUT" in [accuracy1, accuracy2]: is_about = True
         #Too early... the dates do not match!
-        if event_exact.is_this_event_earlier_or_simultaneous_to_this(event_between): return 0.0, 0.0
+        if (not is_about) and event_exact.is_this_event_earlier_or_simultaneous_to_this(event_between): return 0.0, 0.0
         #The date provided is actually later that the range provided
-        elif is_this_date_earlier_or_simultaneous_to_this(event_between.get_year_end(), event_between.get_month_end(), event_between.get_day_end(),
+        elif (not is_about) and is_this_date_earlier_or_simultaneous_to_this(event_between.get_year_end(), event_between.get_month_end(), event_between.get_day_end(),
                                                           event_exact.get_year(), event_exact.get_month(), event_exact.get_day()):
             return 0.0, 0.0
         else:

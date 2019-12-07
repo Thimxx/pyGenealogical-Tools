@@ -201,6 +201,7 @@ class Test(unittest.TestCase):
         Test no adding marriage data due to error
         '''
         prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, type_geni="")
+        assert(prof.get_specific_event("baptism").get_accuracy() == "ABOUT")
         self.assertFalse(prof.add_marriage_in_geni())
         self.assertFalse(prof.delete_profile())
     

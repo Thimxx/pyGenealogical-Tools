@@ -74,3 +74,8 @@ class union(geni_calls, family_profile):
         Returns the parents of the union
         '''
         return self.union_data["partners"]
+    def getMarriage(self):
+        '''
+        It will return the marriage of the profile as an event from pyGenealogy.common_event
+        '''
+        return self.union_data.get("marriage", None)

@@ -152,6 +152,8 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(google_found)
         assert(TEST_GOOGLE in prof.get_all_urls())
         assert(TEST_WIKIPEDIA in prof.get_all_urls())
+        assert(prof.get_specific_web("Google"))
+        assert(not prof.get_specific_web("Not existing"))
         
         prof.del_web_ref(TEST_WIKIPEDIA)
         assert(not (TEST_WIKIPEDIA in prof.get_all_urls()))
@@ -234,6 +236,34 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         fam_id = db.add_family(father = prof_id, mother = wife_id, children = [6], marriage = event_marriage)
         assert(prof_wife.get_specific_event("marriage")[0].get_year() == 1815)
         assert(db.get_family_from_child(6)[0] == fam_id)
+        
+        #Methods for updating the family of RootsMagic
+        assert(not db.update_family(fam_id))
+        new_husband = gen_profile("New", "Husband")
+        new_wife = gen_profile("New", "Wife")
+        new_child = gen_profile("New", "Child")
+        new_husband_id = db.add_profile(new_husband)
+        new_wife_id = db.add_profile(new_wife)
+        new_child_id = db.add_profile(new_child)
+        marriage = event_profile("marriage")
+        marriage.setDate(1900)
+        fam3 = db.get_family_by_ID(3)
+        assert(fam3.getMother() == None)
+        db.update_family(3, mother_id = new_wife_id, children = [new_child_id], marriage = marriage)
+        assert(fam3.getMother() == new_wife_id)
+        
+        fam4 = db.get_family_by_ID(4)
+        assert(fam4.getFather() == None)
+        db.update_family(4, father_id = new_husband_id,  marriage = marriage)
+        assert(fam4.getFather() == new_husband_id)
+        
+        
+        new_child2 = gen_profile("Newer", "Child")
+        new_child3 = gen_profile("Older", "Child")
+        previous_len = len(fam4.getChildren())
+        db.add_child(4, [new_child2, new_child3] )
+        assert(len(fam4.getChildren()) - previous_len == 2)
+        
         db.close_db()
         if os.path.exists(working_file): os.remove(working_file)
     def test_common_init_functions(self):

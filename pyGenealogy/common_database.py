@@ -89,8 +89,13 @@ class gen_database(object):
         '''
         children = []
         for family_id in self.get_all_family_ids_is_parent(profile_id):
-            children += self.get_family_by_ID(family_id).getChildren()
+            children += self.get_children_from_family(family_id)
         return children
+    def get_children_from_family(self, family_id):
+        '''
+        It will provide the children from the given family
+        '''
+        return self.get_family_by_ID(family_id).getChildren()
     def get_parents_from_child(self, profile_id):
         '''
         It returns the ids and profiles of the parents for the given profile
@@ -108,6 +113,16 @@ class gen_database(object):
             parents.remove(profile_id)
             partners += parents
         return partners
+    def get_family_from_partners(self, partner1, partner2):
+        '''
+        This function will be provide the family id of the two partners
+        both partner1 and partner2 shall be the id of the partners
+        '''
+        families1 = self.get_all_family_ids_is_parent(partner1)
+        families2 = self.get_all_family_ids_is_parent(partner2)
+        for fam in families1:
+            if fam in families2: return fam
+        return None
 #===============================================================================
 #         ADD methods: Add methods used to include a new profile and new family
 #===============================================================================
@@ -123,7 +138,6 @@ class gen_database(object):
         '''
         It will create and add a new family to the database
         it is better that each database will create their own families
-        
         father, mother the id of them
         child should be an string of get_child
         marriage is an event

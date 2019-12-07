@@ -20,7 +20,6 @@ class climb(object):
     def get_ancestors(self, source_person, generations):
         '''
         This functions obtains the ancestors up to the requested generations.
-        
         - source person: a person in the format of the database data kind
         - generations: the number of generations to be analyzed.
         '''

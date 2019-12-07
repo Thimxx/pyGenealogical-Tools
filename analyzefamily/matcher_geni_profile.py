@@ -62,24 +62,24 @@ class match_single_profile(object):
         #We can only have the father_rm
         elif father_rm:
             self.non_matched_profiles_rm[father_rm.get_id()] = FATHER
-            print_out("-    NO MATCH in profile " + str(father_rm.nameLifespan()) + " Relation = " + FATHER)
+            print_out("-    NO MATCH of profile in " + self.database_geni.get_db_kind() + " " + str(father_rm.nameLifespan()) + " Relation = " + FATHER)
         elif father_geni:
             self.non_matched_profiles_geni[father_geni.get_id()] = FATHER
-            print_out("-    NO MATCH in profile " + str(father_geni.nameLifespan()) + " Relation = " + FATHER)
-        #Notice that we do not consider teh case of no parents at all identified, no match needed.
+            print_out("-    NO MATCH of profile in " + self.database.get_db_kind() + " " + str(father_geni.nameLifespan()) + " Relation = " + FATHER)
+        #Notice that we do not consider the case of no parents at all identified, no match needed.
         #MOTHER
         _, mother_rm = self.database.get_mother_from_child(profile_rm.get_id())
         _, mother_geni = self.database_geni.get_mother_from_child(profile_geni.get_id())
         #First case is a potential match between the profiles
-        if (mother_rm and mother_rm):
+        if (mother_rm and mother_geni):
             self._match_single_pair(mother_rm, mother_geni)
         #We can only have the father_rm
         elif mother_rm:
             self.non_matched_profiles_rm[mother_rm.get_id()] = MOTHER
-            print_out("-    NO MATCH in profile " + str(mother_rm.nameLifespan()) + " Relation = " + MOTHER)
+            print_out("-    NO MATCH of profile in " + self.database_geni.get_db_kind() + " " + str(mother_rm.nameLifespan()) + " Relation = " + MOTHER)
         elif mother_geni:
             self.non_matched_profiles_geni[mother_geni.get_id()] = MOTHER
-            print_out("-    NO MATCH in profile " + str(mother_geni.nameLifespan()) + " Relation = " + MOTHER)
+            print_out("-    NO MATCH of profile in " + self.database.get_db_kind() + " " + str(mother_geni.nameLifespan()) + " Relation = " + MOTHER)
         #Notice that we do not consider teh case of no parents at all identified, no match needed.
         #PARTNERS
         partners_rm = self.database.get_partners_from_profile(profile_rm.get_id())
@@ -111,22 +111,27 @@ class match_single_profile(object):
             #If it has not been created before, we create the new match in the profile
             if not existing:
                 profile_rm.setWebReference(profile_geni.get_this_profile_url(), name=self.database_geni.get_db_kind(), notes=notes_to_add)
-                self.matched_profiles[profile_rm.get_id()] = profile_geni.get_id()
                 print_out("-    MATCHED :" + str(profile_rm.nameLifespan()) + " WITH " + str(profile_geni.nameLifespan()))
-            #If there was a different previous match, we shall inform in the profile for checking    
+            #We always record the match obtained although was done before
+            self.matched_profiles[profile_rm.get_id()] = profile_geni.get_id()
+            #If there was a different previous match, we shall inform in the profile for checking
             if previous_match:
-                profile_rm.set_task(MATCH_REVIEW_TASK_BEGIN + self.database_geni.get_db_kind() + MATCH_REVIEW_TASK_END, 
+                profile_rm.set_task(MATCH_REVIEW_TASK_BEGIN + self.database_geni.get_db_kind() + MATCH_REVIEW_TASK_END,
                                     details=MATCH_REVIEW_DETAILS + str(all_matches))
         else:
             #This is a conflict, we should have a single match!!!
-            self._conflict_storing(profile_rm, [profile_geni.get_id()])
-    def _conflict_storing(self, profile_rm, conflicted_profiles_ids):
+            self._conflict_storing(profile_rm, [profile_geni.get_id()], self.database_geni)
+    def _conflict_storing(self, profile_rm, conflicted_profiles_ids, db_conflict):
         '''
         Internal function to avoid duplicates. It stores a conflict of matches deviation
         profile_rm is a profile kind
         conflicted_profile_ids is a list of ids with conflict
         '''
-        print_out("-    CONFLICT of profile " + str(profile_rm.nameLifespan()) + " WITH PROFILE(S) " + str(conflicted_profiles_ids))
+        conflict_str = ""
+        for prof_conf_id in conflicted_profiles_ids:
+            prof_conf = db_conflict.get_profile_by_ID(prof_conf_id)
+            conflict_str += str(prof_conf.nameLifespan()) + "  "
+        print_out("-    CONFLICT of profile " + str(profile_rm.nameLifespan()) + " WITH PROFILE(S) " + conflict_str)
         #This is a conflict, we should have a single match!!!
         self.conflict_profiles[profile_rm.get_id()] = conflicted_profiles_ids
         details_info = MATCH_CONFLICT_INFO
@@ -152,29 +157,48 @@ class match_single_profile(object):
         #We store here the profiles that have been identified in profiles_geni
         profiles_not_identified = list(profiles_geni)
         for rm_id in profiles_rm:
+            conflict_match = False
             profile_rm = self.database.get_profile_by_ID(rm_id)
             geni_matches = []
+            conflict_potential = []
             for geni_id in profiles_geni:
                 profile_geni = self.database_geni.get_profile_by_ID(geni_id)
                 score, factor = profile_rm.comparison_score(profile_geni, self.data_language, self.name_convention)
                 if score*factor > self.threshold:
                     geni_matches.append(geni_id)
                     if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
-            #If we have a single profile that is matched,
-            if len(geni_matches) == 0:
-                self.non_matched_profiles_rm[rm_id] = kind_of_match
-                print_out("-    NO MATCH in profile " + str(profile_rm.nameLifespan()) + " Relation = " + kind_of_match)
-            elif len(geni_matches) == 1:
+                elif score > 3*self.threshold:
+                    #This is a common case, where profiles have a minimum difference but still relevant, user to check
+                    conflict_match = True
+                    conflict_potential.append(profile_geni)
+            #If there is a single match, whatever other conditions, we introduce as a match
+            if len(geni_matches) == 1:
                 self._match_single_pair(profile_rm, self.database_geni.get_profile_by_ID(geni_matches[0]))
-            #Or we have more than one match... that is a conflict
             else:
-                self._conflict_storing(profile_rm, geni_matches)
+                #If there is no single match, we can have several options...
+                if (len(geni_matches) == 0) and (not conflict_match):
+                    self.non_matched_profiles_rm[rm_id] = kind_of_match
+                    print_out("-    NO MATCH of profile in " + self.database_geni.get_db_kind() + " " + str(profile_rm.nameLifespan()) + " Relation = " + kind_of_match)
+                #Or we have more than one match... that is a conflict
+                elif len(geni_matches) > 1:
+                    self._conflict_storing(profile_rm, geni_matches, self.database_geni)
+                #We can also have the specific case of conflicted profiles which might be similar
+                if conflict_match:
+                    details_info = "-    CONFLICT POTENTIAL MATCH " + str(profile_rm.nameLifespan()) + " with the following: "
+                    address_list = []
+                    for profile in conflict_potential:
+                        address_list.append(profile.get_this_profile_url())
+                        details_info += str(profile.nameLifespan()) + " Relation = " + kind_of_match 
+                        if profile.get_id() in profiles_not_identified: profiles_not_identified.remove(profile.get_id())
+                    profile_rm.set_task(MATCH_CONFLICT_TASK, priority=1, details= details_info, task_type = 0)
+                    print_out(details_info)
+                    self.conflict_profiles[rm_id] = address_list
         #Now, we are able to detect those children on the "RIGHT" side. Not linked to other
         if len(profiles_not_identified) > 0:
             for missing_prof in profiles_not_identified:
                 self.non_matched_profiles_geni[missing_prof] = kind_of_match
                 prof = self.database_geni.get_profile_by_ID(missing_prof)
-                print_out("-    NO MATCH in profile " + str(prof.nameLifespan()) + " Relation = " + kind_of_match)
+                print_out("-    NO MATCH of profile in " + self.database.get_db_kind() + " " + str(prof.nameLifespan()) + " Relation = " + kind_of_match)
 def print_out(message):
     '''
     Function to be used for printing the obtained results

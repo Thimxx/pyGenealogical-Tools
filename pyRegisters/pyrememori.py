@@ -3,13 +3,14 @@ Created on 16 sept. 2017
 
 @author: Val
 '''
-import requests
+import requests, logging
 from html.parser import HTMLParser
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name
 import datetime
 from pyRegisters.pyCommonRegisters import BaseRegister
 from pyRegisters import sp_age_location_colector
+from messages.parser_messages import NO_FORMAT
 
 BASE_REMEMORY = "https://www.rememori.com"
 SEARCH_LOCATION = BASE_REMEMORY + "/buscar/que:"
@@ -115,7 +116,10 @@ class RememoryParser(HTMLParser):
             if ("Ayer" in data): self.death_date = datetime.datetime.today().date() - datetime.timedelta(days=1)
             elif ("Hoy" in data): self.death_date = datetime.datetime.today().date()
             else:
-                self.death_date = datetime.datetime.strptime(data, "%d/%m/%Y").date()
+                try:
+                    self.death_date = datetime.datetime.strptime(data, "%d/%m/%Y").date()
+                except:
+                    logging.debug(NO_FORMAT)
             self.at_data_location = False
         elif self.at_comments_location:
             self.comments = data

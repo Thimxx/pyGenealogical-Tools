@@ -10,6 +10,7 @@ from pyGenealogy.gen_utils import get_name_surname_from_complete_name
 from pyRegisters.pyCommonRegisters import BaseRegister
 from html.parser import HTMLParser
 from pyRegisters import sp_age_location_colector
+from pyGenealogy.gen_utils import MAXIMUM_LIFESPAN
 
 BASE_ESQUELAS = "https://esquelas.es/search?busqueda="
 #First dead record in El Norte de Castilla
@@ -77,7 +78,8 @@ class EsquelasParser(HTMLParser):
             profile = gen_profile(name, surname)
             profile.setWebReference(self.weblink)
             profile.setCheckedDate("death", self.death_date.year, self.death_date.month, self.death_date.day, "EXACT")
-            if (self.age):
+            #To avoid mistakes in the parsing or issues in registers
+            if (self.age) and (self.age > 0) and (self.age < MAXIMUM_LIFESPAN):
                 profile.setCheckedDate("birth", self.death_date.year - self.age, accuracy="ABOUT")
             if (self.location):
                 profile.setPlaces("death", self.location, language="es" )

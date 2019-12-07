@@ -6,6 +6,7 @@ Created on 13 ago. 2017
 import unittest
 from datetime import date
 from pyGenealogy.common_profile import gen_profile
+from pyGenealogy.common_event import event_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
 
 
@@ -40,6 +41,11 @@ class Test(unittest.TestCase):
         profile2.setCheckedDate("death", 2018,8,24, "EXACT")
         profile2.setCheckedDate("baptism", 2017,1,1, "ABOUT")
         profile2.setCheckedDateWithDates("burial", date2, accuracy = "BETWEEN", date2 = date3)
+        event_fail = event_profile("residence")
+        event_fail.setDate(1800, 2,1)
+        assert(not profile2.setNewEvent(event_fail))
+        event_fail.setDate(2017, 11,1)
+        assert(profile2.setNewEvent(event_fail))
         profile.setComments("comment1")
         profile2.setComments("comment2")
         profile.setWebReference("THIS")
@@ -65,7 +71,7 @@ class Test(unittest.TestCase):
         assert(profile2.get_specific_event("burial").get_year_end() == 2018)
         assert(profile2.get_specific_event("baptism").get_date() ==  date(2017,1,1))
         assert(profile2.get_specific_event("baptism").get_accuracy() == "ABOUT")
-        assert(profile2.get_specific_event("birth").get_location()["city"] == "La Parrilla")
+        assert(profile2.get_specific_event("birth").get_location()["place_name"] == "Calle Nuestra Señora De Los Remedios")
         assert(profile2.get_this_profile_url() == None)
     
         profile3 = gen_profile("Juana", "Bargas")
@@ -238,7 +244,7 @@ class Test(unittest.TestCase):
         profile2.setCheckedGender("F")
         score, factor = profile.comparison_score(profile2)
         assert(score == 4.0)
-        assert(factor == 0.5)
+        assert(factor == 0.1)
         
         profile.setCheckedDate("birth", 2012, 1, 23)
         profile2.setCheckedDate("birth", 1980, accuracy="ABOUT")

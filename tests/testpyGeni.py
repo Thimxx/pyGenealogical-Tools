@@ -28,7 +28,7 @@ class testpyGeni(unittest.TestCase):
         assert(self.philip.gen_data["baptism"].location["place_name"] == 'Iglesia Conventual San Pablo')
         assert(self.philip.gen_data["death"].location["city"] == 'El Escorial' )
         assert(self.philip.gen_data["burial"].location["place_name"] == 'San Lorenzo de El Escorial')
-        
+        assert(self.philip.getLiving() == False)
         #Simplifies the previous file into only 1 test
         assert(self.philip.get_id() == PHILIPIVid)
         philip_bis = profile.profile(PHILIPIVget, "")

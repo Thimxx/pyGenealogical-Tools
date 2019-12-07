@@ -7,7 +7,6 @@ import unittest
 from pyGenealogy.common_event import event_profile
 from pyGenealogy.common_event import is_first_date_lower
 from pyGenealogy.common_family import family_profile
-from pyGenealogy.common_profile import gen_profile
 
 class Test(unittest.TestCase):
 
@@ -38,10 +37,6 @@ class Test(unittest.TestCase):
         '''
         This test will check the basic operation of family classes
         '''
-        father = gen_profile("Father", "Profile")
-        mother = gen_profile("Mother", "Profile")
-        child1 = gen_profile("Child", "First")
-        child2 = gen_profile("Child", "Second")
         
         event1 = event_profile("birth")
         assert(event1.setDate(2013,month = 2, accuracy="ABOUT"))
@@ -61,8 +56,6 @@ class Test(unittest.TestCase):
         '''
         It will check 2 dates to confirm which one is the smaller
         '''
-        new_event = event_profile("birth")
-        
         self.assertFalse(is_first_date_lower(2012, None, None, 2010, None, None))
         assert(is_first_date_lower(1910, None, None, 1912, None, None))
         assert(is_first_date_lower(2010, 1, None, 2010, None, None) == None)

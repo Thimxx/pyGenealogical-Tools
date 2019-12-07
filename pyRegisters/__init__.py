@@ -7,13 +7,16 @@ import re
 from langdetect import detect
 from geotext import GeoText
 
-__all__ = ["pyrememori","pyelnortedecastilla", "pygenanalyzer", "pyabc", "pyCommonRegisters", "pyesquelas", "pycementry_valencia", 
-           "pylavanguardia", "get_location_from_text", "sp_age_location_colector"]
+
+__all__ = ["pyrememori","pyelnortedecastilla", "pygenanalyzer", "pyabc", "pyCommonRegisters", "pyesquelas",
+           "pycementry_valencia","pylavanguardia", "get_location_from_text", "sp_age_location_colector"]
 
 used_strings = {
     "es" : {"AT AGE" : " a los ", "AT THE AGE" : " a la edad de ", "YEARS" : " años"},
     "ca" : { "AT AGE" : " als ", "AT THE AGE" : " a l'edat de ", "YEARS" : " anys"}
     }
+
+    
 
 def get_location_from_text(text):
     '''

@@ -6,6 +6,7 @@ Created on 6 ago. 2019
 import unittest
 from pyGenealogy.common_database import gen_database
 from pyGenealogy.common_profile import gen_profile
+from pyGenealogy.common_event import event_profile
 
 
 class Test_common_database(unittest.TestCase):
@@ -33,6 +34,9 @@ class Test_common_database(unittest.TestCase):
         id_fam, fam = db.get_family_from_child("I3")
         assert(id_fam == "F1")
         assert(fam.getMother() == "I2")
+        marriage_event = event_profile("marriage")
+        fam.setMarriage(marriage_event)
+        assert(fam.getMarriage() == marriage_event)
         
         id_fam2, fam2 = db.get_family_from_child("I1")
         assert( id_fam2 == None)

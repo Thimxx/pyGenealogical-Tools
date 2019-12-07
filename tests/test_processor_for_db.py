@@ -39,7 +39,14 @@ class Test_processor_for_db(unittest.TestCase):
         db_geni = geni_database_interface()
         processor = process_a_db(db, db_geni)
         processor.process()
+        
+        aunt_prof = db_geni.get_profile_by_ID("https://sandbox.geni.com/people/Aunt-Profile/1231306")
+        partners = db_geni.get_partners_from_profile(aunt_prof.get_id())
+        for prof_id in partners:
+            partner_prof = db_geni.get_profile_by_ID(prof_id)
+            if "Aunt Other Partner" in partner_prof.nameLifespan(): partner_prof.delete_profile()
 
+        
         db.close_db()
         if os.path.exists(working_file): os.remove(working_file)
 

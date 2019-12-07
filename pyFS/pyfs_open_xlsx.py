@@ -190,9 +190,11 @@ class getFSfamily(object):
                         #Notice that we shall detect if the given date is a year or a specific date
                         #we will make the different using "about" and using datetime in the background
                         if(is_year(cell_value)):
-                            this_introduction = self.__include_a_date__(column_criteria, included_profile, datetime.strptime(str(cell_value.replace(" ", "")), "%Y").date(), "ABOUT")
+                            this_introduction = self.__include_a_date__(column_criteria, included_profile, 
+                                                            datetime.strptime(str(cell_value.replace(" ", "")), "%Y").date(), "ABOUT")
                         else:
-                            this_introduction = self.__include_a_date__(column_criteria, included_profile, datetime.strptime(cell_value, "%d %b %Y").date(), "EXACT")
+                            this_introduction = self.__include_a_date__(column_criteria, included_profile, 
+                                                            datetime.strptime(cell_value, "%d %b %Y").date(), "EXACT")
                     elif(column_criteria == "full_name"):
                         included_profile.set_name(get_name_from_fullname(cell_value,potential_father_surname, potential_mother_surname, language=self.language))
                         #In the case the name if not the same, we create it as nickname
@@ -211,7 +213,8 @@ class getFSfamily(object):
                         #The separator provided by family search is semicolumn
                         parents = cell_value.split(";")
                         #We obtain firstly the different names
-                        father_name, father_surname, _ = get_name_surname_from_complete_name(parents[0], convention=self.naming_convention, language=self.language)
+                        father_name, father_surname, _ = get_name_surname_from_complete_name(parents[0], 
+                                                            convention=self.naming_convention, language=self.language)
                         if (len(parents) == 2):
                             mother_name, mother_surname, _ = get_name_surname_from_complete_name(parents[1], convention=self.naming_convention, language=self.language)
                         #The algorithm provides an empty surname, we fill it with not known
@@ -291,7 +294,7 @@ class getFSfamily(object):
         iterating_list = list(self.profiles)
         for i in range(len(iterating_list)):
             #We are going one by one all the different profiles
-            if not i in indexes_to_remove:
+            if i not in indexes_to_remove:
                 for j, other_prof in enumerate(iterating_list[i+1:]):
                     merged = self.profiles[i].merge_profile(other_prof, language=self.language, convention=self.naming_convention)
                     if merged:

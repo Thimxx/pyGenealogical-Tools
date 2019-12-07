@@ -112,13 +112,8 @@ class NorteCastillaParser(HTMLParser):
         if self.inside_profile:
             self.inside_profile = False
             result_M = re.search(' (.*) :', data)
-            result_F = re.search(' (.*) :', data)
             if (result_M):
-                self.sex = "M"
                 self.name = result_M.group(1)
-            else:
-                self.sex = "F"
-                self.name = result_F.group(1)
         if self.ending_citation and self.inside_citation:
             name, surname, _ = get_name_surname_from_complete_name(self.name, convention="spanish_surname")
             profile = gen_profile(name, surname)

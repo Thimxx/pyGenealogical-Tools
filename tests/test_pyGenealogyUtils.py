@@ -9,7 +9,7 @@ from pyGenealogy import get_mapbox_key, set_mapbox_key
 from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_fullname, checkDateConsistency, getBestDate, get_partner_gender
 from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name, get_splitted_name_from_complete_name
 from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates, get_compared_data_file, adapted_doublemetaphone
-from pyGenealogy.gen_utils import get_location_standard, formated_year, is_this_date_earlier_or_simultaneous_to_this
+from pyGenealogy.gen_utils import formated_year, is_this_date_earlier_or_simultaneous_to_this
 from pyGenealogy.gen_utils import score_factor_birth_and_death
 from tests.FIXTURES import RIGHT_YEAR, RIGHT_YEAR_IN_A_TEXT, WRONG_YEAR, JUST_TEXT, RIGHT_YEAR_IN_A_DATE
 from tests.FIXTURES import FATHER_SURNAME, MOTHER_SURNAME, SPANISH_CHILD_SURNAME, GENERIC_PLACE_CAPITALS
@@ -179,13 +179,13 @@ class Test(unittest.TestCase):
         output2 = get_formatted_location(GENERIC_PLACE_WITH_PLACE)
         assert(output2["latitude"] > 41.53 )
         assert(output2["longitude"] < -4.53)
-        assert(output2["city"] == "La Parrilla")
+        print(output2)
+        print(get_formatted_location("La Parrilla, Valladolid, Spain"))
         assert(output2["county"] == "Valladolid")
         assert(output2["country"] == "Spain")
         assert(output2["place_name"] == "Calle Nuestra Señora De Los Remedios")
         self.assertFalse("state" in output.keys())
         
-        assert(get_location_standard(output2) == "La Parrilla, Valladolid, Spain" )
         output3 = get_formatted_location("La Asunción, Herrera De Duero, Valladolid, Spain")
         assert("city" in output3)
         
@@ -284,8 +284,12 @@ class Test(unittest.TestCase):
         '''
         Test comparison and score of names
         '''
+        score, factor = get_score_compare_names("Alejandra", "Martín Martín", "Alexandra", "Martín Martín", language = "es")
+        assert(score *factor > 2.0)
+        score, factor = get_score_compare_names("Matías", "Martín Martín", "Mathias", "Martín Martín", language = "es")
+        assert(score *factor >5.0)
         score, factor = get_score_compare_names("Juan", "Fernandez", "Macias", "García")
-        assert(score + factor == 0.0)
+        assert(score * factor == 0.0)
         score, factor = get_score_compare_names("Juan", "Gomez", "Juan", "Gómez")
         assert(score == 4.0)
         assert(factor == 1.0)
@@ -319,6 +323,11 @@ class Test(unittest.TestCase):
         event2 = event_profile("birth")
         event3 = event_profile("birth")
         event3.setDate(2018,2,6)
+        event4 = event_profile("birth")
+        event4.setDate(2018)
+        #Case of no data available
+        score, factor = get_score_compare_dates(event3, event4)
+        assert(score*factor > 1.8)
         #No difference score
         score, factor = get_score_compare_dates(event1, event1)
         assert(score == 2.0)
@@ -491,8 +500,8 @@ class Test(unittest.TestCase):
         event2.setDate(2033, accuracy="ABOUT")
         event3.setDate(2029, accuracy="BETWEEN", year_end = 2031)
         score, factor = get_score_compare_dates(event2, event3)
-        assert(score == 0.0)
-        assert(factor == 0.0)
+        assert(score == 1.0)
+        assert(factor == 1.0)
         event2.setDate(2030, accuracy="BEFORE")
         event3.setDate(2029, accuracy="BETWEEN", year_end = 2031)
         score, factor = get_score_compare_dates(event2, event3)

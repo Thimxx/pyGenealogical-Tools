@@ -39,6 +39,8 @@ class gen_profile(object):
         self.gen_data["research_item"] = []
         self.gen_data["residence"] = []
         self.gen_data["marriage"] = []
+        self.gen_data["access"] = True
+        self.setCheckedGender("U")
     def add_nickname(self, nick_name):
         '''
         Add a nickname
@@ -86,8 +88,8 @@ class gen_profile(object):
         if (self.getGender()) and (profile.getGender()):
             if self.getGender() == profile.getGender():
                 score += 0.5
-            else:
-                factor = 0.5*factor
+            elif (self.getGender() != "U") and (profile.getGender() != "U"):
+                factor = 0.1*factor
         for event_name in MERGE_EVENTS:
             self_event = self.get_specific_event(event_name)
             other_event = profile.get_specific_event(event_name)
@@ -202,7 +204,6 @@ class gen_profile(object):
         '''
         if (not event_name in EVENT_TYPE) or (not accuracy in VALUES_ACCURACY):
             raise NameError(INITIAL_PART_EVENT_ERROR + event_name + " or " + accuracy + END_PART_EVENT_ERROR)
-            return False
         new_event = event_profile(event_name)
         new_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)
         if (not self.selfcheckDateConsistency(new_event)):
@@ -239,6 +240,7 @@ class gen_profile(object):
                 self.gen_data[event.get_event_type()] = [event]
         else:
             self.gen_data[event.get_event_type()] = event
+        return True
     def setComments(self, comment):
         '''
         Comments are aditive on top of the preivous one
@@ -278,12 +280,16 @@ class gen_profile(object):
             return True
         else:
             raise NameError(INITIAL_PART_EVENT_ERROR + event_name + END_PART_EVENT_ERROR)
-            return False
     def setLiving(self, alive):
         '''
         We set if profile is alive or not
         '''
         self.gen_data["living"] = alive
+    def set_accessible(self, accessible):
+        '''
+        Sets the accessibility of the profile
+        '''
+        self.gen_data["access"] = accessible
 #===============================================================================
 #         GET methods: for compatibility with other profiles
 #===============================================================================
@@ -309,7 +315,7 @@ class gen_profile(object):
         '''
         Will return the string with all comments from the profile
         '''
-        return self.gen_data["comments"]
+        return self.gen_data.get("comments", None)
     def getName2Show(self):
         '''
         Function that provides back the name to be shown
@@ -373,7 +379,6 @@ class gen_profile(object):
     def getLiving(self):
         '''
         Returns the living status of a profile
-        
         If the data has not been defined, it will be given as True as more conservative
         '''
         return self.gen_data.get("living", True)
@@ -402,6 +407,11 @@ class gen_profile(object):
         If there is not url (for example local databases) it will provide a None value
         '''
         return None
+    def get_accessible(self):
+        '''
+        Informs if the following profile is accessible
+        '''
+        return self.gen_data.get("access", True)
 #===============================================================================
 #         UPDATE methods: for compatibility with other profiles
 #===============================================================================

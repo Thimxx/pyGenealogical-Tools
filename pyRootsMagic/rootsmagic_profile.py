@@ -139,6 +139,20 @@ class rootsmagic_profile(common_profile.gen_profile):
             web_dict["url"] = "https://www.familysearch.org/tree/person/details/" + fs_data[4]
             webs.append(web_dict)
         return webs
+    def get_specific_web(self, web_name):
+        '''
+        This method will provide an specific web reference defined in the profile
+        web_name is an string with the name of the web (not the url)
+        '''
+        web = None
+        input_urls = "SELECT * FROM URLTable WHERE OwnerID=? AND Name LIKE ?"
+        url_info = self.database.execute( input_urls, (str(self.get_id()), web_name, ) ).fetchone()
+        if url_info:
+            web = {}
+            web["name"] = url_info[4]
+            web["url"] = url_info[5]
+            web["notes"] = url_info[6]
+        return web
     def get_specific_research_log(self, log_name):
         '''
         This function will provide an specific log research log in the database, if existing for the owner id
@@ -335,24 +349,27 @@ class rootsmagic_profile(common_profile.gen_profile):
         edit_date_value = str( (datetime.today()- datetime(1899,12,31) ).days +0.0)
         empty_value =""
         if event.get_event_type() in PERSONAL_EVENTS:
-            new_event = "INSERT INTO EventTable(EventType, OwnerType, OwnerID,FamilyID,PlaceID,SiteID,Date,IsPrimary,IsPrivate,Proof,Status,EditDate,Sentence,Details,Note) VALUES(?,0,?,0,?,0,?,0,0,0,0,?,?,?,?)"
-            self.database.execute( new_event, (DATE_EVENT_ID[event.get_event_type()], str(self.get_id()),place_id,dateRTM,edit_date_value, empty_value,empty_value,empty_value, ) )
+            new_event = ("INSERT INTO EventTable(EventType, OwnerType, OwnerID,FamilyID,PlaceID,SiteID,Date,IsPrimary,"
+                         "IsPrivate,Proof,Status,EditDate,Sentence,Details,Note) VALUES(?,0,?,0,?,0,?,0,0,0,0,?,?,?,?)")
+            self.database.execute( new_event, (DATE_EVENT_ID[event.get_event_type()], 
+                                str(self.get_id()),place_id,dateRTM,edit_date_value, empty_value,empty_value,empty_value, ) )
             self.database.commit()
     def setNewMarriage(self,event, family_id):
         '''
         Overwrites the event from common profile adding the event
-        
         event shall be of pyGenealogy common_event type and a marriage event
         '''
         place_id = self.set_place_and_get_id(event)
-        if not place_id: place_id = "0" 
+        if not place_id: place_id = "0"
         dateRTM = return_date_from_event(event)
         if not dateRTM: dateRTM = "."
         edit_date_value = str( (datetime.today()- datetime(1899,12,31) ).days +0.0)
         empty_value =""
         if event.get_event_type() == "marriage":
-            new_event = "INSERT INTO EventTable(EventType, OwnerType, OwnerID,FamilyID,PlaceID,SiteID,Date,IsPrimary,IsPrivate,Proof,Status,EditDate,Sentence,Details,Note) VALUES(?,1,?,0,?,0,?,0,0,0,0,?,?,?,?)"
-            self.database.execute( new_event, (DATE_EVENT_ID[event.get_event_type()], str(family_id),place_id,dateRTM,edit_date_value, empty_value,empty_value,empty_value, ) )
+            new_event = ("INSERT INTO EventTable(EventType, OwnerType, OwnerID,FamilyID,PlaceID,SiteID,Date,IsPrimary,"
+                "IsPrivate,Proof,Status,EditDate,Sentence,Details,Note) VALUES(?,1,?,0,?,0,?,0,0,0,0,?,?,?,?)")
+            self.database.execute( new_event, (DATE_EVENT_ID[event.get_event_type()],
+                    str(family_id),place_id,dateRTM,edit_date_value, empty_value,empty_value,empty_value, ) )
             self.database.commit()
 #===============================================================================
 #         DELETE methods: methods to delete currently existing entries

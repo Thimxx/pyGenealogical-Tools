@@ -77,6 +77,11 @@ class family_profile(object):
         if self.getFather() : parents.append(self.getFather())
         if self.getMother() : parents.append(self.getMother())
         return parents
+    def getMarriage(self):
+        '''
+        Will return the marriage of the family
+        '''
+        return self.marriage
 #===============================================================================
 #         Other generic methods
 #===============================================================================

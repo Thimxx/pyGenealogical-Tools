@@ -77,7 +77,7 @@ class Test(unittest.TestCase):
         non_matched_profiles_rm2, non_matched_profiles_geni2, conflict_profiles2, matched_profiles2 = matcher.match(11)
         
         assert(12 in non_matched_profiles_rm2.keys())
-        assert(13 in non_matched_profiles_rm2.keys())
+        #assert(13 in non_matched_profiles_rm2.keys())
         assert("profile-3798" in non_matched_profiles_geni2.keys())
         assert("profile-30062" in non_matched_profiles_geni2.keys())
         assert(not conflict_profiles2)

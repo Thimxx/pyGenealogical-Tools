@@ -36,6 +36,8 @@ It is mainly offering the following capabilities:
 * For those interfaces avaialble, it can found potential matches in a GEDCOM.
 9) RootsMagic interface
 * It provide a simple interface to RootsMagic database allowing to access the data and the different profiles.
+10) Matching and synchronization between different genealogical databases
+* It identifies profiles existing in 2 databases (i.e. RootsMagic and Geni) and synchronizes, by creating missing profiles
 
 Notice that this import is intended to import registers from FamilySearch, is you are interested in importing profiles from a family tree located in FamilySearch to Geni use this tool: https://github.com/jeffg2k/SmartCopy, which is a pretty nice piece of software and very helpful.
 

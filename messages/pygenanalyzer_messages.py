@@ -14,6 +14,8 @@ MATCH_CONFLICT_INFO = "This profile does not match with the following geni profi
 MATCH_REVIEW_TASK_BEGIN = "CHECK DOUBLE "
 MATCH_REVIEW_TASK_END = " MATCH"
 MATCH_REVIEW_DETAILS = "The following profiles are duplicated linked "
+MATCH_ADDING_PROFILES = "Adding the profiles "
+MATCH_POTENTIAL_DUPLICATE = "CHECK DUPLICATE "
 
 WEB_DETECTED = "Web automatically detected by pyGenealogicalTools"
 
@@ -23,3 +25,7 @@ PROCESS_MATCH_NUMBER_OF_IMPACTS_BEGIN = "The number of available matches in "
 PROCESS_MATCH_NUMBER_OF_IMPACTS_END = " is "
 PROCESS_ADD_PROFILE_BEGIN = "Adding the profile "
 PROCESS_ADD_PROFILE_END = " as a "
+PROCESS_NO_ACCESS = " profile is skipped as there is no access to the data "
+
+PROCESS_TASK_NAME = "CHECK EVENTS"
+PROCESS_TASK_DETAILS = "Review date for search of event "

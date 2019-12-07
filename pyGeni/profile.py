@@ -21,6 +21,8 @@ SPECIFIC_GENI_INTEGER = ['guid', 'created_at', 'updated_at']
 #TODO: review teh complete post method and include all fields here : https://www.geni.com/platform/developer/help/api?path=profile%2Fadd-child&version=1
 DATA_STRING_IN_GENI = { "name" : "first_name", "surname" : "last_name",
                        "gender": "gender", "comment": "about_me"}
+DATA_STRING_FOR_CONVERSION = { "first_name" : "getName", "last_name" : "getSurname",
+                       "gender": "getGender", "about_me" : "getComments"}
 DATA_LIST_IN_GENI = {"nicknames": "nicknames"}
 #TODO: think about a logic for display name...
 NOT_USED = {"name_to_show" : "display_name"}
@@ -48,9 +50,12 @@ class profile(geni_calls, gen_profile):
         r = s.geni_request_get(url)
         data = r.json()
         #Now we can execute the constructor
-        if (not "first_name" in data.keys()): data["first_name"] = NOT_KNOWN_VALUE
-        if (not "last_name" in data.keys()): data["last_name"] = NOT_KNOWN_VALUE
+        if ("first_name" not in data.keys()): data["first_name"] = NOT_KNOWN_VALUE
+        if ("last_name" not in data.keys()): data["last_name"] = NOT_KNOWN_VALUE
         gen_profile.__init__(self, data["first_name"], data["last_name"], id_db=data.get("id", None) )
+        #In some cases we do not have access to the profile and data is not accurate
+        if data.get("name", None):
+            if ("<private>" in data["name"]): self.set_accessible(False)
         if not "error" in data.keys():
             self.existing_in_geni = True
             self.fulldata = data
@@ -105,6 +110,8 @@ class profile(geni_calls, gen_profile):
                 current_event = self.get_date(value_geni, data.get(value_geni, {}).get("date", {}))
                 current_event.setLocationAlreadyProcessed(data.get(value_geni, {}).get("location", {}))
                 self.gen_data[value_geni] = current_event
+            elif value_geni == "is_alive":
+                self.setLiving(data[value_geni])
     def add_marriage_in_geni(self, union = None):
         '''
         This method add marriage data in geni, add union if there is no unique
@@ -121,8 +128,8 @@ class profile(geni_calls, gen_profile):
         update_marriage = s.GENI_API + union + s.GENI_UPDATE + s.GENI_INITIATE_PARAMETER +  s.GENI_TOKEN + s.get_token()
         #We add the event data for marriage
         data_input={}
-        event_value = self.event_value( "marriage")
-        if (event_value): data_input["marriage"] = event_value
+        event_obtained = event_value(self, "marriage")
+        if (event_obtained): data_input["marriage"] = event_obtained
         #We also add the needed data, that we take from the base profile directly
         r = s.geni_request_post(update_marriage, data_input=data_input)
         data = r.json()
@@ -134,7 +141,7 @@ class profile(geni_calls, gen_profile):
     @classmethod
     def create_internally(cls, geni_input , type_geni):
         return cls(geni_input , type_geni)
-    def creation_operations(self, adding_input):
+    def creation_operations(self, adding_input, data_input):
         '''
         Common functions on creating profiles
         '''
@@ -144,7 +151,6 @@ class profile(geni_calls, gen_profile):
         self.data = {}
         self.geni_specific_data = {}
         #We also add the needed data, that we take from the base profile directly
-        data_input = self.create_input_file_2_geni()
         r = s.geni_request_post(adding_input, data_input=data_input)
         data = r.json()
         if not "error" in data.keys():
@@ -177,12 +183,13 @@ class profile(geni_calls, gen_profile):
                 logging.error(NO_VALID_UNION_PROFILE + str(len(tmp_prof.marriage_union)))
         if (union_to_use == None): return False
         #Calling essentially the constructors
+        data_input = create_input_file_2_geni(base_profile)
         base_profile.__class__ = cls
         geni_calls.__init__(cls)
         #We create the url for creating the child
         add_child = s.GENI_API + union_to_use + s.GENI_ADD_CHILD + s.GENI_INITIATE_PARAMETER + "first_name="
         add_child += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + s.get_token()
-        base_profile.creation_operations(add_child)
+        base_profile.creation_operations(add_child, data_input)
         return True
     @classmethod
     def create_as_a_parent(cls, base_profile, profile = None,
@@ -193,12 +200,13 @@ class profile(geni_calls, gen_profile):
         '''
         child_to_use = process_profile_input(profile, geni_input, type_geni)
         #Calling essentially the constructors
+        data_input = create_input_file_2_geni(base_profile)
         base_profile.__class__ = cls
         geni_calls.__init__(cls)
         #We create the url for creating the child
         add_parent = child_to_use + s.GENI_ADD_PARENT + s.GENI_INITIATE_PARAMETER  + s.GENI_TOKEN + s.get_token()
         #We also add the needed data, that we take from the base profile directly
-        base_profile.creation_operations(add_parent)
+        base_profile.creation_operations(add_parent, data_input)
     @classmethod
     def create_as_a_partner(cls, base_profile, profile = None,
                           geni_input = None, type_geni="g"):
@@ -207,12 +215,13 @@ class profile(geni_calls, gen_profile):
         '''
         partner_to_use = process_profile_input(profile, geni_input, type_geni)
         #Calling essentially the constructors
+        data_input = create_input_file_2_geni(base_profile)
         base_profile.__class__ = cls
         geni_calls.__init__(cls)
         #We create the url for creating the child
         add_partner = partner_to_use + s.GENI_ADD_PARTNER + s.GENI_INITIATE_PARAMETER + "first_name="
         add_partner += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + s.get_token()
-        base_profile.creation_operations(add_partner)
+        base_profile.creation_operations(add_partner, data_input)
         base_profile.add_marriage_in_geni()
     def delete_profile(self):
         '''
@@ -228,53 +237,6 @@ class profile(geni_calls, gen_profile):
             return True
         else:
             return False
-    def create_input_file_2_geni(self):
-        '''
-        This method will return the Json file that will be used as input
-        for the post file
-        '''
-        data = {}
-        data["public"] = "false"
-        for profile_value in DATA_STRING_IN_GENI.keys():
-            if (self.gen_data.get(profile_value, None) != None):
-                data[DATA_STRING_IN_GENI[profile_value]] = self.gen_data[profile_value]
-        for list_data in DATA_LIST_IN_GENI:
-            if (self.gen_data.get(list_data, None) != None):
-                #Needs to be converted in a comman separated list
-                data[DATA_LIST_IN_GENI[list_data]] = ",".join(self.gen_data[list_data])
-        if [self.gen_data["web_ref"] != []]:
-            msg = ABOUT_ME_MESSAGE
-            for value in self.gen_data["web_ref"]:
-                msg += " [" + value["url"] + " FamilySearch-link]"
-            data["about_me"] = msg
-        for event_geni in NO_ARRAY_EVENTS:
-            event_value = self.event_value(event_geni)
-            if (event_value): data[event_geni] = event_value
-        for event_residence in self.gen_data["residence"]:
-            msg = RESIDENCE_MESSAGE
-            if event_residence.get_year():
-                msg += " Year = " + str(event_residence.get_year())
-            if event_residence.get_month():
-                msg += " Month = " + str(event_residence.get_month())
-            if event_residence.get_day():
-                msg += " Day = " + str(event_residence.get_day())
-            if event_residence.get_location():
-                msg += " Location = " + str(event_residence.get_location()["raw"])
-            data["about_me"] += msg
-        return data
-    def event_value(self, event_geni, location_array = 0):
-        '''
-        Provides event value, uses the function
-        '''
-        event_data = {}
-        if (event_geni in self.gen_data.keys()) and (self.gen_data[event_geni] != []):
-            event_selected = self.gen_data[event_geni]
-            if not event_geni in NO_ARRAY_EVENTS: event_selected = self.gen_data[event_geni][location_array]
-            date_structure = getDateStructureGeni(event_selected)
-            location_structure = getLocationStructureGeni(event_selected.get_location())
-            if(date_structure) : event_data["date"] = date_structure
-            if(location_structure) :event_data["location"] = location_structure
-        return event_data
 #===============================================================================
 #         GET methods: overwritting Common_profile methods
 #===============================================================================
@@ -345,10 +307,11 @@ def getLocationStructureGeni(location):
         for key in location.keys():
             if (key in GENI_LOCATION_KEYS):
                 location_data[key] = location[key]
+        if location_data == {} and location.get("raw", None):  location_data["place_name"] = location["raw"]
     return location_data
 def process_profile_input(profile = None, geni_input = None, type_geni="g"):
     '''
-       Function to avoid code duplication that takes returns the right profile id
+    Function to avoid code duplication that takes returns the right profile id
     '''
     profile_to_use = None
     if (profile != None):
@@ -356,3 +319,50 @@ def process_profile_input(profile = None, geni_input = None, type_geni="g"):
     elif (geni_input != None):
         profile_to_use = process_geni_input(geni_input, type_geni)
     return profile_to_use
+def create_input_file_2_geni(profile):
+    '''
+    This method will return the Json file that will be used as input
+    for the post file
+    '''
+    data = {}
+    data["public"] = "false"
+    for profile_value in DATA_STRING_FOR_CONVERSION.keys():
+        result = getattr(profile, DATA_STRING_FOR_CONVERSION[profile_value])()
+        if result: data[profile_value] = result
+    for list_data in DATA_LIST_IN_GENI:
+        if (profile.gen_data.get(list_data, None) != None):
+            #Needs to be converted in a comman separated list
+            data[DATA_LIST_IN_GENI[list_data]] = ",".join(profile.gen_data[list_data])
+    if (profile.gen_data["web_ref"] != []):
+        msg = ABOUT_ME_MESSAGE
+        for value in profile.gen_data["web_ref"]:
+            msg += " [" + value["url"] + " FamilySearch-link]"
+        data["about_me"] = msg
+    for event_geni in NO_ARRAY_EVENTS:
+        event_value_data = event_value(profile, event_geni)
+        if (event_value_data): data[event_geni] = event_value_data
+    for event_residence in profile.gen_data["residence"]:
+        msg = RESIDENCE_MESSAGE
+        if event_residence.get_year():
+            msg += " Year = " + str(event_residence.get_year())
+        if event_residence.get_month():
+            msg += " Month = " + str(event_residence.get_month())
+        if event_residence.get_day():
+            msg += " Day = " + str(event_residence.get_day())
+        if event_residence.get_location():
+            msg += " Location = " + str(event_residence.get_location()["raw"])
+        data["about_me"] += msg
+    return data
+def event_value(profile, event_geni, location_array = 0):
+    '''
+    Provides event value, uses the function
+    '''
+    event_data = {}
+    event_selected = profile.get_specific_event(event_geni)
+    if (event_selected not in [ None, []  ]):
+        if event_geni not in NO_ARRAY_EVENTS: event_selected = event_selected[location_array]
+        date_structure = getDateStructureGeni(event_selected)
+        location_structure = getLocationStructureGeni(event_selected.get_location())
+        if(date_structure) : event_data["date"] = date_structure
+        if(location_structure) :event_data["location"] = location_structure
+    return event_data
