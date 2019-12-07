@@ -24,7 +24,7 @@ DIFFERNCE_BIRTH_BAPT = 90
 ignored_fields =["batch_number", "score", "role_in_record", "father_full_name", "mother_full_name", "easy_unique_id", "record_url", "subcollection_id"]
 date_fields = {"birth_date" : "birth" , "burial_date" : "burial", "chr_date" : "baptism",
                "residence_date" : "residence", "death_date" : "death", "marriage_date" : "marriage"}
-LOCATION_EQUIVALENCE = {"birth_place_text" : "birth", "death_place_text" : "death", 
+LOCATION_EQUIVALENCE = {"birth_place_text" : "birth", "death_place_text" : "death",
                         "chr_place_text" : "baptism"}
 
 class getFSfamily(object):
@@ -38,7 +38,7 @@ class getFSfamily(object):
         self.correct_execution = True
         self.language = language
         if os.path.exists(filename):
-            if (not ".xlsx" in filename):
+            if (".xlsx" not in filename):
                 #This file is not in xlsx format, we change it:
                 pyexcel.save_book_as(file_name=filename, dest_file_name=filename + "x")
                 filename = filename + "x"
@@ -46,7 +46,7 @@ class getFSfamily(object):
             #The file does not exists, we create an error!
             logging.error(NOT_EXISTING_FILE + filename)
             self.correct_execution = False
-        if (not naming_convention in naming_conventions):
+        if (naming_convention not in naming_conventions):
             logging.error(NO_VALID_NAMING_CONVENTION)
             self.correct_execution = False
         self.naming_convention = naming_convention
@@ -109,14 +109,14 @@ class getFSfamily(object):
                 cell_value = current_sheet.cell(row=row, column=column_index).value
                 if (column_criteria in ["father_full_name", "mother_full_name"]  ):
                     #If the cell_value is null we shall avoid continuing
-                    if (cell_value != None):
+                    if (cell_value is not None):
                         name_data = get_name_surname_from_complete_name(cell_value, convention=self.naming_convention, language=self.language)
                         #We have two surnames or one?
                         surname_cand = name_data[1]
                         if (name_data[2] == 2):
                             surname_cand = name_data[1].split()[0]
                         if(column_criteria == "father_full_name"):
-                            if (not surname_cand in potential_father_surname):
+                            if (surname_cand not in potential_father_surname):
                                 potential_father_surname.append(surname_cand)
                                 potential_father_surname_repetitions.append(1)
                             else:
@@ -129,7 +129,7 @@ class getFSfamily(object):
                                 index = potential_father_name.index(name_data[0])
                                 potential_father_name_repetitions[index] = potential_father_name_repetitions[index] + 1
                         elif(column_criteria == "mother_full_name"):
-                            if (not surname_cand in potential_mother_surname):
+                            if (surname_cand not in potential_mother_surname):
                                 potential_mother_surname.append(surname_cand)
                                 potential_mother_surname_repetitions.append(1)
                             else:
@@ -193,10 +193,11 @@ class getFSfamily(object):
                             this_introduction = self.__include_a_date__(column_criteria, included_profile, 
                                                             datetime.strptime(str(cell_value.replace(" ", "")), "%Y").date(), "ABOUT")
                         else:
-                            this_introduction = self.__include_a_date__(column_criteria, included_profile, 
+                            this_introduction = self.__include_a_date__(column_criteria, included_profile,
                                                             datetime.strptime(cell_value, "%d %b %Y").date(), "EXACT")
                     elif(column_criteria == "full_name"):
-                        included_profile.set_name(get_name_from_fullname(cell_value,potential_father_surname, potential_mother_surname, language=self.language))
+                        included_profile.set_name(get_name_from_fullname(cell_value,potential_father_surname,
+                                                    potential_mother_surname, language=self.language))
                         #In the case the name if not the same, we create it as nickname
                         if (cell_value != included_profile.returnFullName()): included_profile.add_nickname(cell_value)
                     elif (column_criteria == "spouse_full_name"):
@@ -213,10 +214,11 @@ class getFSfamily(object):
                         #The separator provided by family search is semicolumn
                         parents = cell_value.split(";")
                         #We obtain firstly the different names
-                        father_name, father_surname, _ = get_name_surname_from_complete_name(parents[0], 
+                        father_name, father_surname, _ = get_name_surname_from_complete_name(parents[0],
                                                             convention=self.naming_convention, language=self.language)
                         if (len(parents) == 2):
-                            mother_name, mother_surname, _ = get_name_surname_from_complete_name(parents[1], convention=self.naming_convention, language=self.language)
+                            mother_name, mother_surname, _ = get_name_surname_from_complete_name(parents[1],
+                                                            convention=self.naming_convention, language=self.language)
                         #The algorithm provides an empty surname, we fill it with not known
                         if (father_surname == ""): father_surname = NOT_KNOWN_VALUE
                         if (mother_surname == ""): mother_surname = NOT_KNOWN_VALUE

@@ -128,7 +128,8 @@ class gedcom_profile(common_profile.gen_profile):
                 new_event.setParameterInLocation("place_name", self.individual.get(EQUIVALENCE[event_name]).get("PLAC", {}).get("VALUE"))
             for key in LOCATION_EQUIVALENCE:
                 if self.individual.get(EQUIVALENCE[event_name]).get("ADDR", {}).get(LOCATION_EQUIVALENCE[key], {}).get("VALUE"):
-                    new_event.setParameterInLocation(key, self.individual.get(EQUIVALENCE[event_name]).get("ADDR", {}).get(LOCATION_EQUIVALENCE[key], {}).get("VALUE"))
+                    new_event.setParameterInLocation(key, self.individual.get(EQUIVALENCE[event_name]).get("ADDR",
+                                                        {}).get(LOCATION_EQUIVALENCE[key], {}).get("VALUE"))
             if event_name in common_profile.ARRAY_EVENTS: return [new_event]
             else: return new_event
         else:

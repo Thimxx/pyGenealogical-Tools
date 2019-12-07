@@ -254,8 +254,8 @@ class rootsmagic_profile(common_profile.gen_profile):
         elif isinstance(url, str):
             value_name = str(name)
             value_notes = str(notes)
-            if name == None: value_name = ""
-            if notes == None: value_notes = ""
+            if name is None: value_name = ""
+            if notes is None: value_notes = ""
             new_web = "INSERT INTO URLTable(OwnerType,LinkType,OwnerID,URL,Name,Note) VALUES(0,0,?,?,?,?)"
             self.database.execute( new_web, (str(self.get_id()), str(url), value_name, value_notes) )
         self.database.commit()
@@ -269,7 +269,8 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         empty_value=""
         self.database.create_collation("RMNOCASE", collate_temp)
-        new_task = "INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details, Date1, Date2, Date3, SortDate1, SortDate2, SortDate3) VALUES(?,?,0,?,0,?,?,?,?,?,?,?,9223372036854775807,9223372036854775807,9223372036854775807)"
+        new_task = ("INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details,"
+                    " Date1, Date2, Date3, SortDate1, SortDate2, SortDate3) VALUES(?,?,0,?,0,?,?,?,?,?,?,?,9223372036854775807,9223372036854775807,9223372036854775807)")
         cursor = self.database.cursor()
         cursor.execute( new_task, (str(task_type), str(self.get_id()),empty_value, str(priority), empty_value, str(task_details), details,".", ".", ".", ) )
         row_data = cursor.lastrowid
@@ -309,10 +310,12 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         Introduces a citation linked to the profile
         '''
-        data_details = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Root><Fields><Field><Name>ItemID</Name><Value/></Field><Field><Name>Date</Name><Value/></Field><Field><Name>Details</Name><Value>"
+        data_details = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Root><Fields><Field><Name>ItemID</Name><Value/></Field><Field>"
+                        "<Name>Date</Name><Value/></Field><Field><Name>Details</Name><Value>")
         data_details += details
         data_details += "</Value></Field><Field><Name>Annotation</Name><Value/></Field></Fields></Root>"
-        new_citation = "INSERT INTO CitationTable(OwnerType, SourceID, OwnerID, Quality, IsPrivate, Comments, ActualText, RefNumber,Flags, Fields) VALUES(0,?,?,?,?,?,?,?,0,?)"
+        new_citation = ("INSERT INTO CitationTable(OwnerType, SourceID, OwnerID, Quality, IsPrivate,"
+                        " Comments, ActualText, RefNumber,Flags, Fields) VALUES(0,?,?,?,?,?,?,?,0,?)")
         self.database.execute( new_citation, (str(sourceid), str(self.get_id()), "~~~", str(isprivate), details, "", "", data_details, ) )
         self.database.commit()
     def set_place_and_get_id(self,event):
@@ -339,11 +342,10 @@ class rootsmagic_profile(common_profile.gen_profile):
     def setNewEvent(self,event):
         '''
         Overwrites the event from common profile adding the event
-        
         event shall be of pyGenealogy common_event type
         '''
         place_id = self.set_place_and_get_id(event)
-        if not place_id: place_id = "0" 
+        if not place_id: place_id = "0"
         dateRTM = return_date_from_event(event)
         if not dateRTM: dateRTM = "."
         edit_date_value = str( (datetime.today()- datetime(1899,12,31) ).days +0.0)
@@ -351,7 +353,7 @@ class rootsmagic_profile(common_profile.gen_profile):
         if event.get_event_type() in PERSONAL_EVENTS:
             new_event = ("INSERT INTO EventTable(EventType, OwnerType, OwnerID,FamilyID,PlaceID,SiteID,Date,IsPrimary,"
                          "IsPrivate,Proof,Status,EditDate,Sentence,Details,Note) VALUES(?,0,?,0,?,0,?,0,0,0,0,?,?,?,?)")
-            self.database.execute( new_event, (DATE_EVENT_ID[event.get_event_type()], 
+            self.database.execute( new_event, (DATE_EVENT_ID[event.get_event_type()],
                                 str(self.get_id()),place_id,dateRTM,edit_date_value, empty_value,empty_value,empty_value, ) )
             self.database.commit()
     def setNewMarriage(self,event, family_id):

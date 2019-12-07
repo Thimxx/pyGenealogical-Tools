@@ -38,10 +38,10 @@ class event_profile(object):
         if month_end:       self.month_end = month_end
         if day_end:         self.day_end = day_end
         #Consistency checkings
-        if not self.accuracy in VALUES_ACCURACY: return False
+        if self.accuracy not in VALUES_ACCURACY: return False
         elif self.accuracy == "BETWEEN":
             if not year_end : return False
-            elif is_first_date_lower(year, month, day, year_end, month_end, day_end) == False:
+            elif is_first_date_lower(year, month, day, year_end, month_end, day_end) is False:
                 #We make sure that the first date is the smallest
                 self.year = year_end
                 if month_end:           self.month = month_end

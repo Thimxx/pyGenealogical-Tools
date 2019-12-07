@@ -3,7 +3,7 @@ Created on 22 oct. 2019
 
 @author: Val
 '''
-import logging, datetime, logging
+import logging, datetime
 from messages.pygenanalyzer_messages import MATCH_PROFILE_ERROR, MATCH_GENI, MATCH_CONFLICT_TASK, MATCH_CONFLICT_INFO
 from messages.pygenanalyzer_messages import MATCH_REVIEW_TASK_BEGIN, MATCH_REVIEW_TASK_END, MATCH_REVIEW_DETAILS
 from analyzefamily import CHILD, FATHER, MOTHER, PARTNER
@@ -178,7 +178,8 @@ class match_single_profile(object):
                 #If there is no single match, we can have several options...
                 if (len(geni_matches) == 0) and (not conflict_match):
                     self.non_matched_profiles_rm[rm_id] = kind_of_match
-                    print_out("-    NO MATCH of profile in " + self.database_geni.get_db_kind() + " " + str(profile_rm.nameLifespan()) + " Relation = " + kind_of_match)
+                    print_out("-    NO MATCH of profile in " + self.database_geni.get_db_kind() + " " + 
+                              str(profile_rm.nameLifespan()) + " Relation = " + kind_of_match)
                 #Or we have more than one match... that is a conflict
                 elif len(geni_matches) > 1:
                     self._conflict_storing(profile_rm, geni_matches, self.database_geni)
@@ -188,7 +189,7 @@ class match_single_profile(object):
                     address_list = []
                     for profile in conflict_potential:
                         address_list.append(profile.get_this_profile_url())
-                        details_info += str(profile.nameLifespan()) + " Relation = " + kind_of_match 
+                        details_info += str(profile.nameLifespan()) + " Relation = " + kind_of_match
                         if profile.get_id() in profiles_not_identified: profiles_not_identified.remove(profile.get_id())
                     profile_rm.set_task(MATCH_CONFLICT_TASK, priority=1, details= details_info, task_type = 0)
                     print_out(details_info)

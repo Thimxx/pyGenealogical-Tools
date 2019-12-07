@@ -117,7 +117,7 @@ class profile(geni_calls, gen_profile):
         This method add marriage data in geni, add union if there is no unique
         marriage
         '''
-        if (union == None):
+        if (union is None):
             #If no union is added is because is the unique...
             if(len(self.marriage_union) == 1):
                 union = self.marriage_union[0].union_id
@@ -153,7 +153,7 @@ class profile(geni_calls, gen_profile):
         #We also add the needed data, that we take from the base profile directly
         r = s.geni_request_post(adding_input, data_input=data_input)
         data = r.json()
-        if not "error" in data.keys():
+        if "error" not in data.keys():
             self.data = data
             self.properly_executed = True
             self.existing_in_geni = True
@@ -168,12 +168,12 @@ class profile(geni_calls, gen_profile):
         as a child of a given union of 2 profiles.
         '''
         union_to_use = None
-        if (union != None):
+        if (union is not None):
             union_to_use = union
-        elif (profile != None):
+        elif (profile is not None):
             if (len(profile.marriage_union) == 1):
                 union_to_use = profile.marriage_union[0].union_id
-        elif (geni_input != None):
+        elif (geni_input is not None):
             tmp_prof = cls.create_internally(geni_input, type_geni)
             #TODO: add error checking if tmp_prof is not properly created.
             if (len(tmp_prof.marriage_union) == 1):
@@ -181,7 +181,7 @@ class profile(geni_calls, gen_profile):
             else:
                 #We have a problem, potentially a wrong profile
                 logging.error(NO_VALID_UNION_PROFILE + str(len(tmp_prof.marriage_union)))
-        if (union_to_use == None): return False
+        if (union_to_use is None): return False
         #Calling essentially the constructors
         data_input = create_input_file_2_geni(base_profile)
         base_profile.__class__ = cls
@@ -303,7 +303,7 @@ def getLocationStructureGeni(location):
     geni
     '''
     location_data = {}
-    if(location != None):
+    if(location is not None):
         for key in location.keys():
             if (key in GENI_LOCATION_KEYS):
                 location_data[key] = location[key]
@@ -314,9 +314,9 @@ def process_profile_input(profile = None, geni_input = None, type_geni="g"):
     Function to avoid code duplication that takes returns the right profile id
     '''
     profile_to_use = None
-    if (profile != None):
+    if (profile is not None):
         profile_to_use = profile.geni_specific_data["url"]
-    elif (geni_input != None):
+    elif (geni_input is not None):
         profile_to_use = process_geni_input(geni_input, type_geni)
     return profile_to_use
 def create_input_file_2_geni(profile):
@@ -330,7 +330,7 @@ def create_input_file_2_geni(profile):
         result = getattr(profile, DATA_STRING_FOR_CONVERSION[profile_value])()
         if result: data[profile_value] = result
     for list_data in DATA_LIST_IN_GENI:
-        if (profile.gen_data.get(list_data, None) != None):
+        if (profile.gen_data.get(list_data, None) is not None):
             #Needs to be converted in a comman separated list
             data[DATA_LIST_IN_GENI[list_data]] = ",".join(profile.gen_data[list_data])
     if (profile.gen_data["web_ref"] != []):

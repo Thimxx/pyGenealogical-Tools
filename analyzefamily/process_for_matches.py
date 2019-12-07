@@ -54,7 +54,6 @@ class process_a_db(object):
             if (profiles_2_analyze == "all") or (prof_id in profiles_2_analyze):
                 prof_in_study = linked_profiles[prof_id]
                 if continue_match(prof_in_study, match_str, threshold = threshold):
-                    families_prof_id = self.db_input.get_all_family_ids_is_parent(prof_id)
                     prof_linked_id = prof_in_study.get_specific_web(kind_match)["url"]
                     prof_linked = self.db_check.get_profile_by_ID(prof_linked_id)
                     #In order to get the marriage, first we get the family from the other database
@@ -65,15 +64,15 @@ class process_a_db(object):
                     non_matched_profiles_input, non_matched_profiles_check, conflict_profiles, matched_profiles = matcher_profiles.match(prof_id)
                     #REMOVAL OF LIVING
                     #If the option is selected to not publish data that is restricted like living we remove teh matched characters
-                    temp_data = {"input" : 
-                                    {"non_matches": non_matched_profiles_input, 
-                                     "database":self.db_input, "other_db": self.db_check, 
+                    temp_data = {"input" :
+                                    {"non_matches": non_matched_profiles_input,
+                                     "database":self.db_input, "other_db": self.db_check,
                                      "family_is_child": family_input,
                                      "current_id_to_add": prof_linked_id,
                                      "current_id_matched": prof_id},
-                                 "check" : 
-                                    {"non_matches": non_matched_profiles_check, 
-                                     "database":self.db_check, "other_db": self.db_input, 
+                                 "check" :
+                                    {"non_matches": non_matched_profiles_check,
+                                     "database":self.db_check, "other_db": self.db_input,
                                      "family_is_child": family_profile,
                                      "current_id_to_add": prof_id,
                                      "current_id_matched": prof_linked.get_id()}}
@@ -86,21 +85,23 @@ class process_a_db(object):
                             #If the option is selected to not publish data that is restricted like living we remove teh matched characters
                             if (kind_db in avoid_import_living_from) and potential_profile.getLiving():
                                 del temp_data[kind_db]["non_matches"][prof]
-                                print_out("-    AVOIDING INTRODUCTION OF LIVING "+ str(potential_profile.nameLifespan()) + " FROM THE DATABASE " + temp_data[kind_db]["database"].get_db_kind())
+                                print_out("-    AVOIDING INTRODUCTION OF LIVING "+ str(potential_profile.nameLifespan()) +
+                                     " FROM THE DATABASE " + temp_data[kind_db]["database"].get_db_kind())
                     #Prior to starting the overall copy/match, we should check first if potential candidates exists in the input database
                     temp_checking = dict(non_matched_profiles_check)
-                    for prof in temp_checking: 
+                    for prof in temp_checking:
                         potential_profile = self.db_check.get_profile_by_ID(prof)
                         #MATCHING: we look if the profile also exists before
-                        matches = self.db_input.get_potential_profile_match(potential_profile, 
+                        matches = self.db_input.get_potential_profile_match(potential_profile,
                                 data_language = self.data_language, name_convention = self.name_convention)
                         if len(matches) > 0:
                             #In this case we have a certain potential match. We should not add and rather, leave for checking an human being
                             del non_matched_profiles_check[prof]
-                            print_out("-    POTENTIAL DUPLICATE of profile " + str(potential_profile.nameLifespan()) + " WITH PROFILE(S) ID(S) " + str(matches))
+                            print_out("-    POTENTIAL DUPLICATE of profile " + str(potential_profile.nameLifespan()) +
+                                " WITH PROFILE(S) ID(S) " + str(matches))
                             #This is a conflict, we should avoid duplicating job of checking and solving
                             conflict_profiles[prof] = matches
-                            details_info = ("Potential existing duplicates for profile " + potential_profile.nameLifespan() + 
+                            details_info = ("Potential existing duplicates for profile " + potential_profile.nameLifespan() +
                                             " with web " + potential_profile.get_this_profile_url() + " in the profiles:      ")
                             for ids_check in matches:
                                 temp_prof = self.db_input.get_profile_by_ID(ids_check)
@@ -123,11 +124,12 @@ class process_a_db(object):
                             father_profile = db_now.get_profile_by_ID(father_id)
                             mother_profile = db_now.get_profile_by_ID(mother_id)
                             #We also add the link!
-                            print_out(MATCH_ADDING_PROFILES + father_profile.nameLifespan() + AND_STRING + 
+                            print_out(MATCH_ADDING_PROFILES + father_profile.nameLifespan() + AND_STRING +
                                     mother_profile.nameLifespan() + TO_STRING + db_other.get_db_kind() )
                             marriage_event = family_is_child.getMarriage()
                             #So.. we add the new profiles
-                            new_father_id, new_mother_id, _ = db_other.add_parents(child_profile_id = current_id_to_add, father_profile = father_profile, mother_profile= mother_profile, marriage_event= marriage_event)
+                            new_father_id, new_mother_id, _ = db_other.add_parents(child_profile_id = current_id_to_add, father_profile = father_profile, 
+                                                                            mother_profile= mother_profile, marriage_event= marriage_event)
                             if db_kind == "check":
                                 self.add_match_to_prof(new_father_id, father_profile)
                                 self.add_match_to_prof(new_mother_id, mother_profile)
@@ -139,7 +141,6 @@ class process_a_db(object):
                     #################
                     #PARTNERS: Review of partners for inclusion
                     partners_input = self.db_input.get_partners_from_profile(prof_id)
-                    partners_check = self.db_check.get_partners_from_profile(prof_linked.get_id())
                     matched_partners = {}
                     for partner_input in partners_input:
                         if partner_input in matched_profiles:
@@ -151,11 +152,13 @@ class process_a_db(object):
                             if temp_data[kind_db]["non_matches"][prof] == "partner":
                                 partner_profile = temp_data[kind_db]["database"].get_profile_by_ID(prof)
                                 #Good, we will need now to add the new partner to the INPUT area
-                                print_out(PROCESS_ADD_PROFILE_BEGIN + partner_profile.nameLifespan() + TO_STRING + temp_data[kind_db]["other_db"].get_db_kind() +
-                                    PROCESS_ADD_PROFILE_END + temp_data[kind_db]["non_matches"][prof] )
-                                family_check = temp_data[kind_db]["database"].get_family_from_partners(temp_data[kind_db]["current_id_matched"], partner_profile.get_id())
+                                print_out(PROCESS_ADD_PROFILE_BEGIN + partner_profile.nameLifespan() + TO_STRING +
+                                           temp_data[kind_db]["other_db"].get_db_kind() + PROCESS_ADD_PROFILE_END + temp_data[kind_db]["non_matches"][prof] )
+                                family_check = temp_data[kind_db]["database"].get_family_from_partners(temp_data[kind_db]["current_id_matched"], 
+                                                                                                       partner_profile.get_id())
                                 marriage_event = temp_data[kind_db]["database"].get_family_by_ID(family_check).getMarriage()
-                                id_partner, _ = temp_data[kind_db]["other_db"].add_partner(temp_data[kind_db]["current_id_to_add"], partner_profile, marriage = marriage_event)
+                                id_partner, _ = temp_data[kind_db]["other_db"].add_partner(temp_data[kind_db]["current_id_to_add"], 
+                                                                                           partner_profile, marriage = marriage_event)
                                 if kind_db == "input":
                                     self.add_match_to_prof(prof, temp_data[kind_db]["other_db"].get_profile_by_ID(id_partner))
                                     matched_partners[prof] = id_partner
@@ -190,7 +193,8 @@ class process_a_db(object):
                         notes_toadd = STATUS_MATCHED + str(today)
                         record_research_log(prof_in_study, match_str, loc_research, prof_linked_id, notes_toadd)
                     else:
-                        notes_toadd = STATUS_TO_CHECK + " "*10 + "--Missing match input " + str(non_matched_profiles_input) + " "*10  + "--Missing match check " + str(non_matched_profiles_check) + " "*10  + "--Pending conflicts " + str(conflict_profiles)
+                        notes_toadd = (STATUS_TO_CHECK + " "*10 + "--Missing match input " + str(non_matched_profiles_input) + " "*10  +
+                             "--Missing match check " + str(non_matched_profiles_check) + " "*10  + "--Pending conflicts " + str(conflict_profiles))
                         record_research_log(prof_in_study, match_str, loc_research, prof_linked_id, notes_toadd)
                 else:
                     print_out("SKIPPING "+ prof_in_study.nameLifespan(), log_level = 15)

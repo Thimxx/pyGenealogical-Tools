@@ -58,12 +58,12 @@ class geni_calls():
         year_end = None
         month_end = None
         day_end = None
-        if (data_dict.get("year",None) != None):
+        if (data_dict.get("year",None) is not None):
             year = data_dict.get("year")
             month = data_dict.get("month", None)
             day = data_dict.get("day", None)
         #TODO: get and handle BETWEEN dates
-        if (data_dict.get("circa", "false") == True): accuracy = "ABOUT"
+        if (data_dict.get("circa", "false") is True): accuracy = "ABOUT"
         elif (data_dict.get("range", "") == "before"): accuracy = "BEFORE"
         elif (data_dict.get("range", "") == "after"): accuracy = "AFTER"
         elif (data_dict.get("range", "") == "between"):

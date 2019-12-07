@@ -270,7 +270,6 @@ class database_rm(gen_database):
     def update_family(self, family_id, father_id = None, mother_id = None, children = None, marriage = None):
         '''
         Updates an existing family with new data
-        
         father, mother shall be the RootsMagic id of the profile, as a minimum one of the profiles shall be already in the family
         child should be an string of RootsMagic IDs.
         marriage is an event from pyGenealogy.common_event

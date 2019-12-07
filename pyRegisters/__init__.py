@@ -16,8 +16,6 @@ used_strings = {
     "ca" : { "AT AGE" : " als ", "AT THE AGE" : " a l'edat de ", "YEARS" : " anys"}
     }
 
-    
-
 def get_location_from_text(text):
     '''
     This function will provide the location from the text
@@ -44,7 +42,7 @@ def sp_age_location_colector(data, language = "es", detect_lan = False):
             if aged.isdigit(): age = int(result.group(1).strip())
     elif (str_input["AT AGE"] in data):
         result = re.search(str_input["AT AGE"] + '(.*)' + str_input["YEARS"], data)
-        if not (result == None):
+        if not (result is None):
             aged = result.group(1).strip()
             if aged.isdigit(): age = int(result.group(1).strip())
     elif  (str_input["AT THE AGE"] in data):

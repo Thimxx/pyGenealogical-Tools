@@ -44,7 +44,7 @@ class geni_database_interface(gen_database):
         '''
         Returns the profile by the input ID
         '''
-        if not id_family in self.families.keys():
+        if id_family not in self.families.keys():
             fam = union(id_family)
             self.families[id_family] = fam
         return self.families[id_family]

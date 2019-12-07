@@ -38,7 +38,7 @@ class gen_analyzer(object):
         else:
             profiles = database.get_all_profiles()
         self.file = None
-        if not output == None: self.file = open(output, "w")
+        if output is not None: self.file = open(output, "w")
         print_out("Total number of profiles = " + str(len(profiles)), self.file)
         for person in profiles:
             #Firstly, we need to analyze if we need to add the research log, if does not exist, of course
@@ -69,12 +69,12 @@ class gen_analyzer(object):
                     self.result_analyzer(person, records, storage, parser, log_loc)
             #We add a single task for all URLs in the person
             if storage and self.urls_task != "": person.set_task("CHECK WEB REFERENCES ", details = self.urls_task)
-        if not self.file == None: self.file.close()
+        if self.file is not None: self.file.close()
     def result_analyzer(self, person, records, storage, web_site, log_id):
         '''
         Common function between all the functions executed above
         '''
-        if records != None:
+        if records is not None:
             for obtained in records:
                 is_stored = False
                 if storage:
@@ -96,7 +96,7 @@ def print_out(message, file):
     Function to be used for printing
     '''
     logging.info(message)
-    if not file == None:
+    if file is not None:
         file.write(message + "\n")
 def store_url_task_in_db(profile, url, web_site, log_id, notes_toadd=None):
     '''

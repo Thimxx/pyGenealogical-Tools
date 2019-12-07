@@ -1,6 +1,6 @@
 __all__ = ["profile", "data_models", "immediate_family", "geniapi_common", "union", "geni2gedcom", "interface_geni_database"]
 
-import requests, logging, re, datetime
+import requests, logging, re
 from messages.pygeni_messages import ERROR_REQUESTS
 
 
@@ -68,17 +68,19 @@ def geni_request_get(url):
     while continue_iteration:
         data = requests.get(url)
         i += 1
-        value_error = data.json().get("error", {}).get("message", None)
+        value_error = data.json().get("error", {})
+        if isinstance(value_error, dict):
+            value_error = value_error.get("message", None)
         if not ( value_error and ("Rate limit exceeded." in value_error) ): continue_iteration = False
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!
         logging.error(ERROR_REQUESTS + str(data.json()) + " in url " + url)
     return data
-def geni_request_post(url, data_input=None):
+def geni_request_post(url, data_input = None):
     '''
     Function to perform post calls.
     '''
-    if (data_input == None): data_input={}
+    if (data_input is None): data_input={}
     data = requests.post(url, json=data_input)
     if "error" in data.json().keys():
         #Ok, now we know we have an error, we need to inform the user!

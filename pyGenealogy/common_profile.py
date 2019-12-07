@@ -11,8 +11,6 @@ from messages.pyGenealogymessages import INITIAL_PART_EVENT_ERROR, END_PART_EVEN
 
 DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments", "id", "marriage_link"]
 MERGE_EVENTS = ["birth", "death", "baptism",  "burial", "marriage"]
-DATA_ACCURACY = ["accuracy_birth_date", "accuracy_death_date", "accuracy_baptism_date", "accuracy_residence_date", "accuracy_burial_date", "accuracy_marriage_date"]
-DATA_PLACES = ["birth_place", "death_place", "baptism_place", "residence_place", "burial_place", "marriage_place"]
 DATA_LISTS = ["web_ref", "nicknames"]
 ARRAY_EVENTS = ["marriage", "residence"]
 NO_ARRAY_EVENTS = ["birth", "death", "baptism",  "burial"]
@@ -57,10 +55,10 @@ class gen_profile(object):
         for event in all_events:
             dict_events[event.get_event_type()] = event
         year_birth = "?"
-        if("birth" in dict_events.keys() and (dict_events["birth"].get_year() != None) ):
+        if("birth" in dict_events.keys() and (dict_events["birth"].get_year() is not None) ):
             year_birth = formated_year(dict_events["birth"].get_year(), dict_events["birth"].get_accuracy())
         year_death = "?"
-        if("death" in dict_events.keys() and (dict_events["death"].get_year() != None)):
+        if("death" in dict_events.keys() and (dict_events["death"].get_year() is not None)):
             year_death = formated_year(dict_events["death"].get_year(), dict_events["death"].get_accuracy())
         if (year_birth == "?") and (year_death == "?"):
             return self.getName2Show()
@@ -113,9 +111,9 @@ class gen_profile(object):
         if (score*factor > 2.0):
             #Ok, we consider the size big enough
             for key_data in ALL_DATA:
-                if(profile.gen_data.get(key_data, None) != None):
+                if(profile.gen_data.get(key_data, None) is not None):
                     #That means we have some data!, exists in the other?
-                    if(self.gen_data.get(key_data, None) == None):
+                    if(self.gen_data.get(key_data, None) is None):
                         #So is a new data!
                         self.gen_data[key_data] = profile.gen_data[key_data]
                     else:
@@ -142,8 +140,8 @@ class gen_profile(object):
                             if event_new.get_accuracy() == "EXACT":
                                 self.gen_data[key_data].setDate(event_new.get_year(),event_new.get_month(),event_new.get_day(),event_new.get_accuracy())
                             for key_location in LOCATION_KEYS:
-                                if event_new.get_location() and (event_new.get_location().get(key_location, None) != None):
-                                    if self.gen_data[key_data].get_location() and (self.gen_data[key_data].get_location().get(key_location, None) == None):
+                                if event_new.get_location() and (event_new.get_location().get(key_location, None) is not None):
+                                    if self.gen_data[key_data].get_location() and (self.gen_data[key_data].get_location().get(key_location, None) is None):
                                         self.gen_data[key_data].setParameterInLocation(key_location, profile.gen_data[key_data][key_location])
             return True
         else:
@@ -178,7 +176,7 @@ class gen_profile(object):
         '''
         Setting the name to be shown if not existing
         '''
-        if (name2show == None):
+        if (name2show is None):
             return self.returnFullName()
         else:
             return name2show
@@ -202,7 +200,7 @@ class gen_profile(object):
         '''
         This function will introduce an event with the data related to the dates of the event
         '''
-        if (not event_name in EVENT_TYPE) or (not accuracy in VALUES_ACCURACY):
+        if (event_name not in EVENT_TYPE) or (accuracy not in VALUES_ACCURACY):
             raise NameError(INITIAL_PART_EVENT_ERROR + event_name + " or " + accuracy + END_PART_EVENT_ERROR)
         new_event = event_profile(event_name)
         new_event.setDate(year, month, day, accuracy, year_end, month_end, day_end)
@@ -245,7 +243,7 @@ class gen_profile(object):
         '''
         Comments are aditive on top of the preivous one
         '''
-        if (not "comments" in self.gen_data.keys()):
+        if ("comments" not in self.gen_data.keys()):
             self.gen_data["comments"] = ""
         self.gen_data["comments"] = self.getComments() + comment
     def setWebReference(self, url, name=None, notes=None):
@@ -395,7 +393,7 @@ class gen_profile(object):
         '''
         earliest_event = None
         for event in self.getEvents():
-            if earliest_event == None:
+            if earliest_event is None:
                 earliest_event = event
             elif event.is_this_event_earlier_or_simultaneous_to_this(earliest_event):
                 earliest_event = event

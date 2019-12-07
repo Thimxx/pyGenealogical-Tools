@@ -24,7 +24,8 @@ GOOGLE_GEOLOCATION_ADDRESS = "https://maps.googleapis.com/maps/api/geocode/json?
 
 LOCATION_KEYS = ["place_name", "city", "county", "state", "country"]
 
-MAPBOX_TRANS_GENITOOLS = {"locality" : "city", "place" : "place_name", "region" : "county", "country" : "country", "address" : "place_name", "poi" : "place_name"}
+MAPBOX_TRANS_GENITOOLS = {"locality" : "city", "place" : "place_name", "region" : "county",
+                          "country" : "country", "address" : "place_name", "poi" : "place_name"}
 
 naming_conventions = ["father_surname", "spanish_surname"]
 #These are the particles used in different languages inside the surnames to connect them but in capital letters as a title
@@ -34,7 +35,8 @@ LANGUAGES_ADDS = {"en" : [], "es" : ["de", "la", "del",  "los", "las"]}
 
 LANGUAGES_NEXUS = {"en" : ["and"], "es" : ["y"]}
 
-LANGUAGES_FILES = { "es" : {"surname" : "surname_es.txt", "name" : "names_es.txt", "normalize" : {"á" : "a", "é" : "e", "í" : "i", "ó" : "o", "ú" : "u", "ñ": "n", "b":"v","th":"t", "ph": "f"}}}
+LANGUAGES_FILES = { "es" : {"surname" : "surname_es.txt", "name" : "names_es.txt",
+                        "normalize" : {"á" : "a", "é" : "e", "í" : "i", "ó" : "o", "ú" : "u", "ñ": "n", "b":"v","th":"t", "ph": "f"}}}
 
 LANGUAGES_DATA = {}
 
@@ -78,7 +80,7 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
                 if temp_surname[i] in LANGUAGES_ADDS[language]:
                     temp_surname[i] = ""
             new_surname = " ".join(temp_surname).rstrip().strip()
-            if (not new_surname in merged_list): merged_list.append(new_surname)
+            if (new_surname not in merged_list): merged_list.append(new_surname)
     merged_metaphore = []
     for data in merged_list:
         if adapted_doublemetaphone(data, language) not in merged_metaphore:
@@ -180,7 +182,7 @@ def getBestDate(date1, accuracy1, date2, accuracy2):
     #TODO: we need to change the model fo the data to allow the inclusion of 2 values
     #in such case we will have the possibility of having before and after
     #Wrong accuracy provided will provide None data
-    if (not accuracy1 in VALUES_ACCURACY) or (not accuracy2 in VALUES_ACCURACY):
+    if (accuracy1 not in VALUES_ACCURACY) or (accuracy2 not in VALUES_ACCURACY):
         logging.error(NO_VALID_ACCURACY)
         return None, None
     #If we have an exact date, that's the one!
@@ -207,7 +209,7 @@ def get_formatted_location(location_string):
     output["raw"] = location_string
     mapbox_results = []
     #New code moving from google maps to MapBox.
-    if (get_mapbox_key() == None) or (location_string == ""):
+    if (get_mapbox_key() is None) or (location_string == ""):
         #Data is not found, let's try removing some
         logging.warning(NO_VALID_KEY)
         return output
@@ -449,8 +451,8 @@ def get_score_compare_dates(event1, event2):
         #Too early... the dates do not match!
         if (not is_about) and event_exact.is_this_event_earlier_or_simultaneous_to_this(event_between): return 0.0, 0.0
         #The date provided is actually later that the range provided
-        elif (not is_about) and is_this_date_earlier_or_simultaneous_to_this(event_between.get_year_end(), event_between.get_month_end(), event_between.get_day_end(),
-                                                          event_exact.get_year(), event_exact.get_month(), event_exact.get_day()):
+        elif (not is_about) and is_this_date_earlier_or_simultaneous_to_this(event_between.get_year_end(), event_between.get_month_end(),
+                            event_between.get_day_end(), event_exact.get_year(), event_exact.get_month(), event_exact.get_day()):
             return 0.0, 0.0
         else:
             range_bet = event_between.get_range_in_between()
@@ -535,7 +537,8 @@ def is_this_date_earlier_or_simultaneous_to_this(year, month, day, year_other, m
         date_self = None
         date_other = None
         if year: date_self = date(year, month if month else 1  ,day if day else 1)
-        if year_other: date_other = date(year_other, month_other if month_other else 12  ,day_other if day_other else (MONTH_DAYS[month_other] if month_other else 31))
+        if year_other: date_other = date(year_other, month_other if month_other else 12  ,
+                    day_other if day_other else (MONTH_DAYS[month_other] if month_other else 31))
         if (date_self and date_other):
             return date_self <= date_other
         elif date_self: return True
@@ -554,10 +557,10 @@ def score_factor_birth_and_death(event_birth, events):
 #Execution of module code
 #====================================================================================
 for language in LANGUAGES_FILES.keys():
-    if not language in LANGUAGES_DATA.keys(): LANGUAGES_DATA[language] = {}
+    if language not in LANGUAGES_DATA.keys(): LANGUAGES_DATA[language] = {}
     for data_kind in LANGUAGES_FILES[language].keys():
         if data_kind != "normalize":
-            if not data_kind in LANGUAGES_DATA[language].keys(): LANGUAGES_DATA[language][data_kind] = {}
+            if data_kind not in LANGUAGES_DATA[language].keys(): LANGUAGES_DATA[language][data_kind] = {}
             file2use = os.path.join(DATA_FOLDER, LANGUAGES_FILES[language][data_kind])
             openedfile = open(file2use, "r", encoding = "ISO-8859-1")
             total_data = []
