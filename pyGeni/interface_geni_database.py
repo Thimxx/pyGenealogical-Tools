@@ -34,7 +34,7 @@ class geni_database_interface(gen_database):
         '''
         if not ( (id_profile in self.profiles.keys()) or (id_profile in self.equivalence.keys()) ):
             prof = profile(id_profile)
-            #We use an unique id wiht profile in front
+            #We use an unique id with profile in front
             self.profiles[prof.get_id()] = prof
             if id_profile != prof.get_id():
                 self.equivalence[id_profile] = prof.get_id()
@@ -147,6 +147,8 @@ class geni_database_interface(gen_database):
             mother_geni.setComments("Profile added by [https://github.com/Thimxx/pyGenealogical-Tools pyGenealogicalTools]")
             profile.create_as_a_parent(mother_geni, geni_input=child_prof.get_id(), type_geni="" )
             mother_id = mother_geni.get_id()
+        #Finally, we need to ensure that the profile has been properly updated
+        self.force_update_profile(child_profile_id)
         return father_id, mother_id, family_id
     def add_partner(self, profile_id, partner_profile, marriage = None):
         '''
@@ -160,15 +162,49 @@ class geni_database_interface(gen_database):
         partner_instance = copy.copy(partner_profile)
         partner_instance.setComments("Profile added by [https://github.com/Thimxx/pyGenealogical-Tools pyGenealogicalTools]")
         profile.create_as_a_partner(partner_instance, geni_input=profile_id)
+        #We force the update due to the inclusion of a new profile, as adding new families
+        self.force_update_profile(profile_id)
         return partner_instance.get_id(), family_id
+    def add_child(self, family_id, children_profiles):
+        '''
+        It create a new child profile and adds to the family
+        family_id shall be an id of the family
+        children shall be an array of children profiles to be added
+        '''
+        child_ids = []
+        for child in children_profiles:
+            child_instance = copy.copy(child)
+            child_instance.setComments("Profile added by [https://github.com/Thimxx/pyGenealogical-Tools pyGenealogicalTools]")
+            profile.create_as_a_child(child_instance, union = family_id)
+            child_ids.append(child_instance.get_id())
+        #We update now the parents with the new child information
+        new_union = union(family_id)
+        for parent in new_union.get_parents():
+            #Now we force the update of all parents
+            self.force_update_profile(parent)
+        return child_ids
 #===============================================================================
 #        INTERMEDIATE methods: methods avoiding duplications
 #===============================================================================
     def get_families_from_profile(self, profile_id):
         '''
-        Intermediate function providing families for a profile
+        Intermediate function providing families for a profile, it will provide
+        a class instance of inmmediate_family, used in Geni
         '''
         link_fam = self.inmediate.get(profile_id, immediate_family(profile_id))
         if link_fam not in self.inmediate.keys(): self.inmediate[profile_id] = link_fam
         return link_fam
-        
+    def force_update_profile(self, profile_id):
+        '''
+        It will force the update of the profile id used by functions which include
+        new profiles inside database
+        '''
+        #Profile data is updated
+        self.profiles[profile_id] = profile(profile_id)
+        id_prof = self.profiles[profile_id].get_id()
+        #The link to the families is updated.
+        self.inmediate[id_prof] = immediate_family(id_prof)
+        #Update of families of the profile
+        unions = list(self.inmediate[id_prof].parent_union) + list(self.inmediate[id_prof].marriage_union)
+        for union_now in unions:
+            self.families[union_now.get_id()] = union(union_now.get_id())

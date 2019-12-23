@@ -18,9 +18,13 @@ class immediate_family(geni_calls):
         The constructor will also make the call to the web to get the right
         string
         '''
+        input_id = myid
+        #This will allow to intoduce the complete direction of the profile
+        if "https" in myid:
+            input_id = "profile" + myid.split("profile")[1]
         #Initiating base class
         geni_calls.__init__(self)
-        self.union_url = self.get_profile_url(myid) + s.GENI_FAMILY + self.token_string()
+        self.union_url = self.get_profile_url(input_id) + s.GENI_FAMILY + self.token_string()
         r = s.geni_request_get(self.union_url)
         self.data = r.json()
         #we initialize the lists
@@ -42,15 +46,15 @@ class immediate_family(geni_calls):
                     #Good... let's obtain the data from the union
                     tmp_union = geni_union(self.data["nodes"][keydata], keydata)
                     #Now we need to filter the parents and children as we should not duplicate
-                    if tmp_union.is_profile_child(myid):
+                    if tmp_union.is_profile_child(input_id):
                         #We know is a child... so
                         self.parents = self.parents + tmp_union.parents
-                        tmp_union.children.remove(myid)
+                        tmp_union.children.remove(input_id)
                         self.sibligns = self.sibligns + tmp_union.children
                         self.parent_union.append(tmp_union)
                     else:
                         #In this case we know is a marriage union
-                        tmp_union.parents.remove(myid)
+                        tmp_union.parents.remove(input_id)
                         self.partner = self.partner +  tmp_union.parents
                         self.children = self.children + tmp_union.children
                         #We obtain the union from Geni in order to introduce the marriage

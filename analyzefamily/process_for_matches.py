@@ -170,23 +170,32 @@ class process_a_db(object):
                     for partner_input in matched_partners:
                         partner_check = matched_partners[partner_input]
                         #We need the family which will be the input for the children
-                        family_input = self.db_input.get_family_from_partners(prof_id, partner_input)
-                        family_check = self.db_check.get_family_from_partners(prof_linked.get_id(), partner_check)
-                        temp = dict(non_matched_profiles_check)
-                        #INTRODUCTION: CHECK profiles
-                        for prof in temp.keys():
-                            #We will only select those profiles which are children
-                            if (non_matched_profiles_check[prof] == "child") and (prof in self.db_check.get_children_from_family(family_check)):
-                                child_profile = self.db_check.get_profile_by_ID(prof)
-                                #Ok, if the profile is accessible, we go ahead for creation
-                                if (child_profile.get_accessible()):
-                                    print_out(PROCESS_ADD_PROFILE_BEGIN + child_profile.nameLifespan() + TO_STRING + self.db_input.get_db_kind() +
-                                      PROCESS_ADD_PROFILE_END + non_matched_profiles_check[prof] )
-                                    child_new_ids = self.db_input.add_child(family_input, [child_profile] )
-                                    self.add_match_to_prof(child_new_ids[0], child_profile)
-                                else:
-                                    print_out(child_profile.nameLifespan() +PROCESS_NO_ACCESS)
-                                del non_matched_profiles_check[prof]
+                        family_part_input = self.db_input.get_family_from_partners(prof_id, partner_input)
+                        family_part_check = self.db_check.get_family_from_partners(prof_linked.get_id(), partner_check)
+                        family_part = {"input" : family_part_check, "check" : family_part_input}
+                        family_current = {"input" : family_part_input, "check" : family_part_check}
+                        #INTRODUCTION: CHILDREN in the family
+                        for kind_db in temp_data:
+                            temp = dict(temp_data[kind_db]["non_matches"])
+                            for prof in temp.keys():
+                                #We will only select those profiles which are children 
+                                if (temp_data[kind_db]["non_matches"][prof] == "child") and (prof in temp_data[kind_db]["database"].get_children_from_family(family_current[kind_db])):
+                                    child_profile = temp_data[kind_db]["database"].get_profile_by_ID(prof)
+                                    #Ok, if the profile is accessible, we go ahead for creation
+                                    if (child_profile.get_accessible()):
+                                        print_out(PROCESS_ADD_PROFILE_BEGIN + child_profile.nameLifespan() + TO_STRING + temp_data[kind_db]["other_db"].get_db_kind() +
+                                            PROCESS_ADD_PROFILE_END + temp_data[kind_db]["non_matches"][prof] )
+                                        
+                                        child_new_ids = temp_data[kind_db]["other_db"].add_child(family_part[kind_db], [child_profile] )
+                                        if kind_db == "input":
+                                            child_new_prof = self.db_check.get_profile_by_ID(child_new_ids[0])
+                                            self.add_match_to_prof(prof, child_new_prof)
+                                        elif kind_db == "check":
+                                            self.add_match_to_prof(child_new_ids[0], child_profile)
+                                    else:
+                                        print_out(child_profile.nameLifespan() +PROCESS_NO_ACCESS)
+                                    del temp_data[kind_db]["non_matches"][prof]
+                    ################################################################
                     if len({**non_matched_profiles_input, **non_matched_profiles_check, **conflict_profiles}) == 0:
                         #In this case, we have achieved the full matching, we store the information
                         today = datetime.date.today().toordinal()
@@ -201,8 +210,8 @@ class process_a_db(object):
     def add_match_to_prof(self, prof_id, profile_to_match):
         '''
         It will add the match to the profile id
-        prof_id shall be the profile in check database by ID
-        profile_to_match shall be the profile of pyGenealogy.common_profile derivated class
+        prof_id shall be the profile in input database by ID
+        profile_to_match shall be the profile of pyGenealogy.common_profile derived class
         '''
         notes_to_add = MATCH_GENI + datetime.date.today().strftime("%d-%m-%Y")
         profile = self.db_input.get_profile_by_ID(prof_id)

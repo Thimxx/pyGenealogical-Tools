@@ -43,12 +43,19 @@ class profile(geni_calls, gen_profile):
         #Some checking parameters initiated
         self.properly_executed = False
         self.existing_in_geni = False
+        self.merged_in_geni = False
         self.geni_specific_data = {}
         #We initiate the base classes
         geni_calls.__init__(self)
         url = process_geni_input(geni_input, type_geni) + self.token_string()
         r = s.geni_request_get(url)
         data = r.json()
+        #In case the profile has been merged to other profile, as the information is available it will be modified.
+        if (data.get("merged_into", None) and data.get("deleted", None)):
+            self.merged_in_geni = True
+            url = data.get("merged_into") + self.token_string()
+            r = s.geni_request_get(url)
+            data = r.json()
         #Now we can execute the constructor
         if ("first_name" not in data.keys()): data["first_name"] = NOT_KNOWN_VALUE
         if ("last_name" not in data.keys()): data["last_name"] = NOT_KNOWN_VALUE
@@ -253,6 +260,11 @@ class profile(geni_calls, gen_profile):
         '''
         if hasattr(self, "data") : return self.data.get('id', None)
         else: return None
+    def get_merged(self):
+        '''
+        Will return the merging status of the profile
+        '''
+        return self.merged_in_geni
 #===================================================
 # Util functions
 #===================================================

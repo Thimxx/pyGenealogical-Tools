@@ -50,11 +50,14 @@ class gen_analyzer(object):
                 checks_2_perform[parser] = continue_analysis(person, parser, threshold, log_loc, self.file)
                 if checks_2_perform[parser]: overall_check = True
             skipping = ""
-            if not overall_check: skipping = " -- SKIPPED"
+            log_level = 20
+            if not overall_check: 
+                skipping = " -- SKIPPED"
+                log_level = 15
+            #We write in the screen the name of the person
+            print_out(str(person.get_id()) + " = "  + person.nameLifespan() + skipping, self.file, log_level = log_level)
             #Variable for urls in tasks
             self.urls_task = ""
-            #We write in the screen the name of the person
-            print_out(str(person.get_id()) + " = "  + person.nameLifespan() + skipping, self.file)
             #We accumulate all readers
             readers_2_use = {}
             readers_2_use["REMEMORI"] = rememori_reader(language=self.language, name_convention=self.name_convention)
@@ -91,11 +94,11 @@ class gen_analyzer(object):
                 else:
                     #If it is not found, then we keep a record for the future, for continuing reviewing.
                     store_url_task_in_db(person, "Not found in " + web_site, web_site, log_id)
-def print_out(message, file):
+def print_out(message, file, log_level = 20):
     '''
     Function to be used for printing
     '''
-    logging.info(message)
+    logging.log(log_level ,message)
     if file is not None:
         file.write(message + "\n")
 def store_url_task_in_db(profile, url, web_site, log_id, notes_toadd=None):
