@@ -78,8 +78,8 @@ class gen_profile(object):
         score, factor = get_score_compare_names(self.getName(), self.getSurname(),
                         profile.getName(), profile.getSurname(), language=data_language, convention=name_convention)
         #Comparing big differences in events
-        score1, factor1 = score_factor_birth_and_death(self.get_specific_event("birth"), profile.getEvents())
-        score2, factor2 = score_factor_birth_and_death(profile.get_specific_event("birth"), self.getEvents())
+        score1, factor1 = score_factor_birth_and_death(self.get_earliest_event_in_event_form(), profile.getEvents())
+        score2, factor2 = score_factor_birth_and_death(profile.get_earliest_event_in_event_form(), self.getEvents())
         score += score1 + score2
         factor = factor*factor1*factor2
         #Comparing gender
@@ -98,7 +98,7 @@ class gen_profile(object):
                 else: other_event = None
             if  self_event and other_event and self_event.is_any_date_available() and other_event.is_any_date_available():
                 score_temp, factor_temp = get_score_compare_dates(self_event, other_event )
-                if not ((self_event.get_event_type() == "marriage") and ( factor_temp < 1.0)):
+                if (not ((self_event.get_event_type() == "marriage") and ( factor_temp < 1.0))) and (self_event.get_event_type() != "residence"):
                     score += score_temp
                     factor = factor*factor_temp
         return score, factor
@@ -393,11 +393,25 @@ class gen_profile(object):
         '''
         earliest_event = None
         for event in self.getEvents():
-            if earliest_event is None:
-                earliest_event = event
-            elif event.is_this_event_earlier_or_simultaneous_to_this(earliest_event):
-                earliest_event = event
+            #The minimum to have a date is having the year. If not, we will ignore the event
+            if event.get_year():
+                if (earliest_event is None) and event.get_year():
+                    earliest_event = event
+                elif event.is_this_event_earlier_or_simultaneous_to_this(earliest_event):
+                    earliest_event = event
         return earliest_event
+    def get_latest_event_in_event_form(self):
+        '''
+        It will return the latest event, of course, the burial or the death, but it is already checked,
+        for simplicity I will not consider that case
+        '''
+        latest_event = None
+        for event in self.getEvents():
+            if (latest_event is None) and event.get_year():
+                latest_event = event
+            elif event.is_this_event_later_or_simultaneous_to_this(latest_event):
+                latest_event = event
+        return latest_event
     def get_this_profile_url(self):
         '''
         This function is a basic function created in case there is an specific web address for this

@@ -111,9 +111,7 @@ class NorteCastillaParser(HTMLParser):
             self.comment = data
         if self.inside_profile:
             self.inside_profile = False
-            result_M = re.search(' (.*) :', data)
-            if (result_M):
-                self.name = result_M.group(1)
+            self.name = data.replace(" : Fallecimiento","").replace("Don ","").replace("Doña ","").replace("D. ","").replace("DON ","").replace("DOÑA ","")
         if self.ending_citation and self.inside_citation:
             name, surname, _ = get_name_surname_from_complete_name(self.name, convention="spanish_surname")
             profile = gen_profile(name, surname)

@@ -47,7 +47,7 @@ def sp_age_location_colector(data, language = "es", detect_lan = False):
             if aged.isdigit(): age = int(result.group(1).strip())
     elif  (str_input["AT THE AGE"] in data):
         result = re.search(str_input["AT THE AGE"] + '(.*)' + str_input["YEARS"], data)
-        if not (result == None):
+        if result is not None:
             aged = result.group(1).strip()
             if aged.isdigit(): age = int(result.group(1).strip())
     location = None

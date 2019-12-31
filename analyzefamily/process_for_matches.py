@@ -128,7 +128,7 @@ class process_a_db(object):
                                     mother_profile.nameLifespan() + TO_STRING + db_other.get_db_kind() )
                             marriage_event = family_is_child.getMarriage()
                             #So.. we add the new profiles
-                            new_father_id, new_mother_id, _ = db_other.add_parents(child_profile_id = current_id_to_add, father_profile = father_profile, 
+                            new_father_id, new_mother_id, _ = db_other.add_parents(child_profile_id = current_id_to_add, father_profile = father_profile,
                                                                             mother_profile= mother_profile, marriage_event= marriage_event)
                             if db_kind == "check":
                                 self.add_match_to_prof(new_father_id, father_profile)
@@ -149,22 +149,34 @@ class process_a_db(object):
                         #We create a temporal copy to remove the data
                         temp_2_use = list(temp_data[kind_db]["non_matches"])
                         for prof in temp_2_use:
-                            if temp_data[kind_db]["non_matches"][prof] == "partner":
+                            #We might delete some profiles (children) in the middle, that's why we check first if the profile is in the list
+                            if (prof in temp_data[kind_db]["non_matches"]) and temp_data[kind_db]["non_matches"][prof] == "partner":
                                 partner_profile = temp_data[kind_db]["database"].get_profile_by_ID(prof)
-                                #Good, we will need now to add the new partner to the INPUT area
-                                print_out(PROCESS_ADD_PROFILE_BEGIN + partner_profile.nameLifespan() + TO_STRING +
+                                #Now, if the partner is not accessible due to data restriction, we will skip this step
+                                if partner_profile.get_accessible():
+                                    #Good, we will need now to add the new partner to the INPUT area
+                                    print_out(PROCESS_ADD_PROFILE_BEGIN + partner_profile.nameLifespan() + TO_STRING +
                                            temp_data[kind_db]["other_db"].get_db_kind() + PROCESS_ADD_PROFILE_END + temp_data[kind_db]["non_matches"][prof] )
-                                family_check = temp_data[kind_db]["database"].get_family_from_partners(temp_data[kind_db]["current_id_matched"], 
+                                    family_check = temp_data[kind_db]["database"].get_family_from_partners(temp_data[kind_db]["current_id_matched"],
                                                                                                        partner_profile.get_id())
-                                marriage_event = temp_data[kind_db]["database"].get_family_by_ID(family_check).getMarriage()
-                                id_partner, _ = temp_data[kind_db]["other_db"].add_partner(temp_data[kind_db]["current_id_to_add"], 
+                                    marriage_event = temp_data[kind_db]["database"].get_family_by_ID(family_check).getMarriage()
+                                    id_partner, _ = temp_data[kind_db]["other_db"].add_partner(temp_data[kind_db]["current_id_to_add"],
                                                                                            partner_profile, marriage = marriage_event)
-                                if kind_db == "input":
-                                    self.add_match_to_prof(prof, temp_data[kind_db]["other_db"].get_profile_by_ID(id_partner))
-                                    matched_partners[prof] = id_partner
-                                elif kind_db == "check":
-                                    self.add_match_to_prof(id_partner, partner_profile)
-                                    matched_partners[id_partner] = prof
+                                    if kind_db == "input":
+                                        self.add_match_to_prof(prof, temp_data[kind_db]["other_db"].get_profile_by_ID(id_partner))
+                                        matched_partners[prof] = id_partner
+                                    elif kind_db == "check":
+                                        self.add_match_to_prof(id_partner, partner_profile)
+                                        matched_partners[id_partner] = prof
+                                else:
+                                    print_out("-    AVOIDING INTRODUCTION OF LIVING "+ str(partner_profile.nameLifespan()) +
+                                              " FROM THE DATABASE " + temp_data[kind_db]["database"].get_db_kind())
+                                    family_eliminate = temp_data[kind_db]["database"].get_family_from_partners(temp_data[kind_db]["current_id_matched"], partner_profile.get_id() )
+                                    #As the partner is not known and we might have access issues, we stop the review of those children in the non accesible partner
+                                    for child in family_eliminate.getChildren():
+                                        if child in temp_data[kind_db]["non_matches"]:
+                                            del temp_data[kind_db]["non_matches"][child]
+                                #We remove also from the non-matching pending those profiles that have been skipped due to privacy
                                 del temp_data[kind_db]["non_matches"][partner_profile.get_id()]
                     #We go ahead looking first for each matched partner
                     for partner_input in matched_partners:
@@ -178,14 +190,14 @@ class process_a_db(object):
                         for kind_db in temp_data:
                             temp = dict(temp_data[kind_db]["non_matches"])
                             for prof in temp.keys():
-                                #We will only select those profiles which are children 
+                                #We will only select those profiles which are children
                                 if (temp_data[kind_db]["non_matches"][prof] == "child") and (prof in temp_data[kind_db]["database"].get_children_from_family(family_current[kind_db])):
                                     child_profile = temp_data[kind_db]["database"].get_profile_by_ID(prof)
                                     #Ok, if the profile is accessible, we go ahead for creation
                                     if (child_profile.get_accessible()):
-                                        print_out(PROCESS_ADD_PROFILE_BEGIN + child_profile.nameLifespan() + TO_STRING + temp_data[kind_db]["other_db"].get_db_kind() +
-                                            PROCESS_ADD_PROFILE_END + temp_data[kind_db]["non_matches"][prof] )
-                                        
+                                        print_out(PROCESS_ADD_PROFILE_BEGIN + child_profile.nameLifespan() + TO_STRING +
+                                             temp_data[kind_db]["other_db"].get_db_kind() + PROCESS_ADD_PROFILE_END +
+                                             temp_data[kind_db]["non_matches"][prof])
                                         child_new_ids = temp_data[kind_db]["other_db"].add_child(family_part[kind_db], [child_profile] )
                                         if kind_db == "input":
                                             child_new_prof = self.db_check.get_profile_by_ID(child_new_ids[0])

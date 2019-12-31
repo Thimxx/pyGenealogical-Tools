@@ -37,7 +37,7 @@ class Test_processor_for_db(unittest.TestCase):
         
         db = database_rm(working_file)
         db_geni = geni_database_interface()
-        processor = process_a_db(db, db_geni)
+        processor = process_a_db(db, db_geni, event_year_task = 1)
         processor.process()
         
         aunt_prof = db_geni.get_profile_by_ID("https://sandbox.geni.com/people/Aunt-Profile/1231306")

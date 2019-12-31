@@ -51,7 +51,7 @@ class gen_analyzer(object):
                 if checks_2_perform[parser]: overall_check = True
             skipping = ""
             log_level = 20
-            if not overall_check: 
+            if not overall_check:
                 skipping = " -- SKIPPED"
                 log_level = 15
             #We write in the screen the name of the person

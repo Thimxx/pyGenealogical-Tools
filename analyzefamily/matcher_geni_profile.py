@@ -161,13 +161,13 @@ class match_single_profile(object):
             profile_rm = self.database.get_profile_by_ID(rm_id)
             geni_matches = []
             conflict_potential = []
-            for geni_id in profiles_geni:
+            for geni_id in profiles_not_identified:
                 profile_geni = self.database_geni.get_profile_by_ID(geni_id)
                 score, factor = profile_rm.comparison_score(profile_geni, self.data_language, self.name_convention)
                 if score*factor > self.threshold:
                     geni_matches.append(geni_id)
                     if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
-                elif score > 3*self.threshold:
+                elif score >= 3*self.threshold:
                     #This is a common case, where profiles have a minimum difference but still relevant, user to check
                     conflict_match = True
                     conflict_potential.append(profile_geni)
@@ -178,7 +178,7 @@ class match_single_profile(object):
                 #If there is no single match, we can have several options...
                 if (len(geni_matches) == 0) and (not conflict_match):
                     self.non_matched_profiles_rm[rm_id] = kind_of_match
-                    print_out("-    NO MATCH of profile in " + self.database_geni.get_db_kind() + " " + 
+                    print_out("-    NO MATCH of profile in " + self.database_geni.get_db_kind() + " " +
                               str(profile_rm.nameLifespan()) + " Relation = " + kind_of_match)
                 #Or we have more than one match... that is a conflict
                 elif len(geni_matches) > 1:

@@ -258,9 +258,13 @@ def get_name_surname_from_complete_name(complete_name, convention="father_surnam
     if convention in naming_conventions:
         name_split, data_identified = get_splitted_name_from_complete_name(complete_name, language=language)
         surnames = -1
-        #We might receive a spanish surname wihtout 2 surnames!
+        #We might receive a spanish surname without 2 surnames!
         if ( convention == "spanish_surname" and len(name_split) > 2): surnames = -2
-        if ("S" in data_identified) or ("N" in data_identified):
+        if ("S" in data_identified) and (data_identified.index("S") > 0):
+            surnames = data_identified.index("S") - len(data_identified)
+        elif ("N" in data_identified) and (data_identified.index("N") < len(data_identified)-1):
+            surnames = data_identified.index("N") + 1 - len(data_identified)
+        elif ("S" in data_identified) or ("N" in data_identified):
             if data_identified[-1] in ["N", "U"]:
                 surnames = 0
             elif (surnames == -2) and (data_identified[-2] in ["N", "U"]):
@@ -371,6 +375,18 @@ def get_score_compare_names(name1, surname1, name2, surname2, language="en", con
     met_surname2 = adapted_doublemetaphone(splitted_surname2[0], language=language)
     #Let's calculate the factors
     factor1 = get_jaro_to_list(met_name1, met_name2)
+    #We are going to use the direct comparison for surnames, in case there is only a few modifications
+    score_direct = 0
+    factor_direct = 0
+    if (len(splitted_surname1[0]) == 2) and (len(splitted_surname2[0]) == 2):
+        value1 = jaro(splitted_surname1[0][0], splitted_surname2[0][0])
+        value2 = jaro(splitted_surname1[0][1], splitted_surname2[0][1])
+        score_direct = value1 + value2
+        factor_direct = value1*value2
+    elif (len(splitted_surname1[0]) > 0) and (len(splitted_surname2[0]) > 0):
+        value1 = jaro(splitted_surname1[0][0], splitted_surname2[0][0])
+        score_direct = value1
+        factor_direct = value1
     #In the specific case of Spanish surnames and having different number of surnames we only check the first one
     #This will improve the result in case the first name will be the same and will reduce dramatically in case are different
     if (len(met_surname1) != len(met_surname2)) and language == "es":
@@ -378,13 +394,23 @@ def get_score_compare_names(name1, surname1, name2, surname2, language="en", con
         met_surname1 = met_surname1[0:minimal]
         met_surname2 = met_surname2[0:minimal]
     #We make a difference with spanish language, as we might have 2 surnames, making things easier for comparison
+    score_met = 0
+    factor_met = 0
     if ((len(met_surname1) == 4) and (len(met_surname2) == 4) and language=="es"):
         factor_sub1 = get_jaro_to_list(met_surname1[0:2], met_surname2[0:2], factor=0.95)
         factor_sub2 = get_jaro_to_list(met_surname1[2:], met_surname2[2:], factor=0.95)
-        return 2*(factor1 +factor_sub1+factor_sub2), factor1*factor_sub1*factor_sub2
+        score_met = 2*(factor1 +factor_sub1+factor_sub2)
+        factor_met = factor1*factor_sub1*factor_sub2
     else:
         factor2 = get_jaro_to_list(met_surname1, met_surname2, factor=0.95)
-        return 2*(factor1 +factor2), factor1*factor2
+        score_met = 2*(factor1 +factor2)
+        factor_met = factor1*factor2
+    score_direct = 2*(factor1 +score_direct)
+    factor_direct = factor1*factor_direct
+    if score_met*factor_met > score_direct*factor_direct:
+        return score_met, factor_met
+    else:
+        return score_direct, factor_direct
 def get_jaro_to_list(first4jaro, list4jaro, factor = 0.9):
     result = [[0 for x in range(len(list4jaro))] for y in range(len(first4jaro))]
     loc_data = 0.0
@@ -416,12 +442,11 @@ def get_score_compare_dates(event1, event2):
     accuracy1 = event1.get_accuracy()
     accuracy2 = event2.get_accuracy()
     if (accuracy1 == "EXACT") and (accuracy2 == "EXACT"):
-        if (not event1.get_day()) or (not event2.get_day()):
-            if (not event1.get_month()) or (not event2.get_month()):
-                diff = diff / 360
-                if diff > 2: diff = 5
-            else:
-                diff = diff / 30
+        if (not event1.get_month()) or (not event2.get_month()):
+            diff = diff / 360
+            if diff > 2: diff = 5
+        elif (not event1.get_day()) or (not event2.get_day()):
+            diff = diff / 30
         if (diff == 0):
             return 2.0, 1.0
         elif (diff < 5):

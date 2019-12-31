@@ -6,6 +6,8 @@ Created on 6 July 2019
 
 __all__ = ["pyrm_database", "rootsmagic_family", "rootsmagic_profile", "collate_temp", "return_date_from_event"]
 
+GEOLOCATION = {}
+
 
 def collate_temp(string1, string2):
     '''
@@ -49,3 +51,13 @@ def get_string_from_date(year, month, day):
     if day and day < 10: day_str = "0" + str(day)
     elif day: day_str = str(day)
     return str(year) + month_str + day_str
+def get_geolocated_before(geo_string):
+    '''
+    This function will return the location data of an already geolocated string
+    '''
+    return GEOLOCATION.get(geo_string, None)
+def set_geolocated(geo_string, location):
+    '''
+    It will link an specific string with the obtained geolocation
+    '''
+    GEOLOCATION[geo_string] = location

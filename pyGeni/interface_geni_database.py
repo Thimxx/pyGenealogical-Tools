@@ -67,8 +67,8 @@ class geni_database_interface(gen_database):
         '''
         link_fam = self.get_families_from_profile(profile_id)
         families = []
-        for union in link_fam.marriage_union:
-            families.append(union.get_id())
+        for union_now in link_fam.marriage_union:
+            families.append(union_now.get_id())
         return families
     def get_all_children(self, profile_id):
         '''

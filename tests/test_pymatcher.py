@@ -52,7 +52,6 @@ class Test(unittest.TestCase):
                 if (web_dict["name"] == "GENI") : is_matched_by_geni = True
             if (not is_matched_by_geni): matched_total = False
         assert(matched_total)
-        
         #Matched is consistent
         assert(4 in matched_profiles.keys())
         assert(5 in matched_profiles.keys())

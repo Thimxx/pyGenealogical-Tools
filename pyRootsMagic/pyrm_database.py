@@ -173,7 +173,6 @@ class database_rm(gen_database):
     def add_family(self, father = "0", mother = "0", children = None, marriage = None):
         '''
         Includes a new family inside rootsmagic_family
-        
         father, mother shall be the RootsMagic id of the profile
         child should be an string of RootsMagic ID.
         marriage is an event from pyGenealogy.common_event

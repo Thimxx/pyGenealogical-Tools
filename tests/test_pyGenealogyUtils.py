@@ -179,8 +179,6 @@ class Test(unittest.TestCase):
         output2 = get_formatted_location(GENERIC_PLACE_WITH_PLACE)
         assert(output2["latitude"] > 41.53 )
         assert(output2["longitude"] < -4.53)
-        print(output2)
-        print(get_formatted_location("La Parrilla, Valladolid, Spain"))
         assert(output2["county"] == "Valladolid")
         assert(output2["country"] == "Spain")
         assert(output2["place_name"] == "Calle Nuestra Señora De Los Remedios")
@@ -265,6 +263,14 @@ class Test(unittest.TestCase):
         name, surname, _ = get_name_surname_from_complete_name(name8, convention = "spanish_surname", language="es")
         assert(name == "Micaela")
         assert(surname == "San Miguel")
+        
+        #Deal with unkonwn surnames
+        name9 = "Pedro María Ortega Cynara"
+        name, surname, _ = get_name_surname_from_complete_name(name9, convention = "spanish_surname", language="es")
+        assert(name == "Pedro María")
+        assert(surname == "Ortega Cynara")
+        
+        
     def test_name_splitted(self):
         '''
         Test the split of names function
@@ -312,8 +318,11 @@ class Test(unittest.TestCase):
         assert(score == 6.0)
         assert(factor == 1.0)
         score, factor = get_score_compare_names("Juan", "Gómez", "Juan", "Pérez Gomez", language="es")
-        assert(score > 2.0)
-        assert(factor < 0.1)
+        assert(score*factor < 2.0)
+        
+        score, factor = get_score_compare_names("Josefa", "Arnanz Tejera", "Josepha", "Arnanz Texera", language="es")
+        assert(score > 5.5)
+        assert(factor > 0.85)
     def test_compare_date(self):
         '''
         Test comparison of dates with scoring

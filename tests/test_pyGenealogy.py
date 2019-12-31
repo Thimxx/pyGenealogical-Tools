@@ -256,8 +256,24 @@ class Test(unittest.TestCase):
         score, factor = profile.comparison_score(profile3)
         assert(score)
         assert(factor == 0.0)
-               
-    
+        
+        #Testing wrong matching
+        
+        profile4 = gen_profile("Name", "Surname")
+        profile4.setCheckedDate("residence", 1700)
+        profile4.setCheckedDate("death", 1760)
+        
+        profile5 = gen_profile("Name", "Surname")
+        profile5.setCheckedDate("baptism", 1799)
+        profile5.setCheckedDate("residence", 1800)
+        profile5.setCheckedDate("residence", 1860)
+                
+        assert(profile4.get_earliest_event_in_event_form().get_year() == 1700)
+        assert(profile4.get_latest_event_in_event_form().get_year() == 1760)
+        assert(profile5.get_earliest_event_in_event_form().get_year() == 1799)
+        assert(profile5.get_latest_event_in_event_form().get_year() == 1860)
+        score, factor = profile4.comparison_score(profile5)
+        assert(score*factor == 0.0)
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_introducing_gender']
     unittest.main()

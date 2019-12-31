@@ -1,11 +1,14 @@
 requests
 metaphone
-openpyxl<2.6.0,>=2.5.0
+#As per resolution in https://github.com/Thimxx/pyGenealogical-Tools/issues/115
+openpyxl>=2.6.1
 pyexcel 
 pyexcel-xls 
 python-Levenshtein
-pyexcel-xlsx
+#As per resolution in https://github.com/Thimxx/pyGenealogical-Tools/issues/115
+pyexcel-xlsx>=0.5.8
 langdetect
 mapbox
 geotext
+#Avoding issue detected in https://github.com/Thimxx/pyGenealogical-Tools/issues/114
 python-dateutil<2.8.1,>=2.5.0

@@ -120,8 +120,22 @@ class gen_database(object):
         '''
         families1 = self.get_all_family_ids_is_parent(partner1)
         families2 = self.get_all_family_ids_is_parent(partner2)
-        for fam in families1:
-            if fam in families2: return fam
+        #We might have the situation that the profile is not accesible by the profile, so that we will need a workaround
+        if families2 == []: return self._check_profile_in_family(families1, partner2)
+        elif families1 == []: return self._check_profile_in_family(families2, partner1)
+        else:
+            for fam in families1:
+                if fam in families2: return fam
+        return None
+    def _check_profile_in_family(self, families, prof_id):
+        '''
+        Checks if profile is in the provided family partners
+        families is an array of family id
+        prof_id is the id of the profile
+        '''
+        for fam in families:
+            fam_prof = self.get_family_by_ID(fam)
+            if prof_id in fam_prof.get_parents(): return fam_prof
         return None
 #===============================================================================
 #         ADD methods: Add methods used to include a new profile and new family

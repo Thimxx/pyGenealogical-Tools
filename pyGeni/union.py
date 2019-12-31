@@ -52,7 +52,10 @@ class union(geni_calls, family_profile):
                 self.union_data["marriage"].setLocationAlreadyProcessed(place_data)
             if key_value == "status": self.union_data["status"] = data[key_value]
             if key_value == "partners":
-                self.union_data["partners"] = data[key_value]
+                self.union_data["partners"] = []
+                #The union stores the partner as a full address, but we are looking for the profile ID which is stored
+                for partner in data[key_value]:
+                    self.union_data["partners"].append(partner.split("/")[-1])
                 self.setFather(geni.get_profile_id_from_address(data[key_value][0]))
                 if len(data.get(key_value, None)) > 1: self.setMother(geni.get_profile_id_from_address(data[key_value][1]))
             if key_value == "children":

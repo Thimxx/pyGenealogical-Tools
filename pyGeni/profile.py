@@ -15,7 +15,7 @@ import logging
 #TODO: there are some areas in the software where geni provides a wrong input. Until is fixed, I will keep this dirty code
 GENI_SANDBOX_BUG_STRING = "api.sandbox.geni.com/"
 
-SPECIFIC_GENI_STRING = ['id', 'url', 'profile_url', 'creator' ]
+SPECIFIC_GENI_STRING = ['id', 'url', 'profile_url', 'creator', 'maiden_name' ]
 SPECIFIC_GENI_BOOLEAN =  ['public', 'is_alive', 'deleted']
 SPECIFIC_GENI_INTEGER = ['guid', 'created_at', 'updated_at']
 #TODO: review teh complete post method and include all fields here : https://www.geni.com/platform/developer/help/api?path=profile%2Fadd-child&version=1
@@ -58,7 +58,7 @@ class profile(geni_calls, gen_profile):
             data = r.json()
         #Now we can execute the constructor
         if ("first_name" not in data.keys()): data["first_name"] = NOT_KNOWN_VALUE
-        if ("last_name" not in data.keys()): data["last_name"] = NOT_KNOWN_VALUE
+        if ("last_name" not in data.keys()): data["last_name"] = data.get("maiden_name", NOT_KNOWN_VALUE)
         gen_profile.__init__(self, data["first_name"], data["last_name"], id_db=data.get("id", None) )
         #In some cases we do not have access to the profile and data is not accurate
         if data.get("name", None):

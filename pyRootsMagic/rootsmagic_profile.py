@@ -5,7 +5,7 @@ Created on 7 jul. 2019
 '''
 from pyGenealogy import common_profile
 from pyGenealogy.common_event import event_profile
-from pyRootsMagic import collate_temp, return_date_from_event
+from pyRootsMagic import collate_temp, return_date_from_event, get_geolocated_before, set_geolocated
 from messages.py_rootsmagic_messages import WARNING_RESEARCH_LOG, PROFILE_RESEARCH_LOG
 from datetime import date, datetime
 import logging
@@ -321,7 +321,6 @@ class rootsmagic_profile(common_profile.gen_profile):
     def set_place_and_get_id(self,event):
         '''
         It will obtain or create a place id inside RootsMagic
-        
         event is an instance of pyGenealogi.common_event, if not location is available will be ignored
         '''
         location = event.get_location()
@@ -475,7 +474,15 @@ class rootsmagic_profile(common_profile.gen_profile):
             place_input = "SELECT * FROM PlaceTable WHERE PlaceID=?"
             place = self.database.execute(place_input, (str(event_in_database[5]), )  )
             place_info = place.fetchone()
-            event_output.setLocation(place_info[2])
+            #We extract the geolocated string from the profile
+            geo_string = place_info[2]
+            #If was extracted before, we should avoid another geolocation call
+            if get_geolocated_before(geo_string):
+                event_output.setLocationAlreadyProcessed(get_geolocated_before(geo_string))
+            else:
+                event_output.setLocation(place_info[2])
+                #We store the geolocation in the database for future use
+                set_geolocated(geo_string, event_output.get_location())
             if int(place_info[5]) != 0 and int(place_info[6]) != 0:
                 event_output.set_geo_location(int(place_info[5])/10000000, int(place_info[6])/10000000)
         return event_output

@@ -190,7 +190,7 @@ class getFSfamily(object):
                         #Notice that we shall detect if the given date is a year or a specific date
                         #we will make the different using "about" and using datetime in the background
                         if(is_year(cell_value)):
-                            this_introduction = self.__include_a_date__(column_criteria, included_profile, 
+                            this_introduction = self.__include_a_date__(column_criteria, included_profile,
                                                             datetime.strptime(str(cell_value.replace(" ", "")), "%Y").date(), "ABOUT")
                         else:
                             this_introduction = self.__include_a_date__(column_criteria, included_profile,
