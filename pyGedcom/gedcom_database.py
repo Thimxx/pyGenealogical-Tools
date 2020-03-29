@@ -159,7 +159,7 @@ def database_2_gedcom(ged_dict, level):
     for key in ged_dict:
         if key != "VALUE":
             #Notice that listing tags will contain a list of parameters, and shall be written in a different approach
-            if not key in listing_tags:
+            if key not in listing_tags:
                 line = str(level) + " " + key + " " + ged_dict.get(key).get("VALUE", "")
                 output.append(line)
             else:

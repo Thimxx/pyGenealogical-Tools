@@ -295,7 +295,7 @@ class Test(unittest.TestCase):
         score, factor = get_score_compare_names("Matías", "Martín Martín", "Mathias", "Martín Martín", language = "es")
         assert(score *factor >5.0)
         score, factor = get_score_compare_names("Juan", "Fernandez", "Macias", "García")
-        assert(score * factor == 0.0)
+        assert(score * factor < 0.06)
         score, factor = get_score_compare_names("Juan", "Gomez", "Juan", "Gómez")
         assert(score == 4.0)
         assert(factor == 1.0)
@@ -322,7 +322,9 @@ class Test(unittest.TestCase):
         
         score, factor = get_score_compare_names("Josefa", "Arnanz Tejera", "Josepha", "Arnanz Texera", language="es")
         assert(score > 5.5)
-        assert(factor > 0.85)
+        assert(factor > 0.79)
+        score, factor = get_score_compare_names("Lorenza", "Enríquez López", "Lorenza", "Sancho López", language = "es")
+        print(score*factor <1.01 )
     def test_compare_date(self):
         '''
         Test comparison of dates with scoring
@@ -381,6 +383,12 @@ class Test(unittest.TestCase):
         score, factor = get_score_compare_dates(event3, event2)
         assert(score < 0.1)
         assert(factor > 0.1)
+        #Let's check the dates
+        event2.setDate(2010, accuracy="EXACT")
+        event3.setDate(1910, accuracy="EXACT")
+        score, factor = get_score_compare_dates(event2, event3)
+        assert(score < 0.003)
+        assert(factor < 0.002)
         #Let's check the dates
         event2.setDate(2010, accuracy="ABOUT")
         event3.setDate(2010, accuracy="ABOUT")
@@ -452,7 +460,7 @@ class Test(unittest.TestCase):
         event3.setDate(2020, accuracy="BEFORE")
         score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
-        assert(factor == 0.0)
+        assert(factor == 1.0)
         #After becomes irrelevant
         event2.setDate(2030, accuracy="ABOUT")
         event3.setDate(2020, accuracy="AFTER")
@@ -501,16 +509,6 @@ class Test(unittest.TestCase):
         score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 0.0)
-        event2.setDate(2030, accuracy="ABOUT")
-        event3.setDate(2029, accuracy="BETWEEN", year_end = 2032)
-        score, factor = get_score_compare_dates(event2, event3)
-        assert(score == 0.5)
-        assert(factor == 1.0)
-        event2.setDate(2033, accuracy="ABOUT")
-        event3.setDate(2029, accuracy="BETWEEN", year_end = 2031)
-        score, factor = get_score_compare_dates(event2, event3)
-        assert(score == 1.0)
-        assert(factor == 1.0)
         event2.setDate(2030, accuracy="BEFORE")
         event3.setDate(2029, accuracy="BETWEEN", year_end = 2031)
         score, factor = get_score_compare_dates(event2, event3)
@@ -558,6 +556,21 @@ class Test(unittest.TestCase):
         score, factor = get_score_compare_dates(event2, event3)
         assert(score == 0.0)
         assert(factor == 0.0)
+        event2.setDate(2030, accuracy="ABOUT")
+        event3.setDate(2029, accuracy="BETWEEN", year_end = 2032)
+        score, factor = get_score_compare_dates(event2, event3)
+        assert(score == 0.5)
+        assert(factor > 0.99)
+        event2.setDate(2033, accuracy="ABOUT")
+        event3.setDate(2029, accuracy="BETWEEN", year_end = 2031)
+        score, factor = get_score_compare_dates(event2, event3)
+        assert(score == 1.0)
+        assert(factor > 0.71)
+        event2.setDate(2028, accuracy="BETWEEN", year_end = 2031)
+        event3.setDate(2010, accuracy="ABOUT", year_end = 2027)
+        score, factor = get_score_compare_dates(event2, event3)
+        assert(score == 0.5)
+        assert(factor > 0.39)
     def test_bug_capital_letters(self):
         '''
         Test Capital Letters are fixed
@@ -613,16 +626,18 @@ class Test(unittest.TestCase):
         '''
         birth1 = event_profile("birth")
         birth1.setDate(1900)
+        residence1 = event_profile("residence")
+        residence1.setDate(1901)
         
         death1 = event_profile("death")
         death1.setDate(2090)
-        score1, factor1 = score_factor_birth_and_death(birth1,[death1])
+        score1, factor1 = score_factor_birth_and_death(birth1,residence1, [death1])
         assert(score1 == 0)
         assert(factor1 == 0)
-        score2, factor2 = score_factor_birth_and_death(birth1,[])
+        score2, factor2 = score_factor_birth_and_death(birth1,residence1, [])
         assert(score2 == 0)
         assert(factor2 == 1)
-        score3, factor3 = score_factor_birth_and_death(None,[])
+        score3, factor3 = score_factor_birth_and_death(None,None,[])
         assert(score3 == 0)
         assert(factor3 == 1)
         

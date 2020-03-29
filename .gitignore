@@ -112,3 +112,4 @@ ENV/
 /.pypirc
 /get_gedcom.py
 /RootsAnalysis.out
+/output_match_geni*.txt

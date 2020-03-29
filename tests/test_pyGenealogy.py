@@ -32,6 +32,8 @@ class Test(unittest.TestCase):
         '''
         profile = gen_profile("Juana", "Bargas")
         profile2 = gen_profile("Juana", "de Bargas Gómez")
+        profile.add_nickname("Juana de Bargas")
+        assert(profile.get_nicknames() == ["Juana de Bargas"])
         profile.setCheckedDate("birth", 2016,4,23, "EXACT")
         date1 = date(2016,1,1)
         date2 = date(2018,8,25)

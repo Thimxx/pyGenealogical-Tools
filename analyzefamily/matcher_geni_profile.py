@@ -3,10 +3,10 @@ Created on 22 oct. 2019
 
 @author: Val
 '''
-import logging, datetime
-from messages.pygenanalyzer_messages import MATCH_PROFILE_ERROR, MATCH_GENI, MATCH_CONFLICT_TASK, MATCH_CONFLICT_INFO
-from messages.pygenanalyzer_messages import MATCH_REVIEW_TASK_BEGIN, MATCH_REVIEW_TASK_END, MATCH_REVIEW_DETAILS
+import logging
+from messages.pygenanalyzer_messages import MATCH_PROFILE_ERROR, MATCH_CONFLICT_TASK, MATCH_CONFLICT_INFO
 from analyzefamily import CHILD, FATHER, MOTHER, PARTNER
+from analyzefamily import include_task_no_duplicate, include_match_profile, print_out
 
 THRESHOLD_MATCH = 2.0
 
@@ -52,6 +52,10 @@ class match_single_profile(object):
             return False
         #This is the profile for analysis
         profile_geni = self.database_geni.get_profile_by_ID(url)
+        #We might have an address that has been updated, we double check for updating it in DB
+        if url != profile_geni.get_this_profile_url():
+            profile_rm.update_web_ref(url = profile_geni.get_this_profile_url(), name = self.database_geni.get_db_kind())
+            print_out("UPDATING " + self.database_geni.get_db_kind() + " LINK to " + profile_geni.get_this_profile_url())
         #Starting checking of the parents
         #FATHER
         _, father_rm = self.database.get_father_from_child(profile_rm.get_id())
@@ -97,27 +101,9 @@ class match_single_profile(object):
         score,factor = profile_rm.comparison_score(profile_geni, self.data_language, self.name_convention)
         if (score*factor > self.threshold):
             #We have a match, so we will create the link as a web link
-            notes_to_add = MATCH_GENI + datetime.date.today().strftime("%d-%m-%Y")
-            #Prior to add, we need to check is not today in the profile
-            existing = False
-            previous_match = False
-            all_matches = [profile_geni.get_this_profile_url()]
-            webs = profile_rm.get_all_webs()
-            for web in webs:
-                if web["url"] == profile_geni.get_this_profile_url(): existing = True
-                elif (web["name"] ==  self.database_geni.get_db_kind()) and (web["url"] != profile_geni.get_this_profile_url()):
-                    previous_match = True
-                    all_matches.append(web["url"])
-            #If it has not been created before, we create the new match in the profile
-            if not existing:
-                profile_rm.setWebReference(profile_geni.get_this_profile_url(), name=self.database_geni.get_db_kind(), notes=notes_to_add)
-                print_out("-    MATCHED :" + str(profile_rm.nameLifespan()) + " WITH " + str(profile_geni.nameLifespan()))
+            include_match_profile(profile_rm, profile_geni, self.database_geni.get_db_kind())
             #We always record the match obtained although was done before
             self.matched_profiles[profile_rm.get_id()] = profile_geni.get_id()
-            #If there was a different previous match, we shall inform in the profile for checking
-            if previous_match:
-                profile_rm.set_task(MATCH_REVIEW_TASK_BEGIN + self.database_geni.get_db_kind() + MATCH_REVIEW_TASK_END,
-                                    details=MATCH_REVIEW_DETAILS + str(all_matches))
         else:
             #This is a conflict, we should have a single match!!!
             self._conflict_storing(profile_rm, [profile_geni.get_id()], self.database_geni)
@@ -137,7 +123,7 @@ class match_single_profile(object):
         details_info = MATCH_CONFLICT_INFO
         for ids_geni in conflicted_profiles_ids:
             details_info += self.database_geni.get_profile_by_ID(ids_geni).get_this_profile_url() + "     "
-        profile_rm.set_task(MATCH_CONFLICT_TASK, priority=1, details= details_info, task_type = 0)
+        include_task_no_duplicate(profile_rm, MATCH_CONFLICT_TASK, 1, details_info)
     def _init_tracking_logs(self):
         '''
         Init to empty for each matching operations
@@ -156,24 +142,54 @@ class match_single_profile(object):
         '''
         #We store here the profiles that have been identified in profiles_geni
         profiles_not_identified = list(profiles_geni)
+        conflict_potential_dictionary = {}
         for rm_id in profiles_rm:
+            #We might be in a situation where very small similarities might create confusion of profiles, we store the previous score
+            previous_score = 0
             conflict_match = False
             profile_rm = self.database.get_profile_by_ID(rm_id)
             geni_matches = []
-            conflict_potential = []
-            for geni_id in profiles_not_identified:
+            for geni_id in list(profiles_not_identified):
                 profile_geni = self.database_geni.get_profile_by_ID(geni_id)
                 score, factor = profile_rm.comparison_score(profile_geni, self.data_language, self.name_convention)
                 if score*factor > self.threshold:
-                    geni_matches.append(geni_id)
-                    if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
+                    #OPTIONS:
+                    # 1.New profile is the right one
+                    # 2.New profile is the first one
+                    # 3.New profile is not the right one.but is the previous
+                    # 4.New profile is as bad as the others.
+                    #Option 1
+                    if score*factor > 3*previous_score:
+                        recover_profs = list(geni_matches)
+                        geni_matches = [geni_id]
+                        profiles_not_identified += recover_profs
+                        previous_score = score*factor
+                        if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
+                    #Option 2
+                    elif len(geni_matches) == 0:
+                        geni_matches.append(geni_id)
+                        previous_score = score*factor
+                        if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
+                    #Option 3
+                    elif previous_score >= 3*score*factor:
+                        #In this case we ignore... we keep the previous one
+                        pass
+                    #Option 4
+                    else:
+                        if score*factor > previous_score: previous_score = score*factor
+                        if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
                 elif score >= 3*self.threshold:
-                    #This is a common case, where profiles have a minimum difference but still relevant, user to check
                     conflict_match = True
-                    conflict_potential.append(profile_geni)
+                    #This is a common case, where profiles have a minimum difference but still relevant, user to check
+                    if rm_id in conflict_potential_dictionary:
+                        conflict_potential_dictionary[rm_id].append(geni_id)
+                    else:
+                        conflict_potential_dictionary[rm_id] = [geni_id]
             #If there is a single match, whatever other conditions, we introduce as a match
             if len(geni_matches) == 1:
                 self._match_single_pair(profile_rm, self.database_geni.get_profile_by_ID(geni_matches[0]))
+                #In case there has been found also a conflict, the conflict is no longer needed, as we do have a match.
+                if rm_id in conflict_potential_dictionary: del conflict_potential_dictionary[rm_id]
             else:
                 #If there is no single match, we can have several options...
                 if (len(geni_matches) == 0) and (not conflict_match):
@@ -183,25 +199,37 @@ class match_single_profile(object):
                 #Or we have more than one match... that is a conflict
                 elif len(geni_matches) > 1:
                     self._conflict_storing(profile_rm, geni_matches, self.database_geni)
-                #We can also have the specific case of conflicted profiles which might be similar
-                if conflict_match:
-                    details_info = "-    CONFLICT POTENTIAL MATCH " + str(profile_rm.nameLifespan()) + " with the following: "
-                    address_list = []
-                    for profile in conflict_potential:
-                        address_list.append(profile.get_this_profile_url())
-                        details_info += str(profile.nameLifespan()) + " Relation = " + kind_of_match
-                        if profile.get_id() in profiles_not_identified: profiles_not_identified.remove(profile.get_id())
-                    profile_rm.set_task(MATCH_CONFLICT_TASK, priority=1, details= details_info, task_type = 0)
-                    print_out(details_info)
-                    self.conflict_profiles[rm_id] = address_list
+        #We perform another loop with those profiles which were conflicted as some of the might have been identified on the other side
+        temp_conflicted = conflict_potential_dictionary.copy()
+        for rm_id_conflicted in temp_conflicted.keys():
+            #We might have some profiles that have been already identified but stored as potential conflicts. We shall remove them
+            for geni_conflict_key in temp_conflicted[rm_id_conflicted]:
+                if geni_conflict_key in self.matched_profiles.values(): conflict_potential_dictionary[rm_id_conflicted].remove(geni_conflict_key)
+        #The profiles left, are either a match, or we have found again gaps of profiles not found
+        for rm_id_final_confliced in conflict_potential_dictionary.keys():
+            #If the list in the dictionary is empty, we do have a missing proifle
+            profile_rm_new = self.database.get_profile_by_ID(rm_id_final_confliced)
+            if conflict_potential_dictionary[rm_id_final_confliced] == []:
+                #This profile was having a potential conflict that ended being actually an empty profile, it is a missing match
+                self.non_matched_profiles_rm[rm_id_final_confliced] = kind_of_match
+                print_out("-    NO MATCH of profile in " + self.database_geni.get_db_kind() + " " +
+                              str(profile_rm_new.nameLifespan()) + " Relation = " + kind_of_match)
+            else:
+                #Ok, in this case we have a potential match with an actual conflict
+                details_info = "-    CONFLICT POTENTIAL MATCH " + str(profile_rm_new.nameLifespan()) + " with the following: "
+                address_list = []
+                for profile_id in conflict_potential_dictionary[rm_id_final_confliced]:
+                    #We remove conflicted profiles from the matching step
+                    if profile_id in profiles_not_identified: profiles_not_identified.remove(profile_id)
+                    profile = self.database_geni.get_profile_by_ID(profile_id)
+                    address_list.append(profile.get_this_profile_url())
+                    details_info += str(profile.nameLifespan()) + " Relation = " + kind_of_match
+                include_task_no_duplicate(profile_rm_new, MATCH_CONFLICT_TASK, 1, details_info)
+                print_out(details_info)
+                self.conflict_profiles[rm_id_final_confliced] = address_list
         #Now, we are able to detect those children on the "RIGHT" side. Not linked to other
         if len(profiles_not_identified) > 0:
             for missing_prof in profiles_not_identified:
                 self.non_matched_profiles_geni[missing_prof] = kind_of_match
                 prof = self.database_geni.get_profile_by_ID(missing_prof)
                 print_out("-    NO MATCH of profile in " + self.database.get_db_kind() + " " + str(prof.nameLifespan()) + " Relation = " + kind_of_match)
-def print_out(message):
-    '''
-    Function to be used for printing the obtained results
-    '''
-    logging.info(message)

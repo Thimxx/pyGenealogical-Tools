@@ -30,6 +30,8 @@ class union(geni_calls, family_profile):
             data = r.json()
             geni.GENI_CALLED_UNIONS[union_id] = data
         self.union_data = {}
+        #Initiating values of the parametrs
+        self.union_data["partners"] = []
         for key_value in data.keys():
             if key_value == "id": self.union_data["id"] = data[key_value]
             if key_value == "url": self.union_data["url"] = data[key_value]
@@ -52,7 +54,6 @@ class union(geni_calls, family_profile):
                 self.union_data["marriage"].setLocationAlreadyProcessed(place_data)
             if key_value == "status": self.union_data["status"] = data[key_value]
             if key_value == "partners":
-                self.union_data["partners"] = []
                 #The union stores the partner as a full address, but we are looking for the profile ID which is stored
                 for partner in data[key_value]:
                     self.union_data["partners"].append(partner.split("/")[-1])

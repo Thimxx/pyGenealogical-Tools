@@ -85,6 +85,7 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         prof5 = db.get_profile_by_ID(1)
         eventsof1= prof5.getEvents()
         no_marriage = True
+        assert("Mariano Profile" in prof5.get_nicknames())
         for event in eventsof1:
             if event.get_event_type() == "marriage": no_marriage = False
         assert(no_marriage)
@@ -158,7 +159,7 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         prof.del_web_ref(TEST_WIKIPEDIA)
         assert(not (TEST_WIKIPEDIA in prof.get_all_urls()))
         #It does not essent
-        assert(prof.update_web_ref("DOES NOT EXISTS", "Google", "A note") == None)
+        assert(prof.update_web_ref("DOES NOT EXISTS", "Googles", "A note") is None)
         
         prof.set_task("TEST", details="HAHA")
         

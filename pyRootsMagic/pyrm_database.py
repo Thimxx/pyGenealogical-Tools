@@ -8,6 +8,7 @@ from datetime import datetime
 from pyRootsMagic.rootsmagic_profile import rootsmagic_profile
 from pyRootsMagic.rootsmagic_family import rootsmagic_family
 from pyGenealogy.common_database import gen_database
+from pyGenealogy import NOT_KNOWN_VALUE
 from pyRootsMagic import collate_temp
 from messages.py_rootsmagic_messages import WARNING_UPDATE_FAMILY_PARENTS
 
@@ -120,7 +121,9 @@ class database_rm(gen_database):
         and the id of the potential candidates
         profile shall be a derived class from pyGenealogy.common_profile
         '''
-        potential_matches = []
+        potential_matches = {}
+        #We skip undefined profiles
+        if (profile.getName() == NOT_KNOWN_VALUE) or (profile.getSurname() == NOT_KNOWN_VALUE): return potential_matches
         self.database.create_collation("RMNOCASE", collate_temp)
         profile_ids = "SELECT OwnerID FROM NameTable WHERE Surname LIKE ?"
         all_ids = self.database.execute(profile_ids, ( str(profile.getSurname()) , ) ).fetchall()
@@ -128,7 +131,9 @@ class database_rm(gen_database):
         for id_prof in all_ids:
             new_prof = self.get_profile_by_ID(id_prof[0])
             score, factor = new_prof.comparison_score(profile, data_language, name_convention)
-            if (score*factor > 2.0): potential_matches.append(id_prof[0])
+            if (score*factor > 2.0):
+                result_score = {"score": score, "factor": factor, "score*factor": score*factor}
+                potential_matches[id_prof[0]] = result_score
         self.database.create_collation("RMNOCASE", None)
         return potential_matches
 #===============================================================================
@@ -165,9 +170,8 @@ class database_rm(gen_database):
         added_profile = self.get_profile_by_ID(row_data)
         for event in profile.getEvents():
             added_profile.setNewEvent(event)
-        
+        #We remove the collation to secure we can continue using the database
         self.database.create_collation("RMNOCASE", None)
-        
         self.database.commit()
         return row_data
     def add_family(self, father = "0", mother = "0", children = None, marriage = None):
@@ -211,13 +215,27 @@ class database_rm(gen_database):
         father_id = None
         mother_id = None
         #Firstly, both profiles of father and mother shall be created
-        if father_profile: father_id = self.add_profile(father_profile)
-        if mother_profile: mother_id = self.add_profile(mother_profile, spouseid = father_id)
+        if father_profile:
+            if (type(father_profile).__name__ == "rootsmagic_profile"):
+                father_id = father_profile.get_id()
+            else:
+                father_id = self.add_profile(father_profile)
+        if mother_profile:
+            if (type(mother_profile).__name__ == "rootsmagic_profile"):
+                mother_id = mother_profile.get_id()
+            else:
+                mother_id = self.add_profile(mother_profile, spouseid = father_id)
         #Child shall be in the right format
         child_input = None
         if child_profile_id: child_input = [child_profile_id]
-        #Once the parents are available, next step is to create the full family
-        family_id = self.add_family(father = father_id, mother = mother_id, children = child_input, marriage = marriage_event)
+        #We firstly check if the family is existing
+        family_id, _ = self.get_family_from_child(child_profile_id)
+        if family_id:
+            #If the family is already existing, we just need to update it with the new profiles.
+            self.update_family(family_id, father_id = father_id, mother_id = mother_id, marriage = marriage_event)
+        else:
+            #Once the parents are available, next step is to create the full family
+            family_id = self.add_family(father = father_id, mother = mother_id, children = child_input, marriage = marriage_event)
         return father_id, mother_id, family_id
     def add_child_to_family(self, family_id, children ):
         '''
@@ -244,7 +262,11 @@ class database_rm(gen_database):
         '''
         child_ids = []
         for child_prof in children_profiles:
-            id_child = self.add_profile(child_prof)
+            #We might receive an already existing profile, so we simply add it
+            if (type(child_prof).__name__ == "rootsmagic_profile"):
+                id_child = child_prof.get_id()
+            else:
+                id_child = self.add_profile(child_prof)
             child_ids.append(id_child)
         self.add_child_to_family(family_id, child_ids )
         return child_ids
@@ -253,10 +275,15 @@ class database_rm(gen_database):
         Adds a partner to the profile, by firstly creating the partner and afterwards
         creating the family
         profile_id shall be the id of the profile
-        partner_profile shall be the partner as a profile derivated by pyGenealogy.common_profile
+        partner_profile shall be the partner as a profile derived by pyGenealogy.common_profile
         marriage shall be an instance of pyGenealogy.common_event
         '''
-        id_partner = self.add_profile(partner_profile)
+        #We might receive a profile that has been already created, we avoid double creation
+        id_partner = None
+        if (type(partner_profile).__name__ == "rootsmagic_profile"):
+            id_partner = partner_profile.get_id()
+        else:
+            id_partner = self.add_profile(partner_profile)
         id_family = None
         if partner_profile.getGender() == "M":
             id_family = self.add_family(father = id_partner, mother = profile_id, marriage = marriage)

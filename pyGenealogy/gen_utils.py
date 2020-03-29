@@ -7,10 +7,10 @@ import logging
 from messages.pyGenealogymessages import NO_VALID_CONVENTION, NO_VALID_ACCURACY, NO_VALID_LOCATION, NO_VALID_KEY
 from messages.pyGenealogymessages import NO_VALID_BIRTH_DATE, NO_VALID_DEATH_DATE, NO_VALID_DEATH_AND_BURIAL
 from datetime import date
-from pyGenealogy import VALUES_ACCURACY, get_mapbox_key
+from pyGenealogy import VALUES_ACCURACY, get_mapbox_key, NOT_KNOWN_VALUE
 from metaphone import doublemetaphone
 from Levenshtein import jaro
-import math
+import math, copy
 import pyGenealogy, os, re
 from mapbox import Geocoder
 
@@ -374,19 +374,12 @@ def get_score_compare_names(name1, surname1, name2, surname2, language="en", con
     met_surname1 = adapted_doublemetaphone(splitted_surname1[0], language=language)
     met_surname2 = adapted_doublemetaphone(splitted_surname2[0], language=language)
     #Let's calculate the factors
-    factor1 = get_jaro_to_list(met_name1, met_name2)
-    #We are going to use the direct comparison for surnames, in case there is only a few modifications
-    score_direct = 0
-    factor_direct = 0
-    if (len(splitted_surname1[0]) == 2) and (len(splitted_surname2[0]) == 2):
-        value1 = jaro(splitted_surname1[0][0], splitted_surname2[0][0])
-        value2 = jaro(splitted_surname1[0][1], splitted_surname2[0][1])
-        score_direct = value1 + value2
-        factor_direct = value1*value2
-    elif (len(splitted_surname1[0]) > 0) and (len(splitted_surname2[0]) > 0):
-        value1 = jaro(splitted_surname1[0][0], splitted_surname2[0][0])
-        score_direct = value1
-        factor_direct = value1
+    factor1 = score_of_given_name_and_meta(met_name1, met_name2, splitted_name1[0][0], splitted_name2[0][0])
+    score1 = factor1
+    #In case there is a not known value, we simply ignore the data, by not giving score
+    if (NOT_KNOWN_VALUE in [name1, name2]):
+        factor1 = 1
+        score1 = 0
     #In the specific case of Spanish surnames and having different number of surnames we only check the first one
     #This will improve the result in case the first name will be the same and will reduce dramatically in case are different
     if (len(met_surname1) != len(met_surname2)) and language == "es":
@@ -397,20 +390,27 @@ def get_score_compare_names(name1, surname1, name2, surname2, language="en", con
     score_met = 0
     factor_met = 0
     if ((len(met_surname1) == 4) and (len(met_surname2) == 4) and language=="es"):
-        factor_sub1 = get_jaro_to_list(met_surname1[0:2], met_surname2[0:2], factor=0.95)
-        factor_sub2 = get_jaro_to_list(met_surname1[2:], met_surname2[2:], factor=0.95)
-        score_met = 2*(factor1 +factor_sub1+factor_sub2)
+        factor_sub1 = score_of_given_name_and_meta(met_surname1[0:2], met_surname2[0:2], splitted_surname1[0][0], splitted_surname2[0][0],factor=0.95)
+        factor_sub2 = score_of_given_name_and_meta(met_surname1[2:], met_surname2[2:], splitted_surname1[0][1], splitted_surname2[0][1],factor=0.95)
+        score_met = 2*(score1 +factor_sub1+factor_sub2)
         factor_met = factor1*factor_sub1*factor_sub2
     else:
         factor2 = get_jaro_to_list(met_surname1, met_surname2, factor=0.95)
-        score_met = 2*(factor1 +factor2)
+        score2 = factor2
+        #In the case of having a not known value, we ignore this step
+        if (NOT_KNOWN_VALUE in [surname1, surname2]):
+            score2 = 0
+            factor2 = 1
+        score_met = 2*(score1 +score2)
         factor_met = factor1*factor2
-    score_direct = 2*(factor1 +score_direct)
-    factor_direct = factor1*factor_direct
-    if score_met*factor_met > score_direct*factor_direct:
-        return score_met, factor_met
-    else:
-        return score_direct, factor_direct
+    return score_met, factor_met
+def score_of_given_name_and_meta(first4jaro, list4jaro, name1, name2, factor = 0.9):
+    '''
+    This function will take the maximum score between the direct comparison of the name and the phonetic comparison
+    '''
+    score_compare = jaro(name1, name2)
+    score_met = get_jaro_to_list(first4jaro, list4jaro, factor = factor)
+    return max(score_met, score_compare*score_compare)
 def get_jaro_to_list(first4jaro, list4jaro, factor = 0.9):
     result = [[0 for x in range(len(list4jaro))] for y in range(len(first4jaro))]
     loc_data = 0.0
@@ -434,6 +434,18 @@ def get_jaro_to_list(first4jaro, list4jaro, factor = 0.9):
         return loc_data*loc_data*math.pow(factor, dif)
     else:
         return loc_data*loc_data*get_jaro_to_list(first2return, list4return)
+def score_factor_diff_decay(diff):
+    '''
+    This function is an intermediate function used for the decay of an specific data and the impact on the score
+    '''
+    if (diff == 0):
+        return 2.0, 1.0
+    elif (diff < 5):
+        return 1.5+0.10*(5 - diff), 0.75+0.05*(5 - diff)
+    elif (diff <30):
+        return 1.0+ 0.02*(30-diff), 0.5 + 0.01*(30-diff)
+    else:
+        return 30.0/diff, 15.0/diff
 def get_score_compare_dates(event1, event2):
     '''
     Get an score comparing 2 dates including accuracy
@@ -444,17 +456,11 @@ def get_score_compare_dates(event1, event2):
     if (accuracy1 == "EXACT") and (accuracy2 == "EXACT"):
         if (not event1.get_month()) or (not event2.get_month()):
             diff = diff / 360
-            if diff > 2: diff = 5
+            if diff > 2: diff = diff*diff
         elif (not event1.get_day()) or (not event2.get_day()):
             diff = diff / 30
-        if (diff == 0):
-            return 2.0, 1.0
-        elif (diff < 5):
-            return 1.5+0.10*(5 - diff), 0.75+0.05*(5 - diff)
-        elif (diff <30):
-            return 1.0+ 0.02*(30-diff), 0.5 + 0.01*(30-diff)
-        else:
-            return 30.0/diff, 15.0/diff
+            if diff > 2: diff = diff*diff
+        return score_factor_diff_decay(diff)
     elif ("EXACT" in [accuracy1, accuracy2]) and ("ABOUT" in [accuracy1, accuracy2]):
         if (diff < 360):
             return 1.0, 1.0
@@ -479,10 +485,14 @@ def get_score_compare_dates(event1, event2):
         elif (not is_about) and is_this_date_earlier_or_simultaneous_to_this(event_between.get_year_end(), event_between.get_month_end(),
                             event_between.get_day_end(), event_exact.get_year(), event_exact.get_month(), event_exact.get_day()):
             return 0.0, 0.0
+        elif not is_about:
+            range_bet = event_between.get_range_in_between()
+            return output_with_range(range_bet)
         else:
             range_bet = event_between.get_range_in_between()
-            if is_about: range_bet = 1.5*range_bet
-            return output_with_range(range_bet)
+            _, factor_temp = score_factor_diff_decay(diff/(360))
+            score, factor = output_with_range(range_bet)
+            return score, factor*factor_temp*factor_temp
     elif (accuracy1 == "ABOUT") and (accuracy2 == "ABOUT"):
         diff_years= abs((event1.get_year()-event2.get_year()))
         if (diff_years < 2):
@@ -494,8 +504,11 @@ def get_score_compare_dates(event1, event2):
         else:
             return 20/(diff_years*diff_years), 30/(diff_years*diff_years)
     elif (accuracy1 == "BEFORE"):
+        new_event = copy.copy(event2)
+        #In the case of about we need to be careful and provide a margin of 10 years
+        if accuracy2 == "ABOUT": new_event.set_year(event2.get_year() - 10)
         if (accuracy2 == "BEFORE") : return 0.0, 1.0
-        elif (event2.is_this_event_earlier_or_simultaneous_to_this(event1)): return 0.0, 1.0
+        elif (new_event.is_this_event_earlier_or_simultaneous_to_this(event1)): return 0.0, 1.0
         else: return 0.0, 0.0
     elif (accuracy1 == "AFTER"):
         if (accuracy2 == "AFTER") : return 0.0, 1.0
@@ -505,7 +518,10 @@ def get_score_compare_dates(event1, event2):
         elif (event2.is_this_event_later_or_simultaneous_to_this(event1)): return 0.0, 1.0
         else: return 0.0, 0.0
     elif (accuracy2 == "BEFORE"):
-        if (event1.is_this_event_earlier_or_simultaneous_to_this(event2)): return 0.0, 1.0
+        new_event = copy.copy(event1)
+        #In the case of about we need to be careful and provide a margin of 10 years
+        if accuracy1 == "ABOUT": new_event.set_year(event1.get_year() - 10)
+        if (new_event.is_this_event_earlier_or_simultaneous_to_this(event2)): return 0.0, 1.0
         else: return 0.0, 0.0
     elif (accuracy2 == "AFTER"):
         if ( (accuracy1 == "BETWEEN") and is_this_date_earlier_or_simultaneous_to_this(event2.get_year(), event2.get_month(), event2.get_day(),
@@ -569,14 +585,57 @@ def is_this_date_earlier_or_simultaneous_to_this(year, month, day, year_other, m
         elif date_self: return True
         elif date_other: return False
         else: return None
-def score_factor_birth_and_death(event_birth, events):
+def is_this_date_later_or_simultaneous_to_this(year, month, day, year_other, month_other, day_other):
+        '''
+        Confirms if the following date is later or at the same time as the other
+        '''
+        date_self = None
+        date_other = None
+        if year: date_self = date(year, month if month else 12  ,day if day else (MONTH_DAYS[month] if month else 31))
+        if year_other: date_other = date(year_other, month_other if month_other else 1  ,
+                    day_other if day_other else 1)
+        if (date_self and date_other):
+            return date_self >= date_other
+        elif date_self: return True
+        elif date_other: return False
+        else: return None
+def score_factor_birth_and_death(event_earliest, event_latest, events):
     '''
     This method will provide score and factor for data contained in the profile
     '''
-    if event_birth and event_birth.get_year():
+    if event_earliest and event_earliest.get_year():
         for event in events:
-            if event.get_year() and(event.get_year() - event_birth.get_year() > MAXIMUM_LIFESPAN):
-                return 0,0
+            if event.get_year():
+                accepted_delta = 0
+                #With events where only the year is provided we accept uncertainty of 1 year
+                if event_earliest.is_only_year_available(): accepted_delta += 1
+                if event.is_only_year_available(): accepted_delta += 1
+                delta_years =  event.get_year() - event_earliest.get_year()
+                both_exact = (event.get_accuracy() == "EXACT") and (event_earliest.get_accuracy() == "EXACT")
+                if event.get_year() and(delta_years > MAXIMUM_LIFESPAN):
+                    return 0.0, 0.0
+                #If the event_birth is actually a birth and the other event is before that date, for sure, we have a problem :)
+                elif both_exact and (event_earliest.get_event_type() == "birth") and delta_years < -accepted_delta : return 0.0, 0.0
+                elif both_exact and (event.get_event_type() == "birth") and delta_years > accepted_delta: return 0.0, 0.0
+    if event_latest and event_latest.get_year():
+        for event in events:
+            if event.get_year():
+                accepted_delta = 0
+                #With events where only the year is provided we accept uncertainty of 1 year
+                if event_latest.is_only_year_available(): accepted_delta += 1
+                if event.is_only_year_available(): accepted_delta += 1
+                #As we are looking for the latest year, ideally is negative
+                delta_years =  event.get_year() - event_latest.get_year()
+                both_exact = (event.get_accuracy() == "EXACT") and (event_latest.get_accuracy() == "EXACT")
+                #Intermediate variable to identify if being into burial and death
+                event_types = [event_latest.get_event_type(), event.get_event_type()]
+                #When events are burial and death we might have significant differences, some burials are having significant differences
+                if (event_types == ["burial", "death"] or event_types == ["death", "burial"]): pass
+                elif event.get_year() and(delta_years > MAXIMUM_LIFESPAN):
+                    return 0.0, 0.0
+                #If the event_birth is actually a death and the other event is after that date, for sure, we have a problem :)
+                elif both_exact and (event_latest.get_event_type() in ["death", "burial"]) and delta_years > accepted_delta : return 0.0, 0.0
+                elif both_exact and (event.get_event_type()  in ["death", "burial"]) and delta_years < -accepted_delta: return 0.0, 0.0
     return 0, 1
 #====================================================================================
 #Execution of module code

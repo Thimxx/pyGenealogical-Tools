@@ -15,7 +15,10 @@ MATCH_REVIEW_TASK_BEGIN = "CHECK DOUBLE "
 MATCH_REVIEW_TASK_END = " MATCH"
 MATCH_REVIEW_DETAILS = "The following profiles are duplicated linked "
 MATCH_ADDING_PROFILES = "Adding the profiles "
+MATCH_EXISTING_PROFILES = "Linking existing profiles "
 MATCH_POTENTIAL_DUPLICATE = "CHECK DUPLICATE "
+MATCH_POTENTIAL_EXISTING = "CHECK EXISTING "
+MATCH_POTENTIAL_INFO_EXISTING = "Trying to add the existing profile "
 
 WEB_DETECTED = "Web automatically detected by pyGenealogicalTools"
 
@@ -24,6 +27,7 @@ TOP_CLIMB = "The maximum level of generations have been reached at the generatio
 PROCESS_MATCH_NUMBER_OF_IMPACTS_BEGIN = "The number of available matches in "
 PROCESS_MATCH_NUMBER_OF_IMPACTS_END = " is "
 PROCESS_ADD_PROFILE_BEGIN = "Adding the profile "
+PROCESS_LINK_PROFILE_BEGIN = "Linking the existing profile "
 PROCESS_ADD_PROFILE_END = " as a "
 PROCESS_NO_ACCESS = " profile is skipped as there is no access to the data "
 

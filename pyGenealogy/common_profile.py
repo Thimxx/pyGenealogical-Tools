@@ -78,8 +78,8 @@ class gen_profile(object):
         score, factor = get_score_compare_names(self.getName(), self.getSurname(),
                         profile.getName(), profile.getSurname(), language=data_language, convention=name_convention)
         #Comparing big differences in events
-        score1, factor1 = score_factor_birth_and_death(self.get_earliest_event_in_event_form(), profile.getEvents())
-        score2, factor2 = score_factor_birth_and_death(profile.get_earliest_event_in_event_form(), self.getEvents())
+        score1, factor1 = score_factor_birth_and_death(self.get_earliest_event_in_event_form(), self.get_latest_event_in_event_form(), profile.getEvents())
+        score2, factor2 = score_factor_birth_and_death(profile.get_earliest_event_in_event_form(),  self.get_latest_event_in_event_form(), self.getEvents())
         score += score1 + score2
         factor = factor*factor1*factor2
         #Comparing gender
@@ -309,6 +309,11 @@ class gen_profile(object):
             return self.gen_data["gender"]
         else:
             return None
+    def get_nicknames(self):
+        '''
+        Add a nickname
+        '''
+        return self.gen_data["nicknames"]
     def getComments(self):
         '''
         Will return the string with all comments from the profile
@@ -356,6 +361,14 @@ class gen_profile(object):
         for weblink in self.get_all_webs():
             urls[weblink['url']] = weblink
         return urls
+    def get_all_url_names(self):
+        '''
+        This function will provide all registered names for the web addressed
+        '''
+        names = {}
+        for weblink in self.get_all_webs():
+            names[weblink['name']] = weblink
+        return names
     def get_all_webs(self):
         '''
         This function will provide all web references

@@ -118,7 +118,7 @@ class RememoryParser(HTMLParser):
             else:
                 try:
                     self.death_date = datetime.datetime.strptime(data, "%d/%m/%Y").date()
-                except:
+                except ValueError:
                     logging.debug(NO_FORMAT)
             self.at_data_location = False
         elif self.at_comments_location:

@@ -9,6 +9,7 @@ from pyRootsMagic import collate_temp, return_date_from_event, get_geolocated_be
 from messages.py_rootsmagic_messages import WARNING_RESEARCH_LOG, PROFILE_RESEARCH_LOG
 from datetime import date, datetime
 import logging
+from pyGenealogy import NOT_KNOWN_VALUE
 
 DATE_EVENT_ID = {"birth" : "1", "death" : "2", "baptism" : "3",  "burial" : "4", "marriage" : "300", "residence" : "29"}
 PERSONAL_EVENTS = ["birth", "death", "baptism", "burial", "residence"]
@@ -35,12 +36,16 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         We get the name from the name table directly
         '''
-        return self.return_person_data_in_NameTable()[0]
+        name = self.return_person_data_in_NameTable()[0]
+        if name == "": return NOT_KNOWN_VALUE
+        else: return name
     def getSurname(self):
         '''
         Function to return the surname
         '''
-        return self.return_person_data_in_NameTable()[1]
+        surname = self.return_person_data_in_NameTable()[1]
+        if surname == "": return NOT_KNOWN_VALUE
+        else: return surname
     def getGender(self):
         '''
         Method override in order to access directly to the gender of the profile
@@ -51,6 +56,11 @@ class rootsmagic_profile(common_profile.gen_profile):
             if gender == 0: return "M"
             elif gender == 1: return "F"
             else: return "U"
+    def get_nicknames(self):
+        '''
+        It will go to RootsMagic database and provide all defined nicknames
+        '''
+        return self.return_person_data_in_NameTable(primary = 0)
     def getLiving(self):
         '''
         Method override in order to access directly to the gender of the profile
@@ -227,7 +237,6 @@ class rootsmagic_profile(common_profile.gen_profile):
     def get_place_id_by_name(self, name):
         '''
         Will provide the place id if existing by the name provided
-        
         name will be an string separated by commas
         '''
         input_place = "SELECT * FROM PlaceTable WHERE Name LIKE ?"
@@ -269,8 +278,8 @@ class rootsmagic_profile(common_profile.gen_profile):
         '''
         empty_value=""
         self.database.create_collation("RMNOCASE", collate_temp)
-        new_task = ("INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details,"
-                    " Date1, Date2, Date3, SortDate1, SortDate2, SortDate3) VALUES(?,?,0,?,0,?,?,?,?,?,?,?,9223372036854775807,9223372036854775807,9223372036854775807)")
+        new_task = ("INSERT INTO ResearchTable(TaskType,OwnerID,OwnerType,RefNumber, Status, Priority, Filename, Name, Details, Date1, Date2, Date3, SortDate1,"
+                    " SortDate2, SortDate3) VALUES(?,?,0,?,0,?,?,?,?,?,?,?,9223372036854775807,9223372036854775807,9223372036854775807)")
         cursor = self.database.cursor()
         cursor.execute( new_task, (str(task_type), str(self.get_id()),empty_value, str(priority), empty_value, str(task_details), details,".", ".", ".", ) )
         row_data = cursor.lastrowid
@@ -386,7 +395,7 @@ class rootsmagic_profile(common_profile.gen_profile):
 #===============================================================================
 #         UPDATE methods: modified inputs which depend on database
 #===============================================================================
-    def update_web_ref(self, url, name = None, notes = None):
+    def update_web_ref(self, url = None, name = None, notes = None):
         '''
         This function will update a given web reference
         '''
@@ -398,6 +407,15 @@ class rootsmagic_profile(common_profile.gen_profile):
             if notes :
                 update_note = "UPDATE URLTable SET Note = ? WHERE URL=? AND OwnerID=?"
                 self.database.execute( update_note, (str(notes), str(url), str(self.get_id()), ) )
+            self.database.commit()
+            return True
+        elif name in self.get_all_url_names():
+            if url:
+                update_name = "UPDATE URLTable SET URL = ? WHERE Name=? AND OwnerID=?"
+                self.database.execute( update_name, (str(url), str(name), str(self.get_id()), ) )
+            if notes :
+                update_note = "UPDATE URLTable SET Note = ? WHERE Name=? AND OwnerID=?"
+                self.database.execute( update_note, (str(notes), str(name), str(self.get_id()), ) )
             self.database.commit()
             return True
         else:
@@ -424,18 +442,23 @@ class rootsmagic_profile(common_profile.gen_profile):
         input_person = "SELECT * FROM PersonTable WHERE PersonID=?"
         person_info = self.database.execute( input_person, (str(self.get_id()),) )
         return person_info.fetchone()
-    def return_person_data_in_NameTable(self):
+    def return_person_data_in_NameTable(self, primary = 1):
         '''
         Common function used to get the table with the NameTable, used for name and surname
         '''
         input_person = "SELECT * FROM NameTable WHERE OwnerID=?"
         name_info = self.database.execute( input_person, (str(self.get_id()),) )
         loop_database = True
+        array_nicks = []
         while loop_database:
             name_data = name_info.fetchone()
-            if int(name_data[10]) == 1:
-                loop_database = False
-                return name_data[3],name_data[2]
+            if (name_data is not None):
+                if (int(name_data[10]) == 1) and (primary == 1):
+                    return name_data[3],name_data[2]
+                elif (int(name_data[10]) == 0) and (primary == 0):
+                    array_nicks.append(str(name_data[3]) + " " + str(name_data[2]))
+            else:
+                return array_nicks
     def return_event_from_database_info(self, event_in_database):
         '''
         This function is used to get info about all events

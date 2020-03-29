@@ -36,7 +36,7 @@ class Test(unittest.TestCase):
         profile = gen_profile("José Luis", "García Martín")
         reader = esquelas_reader()
         records = reader.profile_is_matched(profile)
-        assert(len(records) > 2)
+        assert(len(records) > 1)
         
     def test_valencia(self):
         '''

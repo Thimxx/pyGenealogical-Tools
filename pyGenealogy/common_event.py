@@ -5,7 +5,7 @@ Created on 8 jul. 2019
 '''
 from pyGenealogy import EVENT_TYPE, VALUES_ACCURACY
 from messages.pyGenealogymessages import NO_VALID_EVENT_START, NO_VALID_EVENT_END
-from pyGenealogy.gen_utils import get_formatted_location, is_this_date_earlier_or_simultaneous_to_this
+from pyGenealogy.gen_utils import get_formatted_location, is_this_date_earlier_or_simultaneous_to_this, is_this_date_later_or_simultaneous_to_this
 from datetime import date
 from pyGedcom import GEDCOM_MONTH
 from pyGenealogy.gen_utils import MONTH_DAYS
@@ -24,6 +24,11 @@ class event_profile(object):
             raise ValueError(NO_VALID_EVENT_START + event_type + NO_VALID_EVENT_END)
         self._setToNullDate()
         self.location = None
+    def set_year(self, year):
+        '''
+        Modifies the year of an event
+        '''
+        self.year = year
     def setDate(self, year, month = None, day = None, accuracy = "EXACT", year_end = None,
                 month_end = None, day_end = None):
         '''
@@ -91,9 +96,10 @@ class event_profile(object):
         '''
         Confirms if the following event is later or at the same time as the other
         '''
-        date_self = date(self.year, self.month if self.month else 12  ,self.day if self.day else (MONTH_DAYS[self.month] if self.month else 31))
-        date_other = date(event.year, event.month if event.month else 1  ,event.day if event.day else 1)
-        return date_self >= date_other
+        if event:
+            return is_this_date_later_or_simultaneous_to_this(self.get_year(), self.get_month(), self.get_day(),
+                                                            event.get_year(), event.get_month(), event.get_day())
+        else: return True
     def has_date(self):
         '''
         Small check to confirm that there is a date
@@ -171,6 +177,11 @@ class event_profile(object):
         This function will provide the end date in the format of gedcom
         '''
         return convert_date_to_gedcom_format(self.year_end, self.month_end, self.day_end)
+    def is_only_year_available(self):
+        '''
+        Will return all if only year is available
+        '''
+        return not (self.get_day() and self.get_month())
     def is_full_date_available(self):
         '''
         Returns true if the full data of the date is avialable
