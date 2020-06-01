@@ -4,7 +4,7 @@ Created on 22 oct. 2019
 @author: Val
 '''
 import logging
-from messages.pygenanalyzer_messages import MATCH_PROFILE_ERROR, MATCH_CONFLICT_TASK, MATCH_CONFLICT_INFO
+from messages.pygenanalyzer_messages import MATCH_PROFILE_ERROR, MATCH_CONFLICT_TASK, MATCH_CONFLICT_INFO, MATCH_CONFLICT_URL_EXISTING, MATCH_CONFLICT_URL_MESSAGE
 from analyzefamily import CHILD, FATHER, MOTHER, PARTNER
 from analyzefamily import include_task_no_duplicate, include_match_profile, print_out
 
@@ -24,6 +24,7 @@ class match_single_profile(object):
         self.data_language = data_language
         self.name_convention = name_convention
         self.threshold = threshold
+        self.current_match = None
         #Initialization of the different matcher functions
         self._init_tracking_logs()
     def match(self, profile_ID):
@@ -39,6 +40,7 @@ class match_single_profile(object):
         #Initialization of the different matcher functions
         self._init_tracking_logs()
         profile_rm = self.database.get_profile_by_ID(profile_ID)
+        self.current_match = str(profile_ID) + ":" + profile_rm.nameLifespan()
         print_out(str(profile_ID) + " = "  + profile_rm.nameLifespan())
         url = None
         #We confirm is a valid profile, should contain a match
@@ -101,7 +103,7 @@ class match_single_profile(object):
         score,factor = profile_rm.comparison_score(profile_geni, self.data_language, self.name_convention)
         if (score*factor > self.threshold):
             #We have a match, so we will create the link as a web link
-            include_match_profile(profile_rm, profile_geni, self.database_geni.get_db_kind())
+            include_match_profile(profile_rm, profile_geni, self.database_geni.get_db_kind(), self.database_geni)
             #We always record the match obtained although was done before
             self.matched_profiles[profile_rm.get_id()] = profile_geni.get_id()
         else:
@@ -148,6 +150,7 @@ class match_single_profile(object):
             previous_score = 0
             conflict_match = False
             profile_rm = self.database.get_profile_by_ID(rm_id)
+            url_rm_now = profile_rm.get_specific_web(self.database_geni.get_db_kind()).get("url", None)
             geni_matches = []
             for geni_id in list(profiles_not_identified):
                 profile_geni = self.database_geni.get_profile_by_ID(geni_id)
@@ -185,6 +188,13 @@ class match_single_profile(object):
                         conflict_potential_dictionary[rm_id].append(geni_id)
                     else:
                         conflict_potential_dictionary[rm_id] = [geni_id]
+            #Options in place with the current match of url
+            # No existing url => we ignore
+            # Existing so...
+            #  - The match is the same. => NO ACTION. Covered by code
+            #  - The match is different => NO ACTION. Covered by code double match will be created with warning
+            #  - There is no match => ACTION. Include a conflict warning
+                
             #If there is a single match, whatever other conditions, we introduce as a match
             if len(geni_matches) == 1:
                 self._match_single_pair(profile_rm, self.database_geni.get_profile_by_ID(geni_matches[0]))
@@ -193,8 +203,15 @@ class match_single_profile(object):
             else:
                 #If there is no single match, we can have several options...
                 if (len(geni_matches) == 0) and (not conflict_match):
-                    self.non_matched_profiles_rm[rm_id] = kind_of_match
-                    print_out("-    NO MATCH of profile in " + self.database_geni.get_db_kind() + " " +
+                    if url_rm_now and (len(geni_matches) == 0):                        #This is the only option where we are going ot generate a conflict, as existing before!
+                        print_out("-    CONFLICT of profile " + str(profile_rm.nameLifespan()) + " as has a previous match.")
+                        details = MATCH_CONFLICT_URL_MESSAGE + self.current_match + " as " + kind_of_match
+                        include_task_no_duplicate(profile_rm, MATCH_CONFLICT_URL_EXISTING, 1, details)
+                        #We move the profile to conflicted ones
+                        self.conflict_profiles[profile_rm.get_id()] = []
+                    else:
+                        self.non_matched_profiles_rm[rm_id] = kind_of_match
+                        print_out("-    NO MATCH of profile in " + self.database_geni.get_db_kind() + " " +
                               str(profile_rm.nameLifespan()) + " Relation = " + kind_of_match)
                 #Or we have more than one match... that is a conflict
                 elif len(geni_matches) > 1:

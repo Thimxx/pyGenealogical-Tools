@@ -154,11 +154,10 @@ class rootsmagic_profile(common_profile.gen_profile):
         This method will provide an specific web reference defined in the profile
         web_name is an string with the name of the web (not the url)
         '''
-        web = None
+        web = {}
         input_urls = "SELECT * FROM URLTable WHERE OwnerID=? AND Name LIKE ?"
         url_info = self.database.execute( input_urls, (str(self.get_id()), web_name, ) ).fetchone()
         if url_info:
-            web = {}
             web["name"] = url_info[4]
             web["url"] = url_info[5]
             web["notes"] = url_info[6]

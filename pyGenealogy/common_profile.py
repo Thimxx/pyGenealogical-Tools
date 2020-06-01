@@ -3,11 +3,12 @@ Created on 13 ago. 2017
 
 @author: Val
 '''
-from pyGenealogy.gen_utils import checkDateConsistency, get_score_compare_names, get_score_compare_dates
+from pyGenealogy.gen_utils import checkDateConsistency, get_score_compare_names, get_score_compare_dates, get_name_surname_from_complete_name
 from pyGenealogy import VALUES_ACCURACY, EVENT_TYPE
 from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS, formated_year,score_factor_birth_and_death
 from pyGenealogy.common_event import event_profile
 from messages.pyGenealogymessages import INITIAL_PART_EVENT_ERROR, END_PART_EVENT_ERROR
+from datetime import datetime
 
 DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments", "id", "marriage_link"]
 MERGE_EVENTS = ["birth", "death", "baptism",  "burial", "marriage"]
@@ -23,12 +24,14 @@ class gen_profile(object):
     This class will include a single genealogical profile common for all tools,
     common information like birth dates, death dates... will be covered here.
     '''
-    def __init__(self, name, surname, name2show=None, id_db=None):
+    def __init__(self, name, surname, name2show=None, id_db=None, data_language = "en"):
         '''
         Constructor, name and surname as minimal parameters
         '''
         if not hasattr(self, "gen_data") : self.gen_data = {}
         if not self.get_id() : self.set_id(id_db)
+        #Default language
+        self.gen_data["main_language"] = data_language
         self.gen_data["name"] = name
         self.gen_data["surname"] = surname
         self.gen_data["name_to_show"] = self.set_name_2_show(name2show)
@@ -77,9 +80,27 @@ class gen_profile(object):
         '''
         score, factor = get_score_compare_names(self.getName(), self.getSurname(),
                         profile.getName(), profile.getSurname(), language=data_language, convention=name_convention)
+        #We compare now all the potential names, in case that there is a different convention
+        score_nicks = 0
+        factor_nicks = 0
+        for complete_name_self in self.get_all_names():
+            name_self, surname_self, _ = get_name_surname_from_complete_name(complete_name_self, convention=name_convention, language=data_language)
+            for complete_name_other in profile.get_all_names():
+                name_other, surname_other, _ = get_name_surname_from_complete_name(complete_name_other, convention=name_convention, language=data_language)
+                score_int, factor_int = get_score_compare_names(name_self, surname_self,
+                        name_other, surname_other, language=data_language, convention=name_convention)
+                #We take the bigger of the scores
+                if (score_int > score_nicks) and (factor_int > factor_nicks):
+                    score_nicks = score_int
+                    factor_nicks = factor_int
+        #We only take the new score if bigger than the previous one, but we include a penalty (we introduce preference to the score given by formal names)
+        if (score_nicks > score) and (factor_nicks > factor) and (score_nicks*factor_nicks*0.5 > score*factor):
+            score = score_nicks*0.5
+            factor = factor_nicks
         #Comparing big differences in events
         score1, factor1 = score_factor_birth_and_death(self.get_earliest_event_in_event_form(), self.get_latest_event_in_event_form(), profile.getEvents())
         score2, factor2 = score_factor_birth_and_death(profile.get_earliest_event_in_event_form(),  self.get_latest_event_in_event_form(), self.getEvents())
+        #In this stage we add all obtained scores and factors.
         score += score1 + score2
         factor = factor*factor1*factor2
         #Comparing gender
@@ -288,6 +309,11 @@ class gen_profile(object):
         Sets the accessibility of the profile
         '''
         self.gen_data["access"] = accessible
+    def set_main_language(self, language):
+        '''
+        Sets the main language of the profile that can be used later on in several functions
+        '''
+        self.gen_data["main_language"] = language
 #===============================================================================
 #         GET methods: for compatibility with other profiles
 #===============================================================================
@@ -311,9 +337,14 @@ class gen_profile(object):
             return None
     def get_nicknames(self):
         '''
-        Add a nickname
+        Gets the list of nicknames
         '''
         return self.gen_data["nicknames"]
+    def get_all_names(self):
+        '''
+        Returns a list of all the names, including formal names and nicknames
+        '''
+        return [self.getName() + " " + self.getSurname()] + self.get_nicknames()
     def getComments(self):
         '''
         Will return the string with all comments from the profile
@@ -398,7 +429,8 @@ class gen_profile(object):
         It will return the earliest event, of course, the birth, but it is already checked,
         for simplicity I will not consider that case
         '''
-        return self.get_earliest_event_in_event_form().get_date()
+        if self.get_earliest_event_in_event_form(): return self.get_earliest_event_in_event_form().get_date()
+        else: return None
     def get_earliest_event_in_event_form(self):
         '''
         It will return the earliest event, of course, the birth, but it is already checked,
@@ -437,6 +469,17 @@ class gen_profile(object):
         Informs if the following profile is accessible
         '''
         return self.gen_data.get("access", True)
+    def get_main_language(self):
+        '''
+        Sets the main language of the profile that can be used later on in several functions
+        '''
+        return self.gen_data["main_language"]
+    def get_update_datetime(self):
+        '''
+        It will return a datetime object with the modification date. In Common profile we include today
+        as modification date
+        '''
+        return datetime.now()
 #===============================================================================
 #         UPDATE methods: for compatibility with other profiles
 #===============================================================================

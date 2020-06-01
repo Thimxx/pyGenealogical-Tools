@@ -35,6 +35,9 @@ class Test(unittest.TestCase):
         #Securing before is properly captured
         assert(prof.get_accuracy_event("baptism") == "BEFORE")
         
+        #Be careful! If the profile gets changed, this checking might fail
+        assert(prof.get_update_datetime().year == 2018)
+        
         prof = profile.profile(MAIN_SANDBOX_PROFILE_API)
         assert(prof.gen_data["name"] == "Testing")
         assert(prof.properly_executed)

@@ -73,6 +73,7 @@ WRONG_TOKEN='iSNPWCfIVKI2vH2HQLUnYppCssIMVN17kpno9ZTe'
 
 #File to delete
 FILE2DELETE = "DeleteMeIfYouSeeMe.out"
+FILE2DELETE_QUALITY = "DeleteMeIfYouSeeMeQualityCheck.out"
 ROOTS_MAGIC_GEN_ANALYZER = "RootsMagicGenAnalyzer.rmgc"
 
 #Examples of ADDRESES

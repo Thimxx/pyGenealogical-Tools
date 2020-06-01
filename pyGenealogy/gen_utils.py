@@ -261,7 +261,8 @@ def get_name_surname_from_complete_name(complete_name, convention="father_surnam
         #We might receive a spanish surname without 2 surnames!
         if ( convention == "spanish_surname" and len(name_split) > 2): surnames = -2
         if ("S" in data_identified) and (data_identified.index("S") > 0):
-            surnames = data_identified.index("S") - len(data_identified)
+            surnames_aux = data_identified.index("S") - len(data_identified)
+            if surnames_aux < surnames: surnames = surnames_aux
         elif ("N" in data_identified) and (data_identified.index("N") < len(data_identified)-1):
             surnames = data_identified.index("N") + 1 - len(data_identified)
         elif ("S" in data_identified) or ("N" in data_identified):
@@ -277,6 +278,9 @@ def get_name_surname_from_complete_name(complete_name, convention="father_surnam
         else:
             name = " ".join(name_split[:surnames]).rstrip()
             surname = " ".join(name_split[surnames:]).rstrip()
+        #In the case that no name has been detected and all surnames are empty, we introduce Not Known Value 
+        if (len(name) == 0): name = NOT_KNOWN_VALUE
+        if (len(surname) == 0): surname = NOT_KNOWN_VALUE
         return name,surname, abs(surnames)
     else: return None, None, None
 def get_splitted_name_from_complete_name(complete_name, language="en", include_particle=True):
@@ -611,12 +615,26 @@ def score_factor_birth_and_death(event_earliest, event_latest, events):
                 if event_earliest.is_only_year_available(): accepted_delta += 1
                 if event.is_only_year_available(): accepted_delta += 1
                 delta_years =  event.get_year() - event_earliest.get_year()
+                #Logic for the checking
                 both_exact = (event.get_accuracy() == "EXACT") and (event_earliest.get_accuracy() == "EXACT")
+                before_in_earliest = (event_earliest.get_accuracy() == "BEFORE") and (event.get_accuracy() == "EXACT") and (event.get_event_type() == "birth")
+                before_in_event = (event_earliest.get_accuracy() == "EXACT") and (event.get_accuracy() == "BEFORE") and (event_earliest.get_event_type() == "birth")
+                logic_about = False
+                if (event.get_accuracy() == "ABOUT") and (event_earliest.get_accuracy() == "ABOUT"):
+                    logic_about = True
+                    accepted_delta = 20
+                elif (event.get_accuracy() == "ABOUT") and (event_earliest.get_accuracy() in ["BEFORE", "EXACT"]) and (event.get_event_type() == "birth"):
+                    logic_about = True
+                    accepted_delta = 10
+                elif   (event_earliest.get_accuracy() == "ABOUT") and (event.get_accuracy() in ["BEFORE", "EXACT"]) and (event_earliest.get_event_type() == "birth"):
+                    logic_about = True
+                    accepted_delta = 10     
+                logic_check = both_exact or before_in_earliest or before_in_event or logic_about
                 if event.get_year() and(delta_years > MAXIMUM_LIFESPAN):
                     return 0.0, 0.0
                 #If the event_birth is actually a birth and the other event is before that date, for sure, we have a problem :)
-                elif both_exact and (event_earliest.get_event_type() == "birth") and delta_years < -accepted_delta : return 0.0, 0.0
-                elif both_exact and (event.get_event_type() == "birth") and delta_years > accepted_delta: return 0.0, 0.0
+                elif logic_check and (event_earliest.get_event_type() == "birth") and delta_years < -accepted_delta : return 0.0, 0.0
+                elif logic_check and (event.get_event_type() == "birth") and delta_years > accepted_delta: return 0.0, 0.0
     if event_latest and event_latest.get_year():
         for event in events:
             if event.get_year():

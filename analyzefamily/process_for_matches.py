@@ -292,7 +292,7 @@ class process_a_db(object):
         profile_to_match shall be the profile of pyGenealogy.common_profile derived class
         '''
         profile = self.db_input.get_profile_by_ID(prof_id)
-        include_match_profile(profile, profile_to_match, self.db_check.get_db_kind())
+        include_match_profile(profile, profile_to_match, self.db_check.get_db_kind(), self.db_check)
         #We also need to introduce the matching of tasks
         if self.event_year_task and adding:
             #We only enter if the data has been introduced
@@ -304,7 +304,7 @@ class process_a_db(object):
                 include_task_no_duplicate(profile, PROCESS_TASK_NAME, 1, details)
     def get_existing_before(self, profile_to_check, link_string, prof_id):
         '''
-        This function will detect if the profile has a link existing before 
+        This function will detect if the profile has a link existing before
         it will create a task informing that profile should not be avoided
         '''
         #We first get all webs of the current profile

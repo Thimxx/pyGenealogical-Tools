@@ -35,14 +35,14 @@ class rootsmagic_family(family_profile):
         It will return the ID of the father
         '''
         father = self.returnFamilyRootsMagic()[1]
-        if father == 0: return None
+        if (father == 0) or (father == "None"): return None
         else: return father
     def getMother(self):
         '''
         It will return the ID of the mother
         '''
         mother = self.returnFamilyRootsMagic()[2]
-        if mother == 0: return None
+        if (mother == 0) or (mother == "None"): return None
         else: return mother
     def getChildren(self):
         '''

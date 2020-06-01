@@ -242,7 +242,7 @@ class Test(unittest.TestCase):
         name4 = "Valentín Lupicino"
         name, surname, _ = get_name_surname_from_complete_name(name4, convention = "spanish_surname", language="es")
         assert(name == name4)
-        assert(surname == "")
+        assert(surname == "N.N.")
         
         name5 = "Valentin Lupicino Martin"
         name, surname, _ = get_name_surname_from_complete_name(name5, convention = "spanish_surname", language="es")
@@ -252,12 +252,12 @@ class Test(unittest.TestCase):
         name6 = "Pedro"
         name, surname, _ = get_name_surname_from_complete_name(name6, convention = "spanish_surname", language="es")
         assert(name == "Pedro")
-        assert(surname == "")
+        assert(surname == "N.N.")
         
         name7 = "Hijinia"
         name, surname, _ = get_name_surname_from_complete_name(name7, convention = "spanish_surname", language="es")
         assert(name == "Higinia")
-        assert(surname == "")
+        assert(surname == "N.N.")
         #Bug with particle San in Spanish
         name8 = "Michaela San Miguel"
         name, surname, _ = get_name_surname_from_complete_name(name8, convention = "spanish_surname", language="es")
@@ -270,6 +270,11 @@ class Test(unittest.TestCase):
         assert(name == "Pedro María")
         assert(surname == "Ortega Cynara")
         
+        #Some problems with extra length names
+        name10 = "Benedicta Sofía Juliana Isla Capdevila"
+        name, surname, _ = get_name_surname_from_complete_name(name10, convention = "spanish_surname", language="es")
+        assert(name == "Benedicta Sofía Juliana")
+        assert(surname == "Isla Capdevila")
         
     def test_name_splitted(self):
         '''
@@ -324,7 +329,7 @@ class Test(unittest.TestCase):
         assert(score > 5.5)
         assert(factor > 0.79)
         score, factor = get_score_compare_names("Lorenza", "Enríquez López", "Lorenza", "Sancho López", language = "es")
-        print(score*factor <1.01 )
+        assert(score*factor <1.01 )
     def test_compare_date(self):
         '''
         Test comparison of dates with scoring
@@ -576,7 +581,7 @@ class Test(unittest.TestCase):
         Test Capital Letters are fixed
         '''
         output = get_formatted_location(GENERIC_PLACE_CAPITALS)
-        assert(output["place_name"] == "Pz San Juan Evangelista")
+        assert(output["place_name"] == "Plaza San Juan Evangelista")
         assert(output["country"] == "Spain")
     
     def test_compare_with_files(self):

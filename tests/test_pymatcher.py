@@ -9,6 +9,7 @@ from pyRootsMagic.pyrm_database import database_rm
 from analyzefamily.matcher_geni_profile import match_single_profile
 from pyGeni import set_token, update_geni_address
 from pyGeni.interface_geni_database import geni_database_interface
+from analyzefamily import FATHER
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -35,6 +36,8 @@ class Test(unittest.TestCase):
         
         db = database_rm(working_file)
         db_geni = geni_database_interface()
+        #Delete existing profiles from this testing area
+        clean_geni_prof(db_geni)
         
         matcher = match_single_profile(db, db_geni, data_language="es", name_convention="spanish_surname")
         #Testing profile, no GENI
@@ -74,17 +77,28 @@ class Test(unittest.TestCase):
         # New test with different parameter
         #===============================================
         non_matched_profiles_rm2, non_matched_profiles_geni2, conflict_profiles2, matched_profiles2 = matcher.match(11)
-        
         assert(12 in non_matched_profiles_rm2.keys())
         #assert(13 in non_matched_profiles_rm2.keys())
         assert("profile-3798" in non_matched_profiles_geni2.keys())
         assert("profile-30062" in non_matched_profiles_geni2.keys())
         assert(not conflict_profiles2)
         assert(10 in matched_profiles2.keys())
-        
+        #Delete existing profiles from this testing area
+        clean_geni_prof(db_geni)
         
         db.close_db()
         if os.path.exists(working_file): os.remove(working_file)
+
+def clean_geni_prof(db_geni):
+    '''
+    This function will clean any profile created
+    '''
+    #First step will be to make sure that the profile of Father Aunt is not existing and deleted.
+    profile_aunt = db_geni.get_profile_by_ID("https://sandbox.geni.com/people/Aunt-Profile/1231306")
+    father_aunt_prof = db_geni.get_father_from_child(profile_aunt.get_id())[1]
+    if father_aunt_prof:
+        father_aunt_prof.delete_profile()
+    
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

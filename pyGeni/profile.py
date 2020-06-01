@@ -11,6 +11,7 @@ from pyGenealogy.common_profile import gen_profile, EVENT_TYPE, NO_ARRAY_EVENTS
 from pyGenealogy import NOT_KNOWN_VALUE
 from messages.pygeni_messages import ABOUT_ME_MESSAGE, ERROR_REQUESTS, RESIDENCE_MESSAGE, NO_VALID_UNION_PROFILE
 import logging
+from datetime import datetime
 
 #TODO: there are some areas in the software where geni provides a wrong input. Until is fixed, I will keep this dirty code
 GENI_SANDBOX_BUG_STRING = "api.sandbox.geni.com/"
@@ -33,7 +34,7 @@ GENI_LOCATION_KEYS = ["latitude", "longitude", "county", "country", "city", "pla
 TOOL_ID = ""
 
 class profile(geni_calls, gen_profile):
-    def __init__(self, geni_input, type_geni="g"):  # id int or string
+    def __init__(self, geni_input, type_geni="g", data_language = "en"):  # id int or string
         '''
         The geni input provided can be:
         - The id of the profile
@@ -59,7 +60,7 @@ class profile(geni_calls, gen_profile):
         #Now we can execute the constructor
         if ("first_name" not in data.keys()): data["first_name"] = NOT_KNOWN_VALUE
         if ("last_name" not in data.keys()): data["last_name"] = data.get("maiden_name", NOT_KNOWN_VALUE)
-        gen_profile.__init__(self, data["first_name"], data["last_name"], id_db=data.get("id", None) )
+        gen_profile.__init__(self, data["first_name"], data["last_name"], id_db=data.get("id", None), data_language = "en" )
         #In some cases we do not have access to the profile and data is not accurate
         if data.get("name", None):
             if ("<private>" in data["name"]): self.set_accessible(False)
@@ -119,6 +120,16 @@ class profile(geni_calls, gen_profile):
                 self.gen_data[value_geni] = current_event
             elif value_geni == "is_alive":
                 self.setLiving(data[value_geni])
+            elif value_geni == "updated_at":
+                #This is the latest update time of the profile.
+                self.gen_data[value_geni] = datetime.fromtimestamp(int(data[value_geni]))
+        #In GENI there are stored several names in several languages
+        names_to_read = data.get("names", {})
+        for name_dict in names_to_read.values():
+            #We might have incomplete data, we just take teh common one
+            name = name_dict.get("first_name", data.get("first_name", NOT_KNOWN_VALUE))
+            surname = name_dict.get("last_name", data.get("first_name",NOT_KNOWN_VALUE))
+            self.gen_data["nicknames"].append(name + " " + surname)
     def add_marriage_in_geni(self, union = None):
         '''
         This method add marriage data in geni, add union if there is no unique
@@ -265,6 +276,28 @@ class profile(geni_calls, gen_profile):
         Will return the merging status of the profile
         '''
         return self.merged_in_geni
+    def getName(self):
+        '''
+        Function to get the name
+        '''
+        #We always use the main language to return the names and surnames
+        if hasattr(self, "data") and ( self.get_main_language() in self.data.get("names",{}).keys() ):
+            return self.data["names"][self.get_main_language()]["first_name"]
+        return self.gen_data["name"]
+    def getSurname(self):
+        '''
+        Function to return the surname
+        '''
+        #We always use the main language to return the names and surnames
+        if hasattr(self, "data") and ( self.get_main_language() in self.data.get("names",{}).keys() ):
+            return self.data["names"][self.get_main_language()]["last_name"]
+        return self.gen_data["surname"]
+    def get_update_datetime(self):
+        '''
+        It will return a datetime object with the modification date. In Common profile we include today
+        as modification date
+        '''
+        return self.gen_data["updated_at"]
 #===================================================
 # Util functions
 #===================================================
