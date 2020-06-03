@@ -161,7 +161,6 @@ class database_rm(gen_database):
         if (birth_event and birth_event.get_year()) : birth_year = birth_event.get_year()
         if (death_event and death_event.get_year()) : death_year = death_event.get_year()
         self.database.create_collation("RMNOCASE", collate_temp)
-            
         new_name = ("INSERT INTO NameTable(OwnerID,Surname,Given,Prefix,Suffix,Nickname,NameType,Date,SortDate,IsPrimary,IsPrivate,Proof,EditDate,Sentence,"
                     "Note,BirthYear,DeathYear) VALUES(?,?,?,?,?,?,0,?,9223372036854775807,1,0,0,?,?,?,?,?)")
         self.database.execute( new_name, (str(row_data), profile.getSurname(), profile.getName(),empty_value, empty_value,

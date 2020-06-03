@@ -12,7 +12,7 @@ class Test(unittest.TestCase):
 
 
     def test_reading_an_input(self):
-        profile = gen_profile("José", "García Martín")
+        profile = gen_profile("Jose", "Garcia Martin")
         reader = rememori_reader()
         records = reader.profile_is_matched(profile)
         date1 = date(2016,4,2)

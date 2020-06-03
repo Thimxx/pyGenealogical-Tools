@@ -30,6 +30,13 @@ It is mainly offering the following capabilities:
 * Rememori: https://www.rememori.com
 * Obituary from this newspaper: http://esquelas.elnortedecastilla.es/
 * Obituary from this newspaper: https://www.abc.es/esquelas/
+* Cementry of the city of Valencia: http://www.valencia.es/ayuntamiento/cementerios.nsf/
+* Web obituary from Spain: https://esquelas.es
+* Obituary from this newspaper: https://enmemoria.lavanguardia.com
+* Obituary from this newspaper: https://esquelas.elcorreo.com/
+* Obituary from this newspaper: https://esquelas.eldiariomontanes.es/
+* Obituary from this newspaper: https://esquelas.ideal.es/
+* Obituary from this newspaper: https://esquelas.larioja.com/
 7) GEDCOM file wrapper
 * It allows to read gedcomfiles and operated them (add new profiles)
 * It allows to transform data from other sources (Geni, RootsMagic) into GEDCOM.
@@ -39,6 +46,7 @@ It is mainly offering the following capabilities:
 * It provide a simple interface to RootsMagic database allowing to access the data and the different profiles.
 10) Matching and synchronization between different genealogical databases
 * It identifies profiles existing in 2 databases (i.e. RootsMagic and Geni) and synchronizes, by creating missing profiles
+11) Perform some quality checks of wrong or missing data
 
 Notice that this import is intended to import registers from FamilySearch, is you are interested in importing profiles from a family tree located in FamilySearch to Geni use this tool: https://github.com/jeffg2k/SmartCopy, which is a pretty nice piece of software and very helpful.
 

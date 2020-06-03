@@ -5,6 +5,7 @@ Created on 22 oct. 2019
 '''
 import logging
 from messages.pygenanalyzer_messages import MATCH_PROFILE_ERROR, MATCH_CONFLICT_TASK, MATCH_CONFLICT_INFO, MATCH_CONFLICT_URL_EXISTING, MATCH_CONFLICT_URL_MESSAGE
+from messages.pygenanalyzer_messages import MATCH_PREVIOUS_MATCH
 from analyzefamily import CHILD, FATHER, MOTHER, PARTNER
 from analyzefamily import include_task_no_duplicate, include_match_profile, print_out
 
@@ -194,7 +195,7 @@ class match_single_profile(object):
             #  - The match is the same. => NO ACTION. Covered by code
             #  - The match is different => NO ACTION. Covered by code double match will be created with warning
             #  - There is no match => ACTION. Include a conflict warning
-                
+            #
             #If there is a single match, whatever other conditions, we introduce as a match
             if len(geni_matches) == 1:
                 self._match_single_pair(profile_rm, self.database_geni.get_profile_by_ID(geni_matches[0]))
@@ -203,8 +204,9 @@ class match_single_profile(object):
             else:
                 #If there is no single match, we can have several options...
                 if (len(geni_matches) == 0) and (not conflict_match):
-                    if url_rm_now and (len(geni_matches) == 0):                        #This is the only option where we are going ot generate a conflict, as existing before!
-                        print_out("-    CONFLICT of profile " + str(profile_rm.nameLifespan()) + " as has a previous match.")
+                    if url_rm_now and (len(geni_matches) == 0):                        
+                        #This is the only option where we are going to generate a conflict, as existing before!
+                        print_out("-    CONFLICT of profile " + str(profile_rm.nameLifespan()) + MATCH_PREVIOUS_MATCH)
                         details = MATCH_CONFLICT_URL_MESSAGE + self.current_match + " as " + kind_of_match
                         include_task_no_duplicate(profile_rm, MATCH_CONFLICT_URL_EXISTING, 1, details)
                         #We move the profile to conflicted ones

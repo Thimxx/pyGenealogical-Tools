@@ -4,7 +4,7 @@ Created on 28 mar. 2018
 @author: Val
 '''
 from pyRegisters.pyrememori import rememori_reader
-from pyRegisters.pyelnortedecastilla import elnortedecastilla_reader
+from pyRegisters.pyvocento import vocento_reader, BASE_PERSON
 from pyRegisters.pyabc import abc_reader
 from pyRegisters.pyesquelas import esquelas_reader
 from pyRegisters.pycementry_valencia import valencia_reader
@@ -13,7 +13,8 @@ from pyGenealogy.generic_functions import get_research_log_id
 import logging, datetime
 from messages.pygenanalyzer_messages import WEB_DETECTED
 
-ALL_PARSERS = ["REMEMORI", "ELNORTEDECASTILLA", "ABC", "ESQUELAS", "CEMENTRY VALENCIA", "LAVANGUARDIA" ]
+VOCENTO_PARSERS =  list(BASE_PERSON.keys())
+ALL_PARSERS = ["REMEMORI",  "ABC", "ESQUELAS", "CEMENTRY VALENCIA", "LAVANGUARDIA" ] + VOCENTO_PARSERS
 
 class gen_analyzer(object):
     '''
@@ -61,11 +62,13 @@ class gen_analyzer(object):
             #We accumulate all readers
             readers_2_use = {}
             readers_2_use["REMEMORI"] = rememori_reader(language=self.language, name_convention=self.name_convention)
-            readers_2_use["ELNORTEDECASTILLA"] = elnortedecastilla_reader(language=self.language, name_convention=self.name_convention)
             readers_2_use["ABC"] = abc_reader(language=self.language, name_convention=self.name_convention)
             readers_2_use["ESQUELAS"] = esquelas_reader(language=self.language, name_convention=self.name_convention)
             readers_2_use["CEMENTRY VALENCIA"] = valencia_reader(language=self.language, name_convention=self.name_convention)
             readers_2_use["LAVANGUARDIA"] = vanguardia_reader(language=self.language, name_convention=self.name_convention)
+            for reader in VOCENTO_PARSERS:
+                readers_2_use[reader] = vocento_reader(reader= reader, language=self.language, name_convention=self.name_convention)
+            
             for parser in ALL_PARSERS:
                 if checks_2_perform[parser]:
                     records = readers_2_use[parser].profile_is_matched(person)

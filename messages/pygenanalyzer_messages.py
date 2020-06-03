@@ -21,6 +21,7 @@ MATCH_EXISTING_PROFILES = "Linking existing profiles "
 MATCH_POTENTIAL_DUPLICATE = "CHECK DUPLICATE "
 MATCH_POTENTIAL_EXISTING = "CHECK EXISTING "
 MATCH_POTENTIAL_INFO_EXISTING = "Trying to add the existing profile "
+MATCH_PREVIOUS_MATCH = " as has a previous match but it has not been possible to find a match."
 
 WEB_DETECTED = "Web automatically detected by pyGenealogicalTools"
 

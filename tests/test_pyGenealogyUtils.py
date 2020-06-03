@@ -10,7 +10,7 @@ from pyGenealogy.gen_utils import is_year, get_children_surname, get_name_from_f
 from pyGenealogy.gen_utils import get_formatted_location, get_name_surname_from_complete_name, get_splitted_name_from_complete_name
 from pyGenealogy.gen_utils import get_score_compare_names, get_score_compare_dates, get_compared_data_file, adapted_doublemetaphone
 from pyGenealogy.gen_utils import formated_year, is_this_date_earlier_or_simultaneous_to_this
-from pyGenealogy.gen_utils import score_factor_birth_and_death
+from pyGenealogy.gen_utils import score_factor_birth_and_death, get_location_standard
 from tests.FIXTURES import RIGHT_YEAR, RIGHT_YEAR_IN_A_TEXT, WRONG_YEAR, JUST_TEXT, RIGHT_YEAR_IN_A_DATE
 from tests.FIXTURES import FATHER_SURNAME, MOTHER_SURNAME, SPANISH_CHILD_SURNAME, GENERIC_PLACE_CAPITALS
 from tests.FIXTURES import FULL_NAME, FULL_NAME_SPANISH, ACTUAL_NAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
@@ -196,6 +196,9 @@ class Test(unittest.TestCase):
         assert("raw" in output5)
         self.assertFalse("country" in output5)
         
+        #Testing location standard
+        assert(get_location_standard({"city" : "Madrid", "country": "Spain"}) == "Madrid, Spain")
+        
     def test_return_sex(self):
         '''
         Test function returning sex of partner
@@ -330,6 +333,9 @@ class Test(unittest.TestCase):
         assert(factor > 0.79)
         score, factor = get_score_compare_names("Lorenza", "Enríquez López", "Lorenza", "Sancho López", language = "es")
         assert(score*factor <1.01 )
+        score, factor = get_score_compare_names("Ana", "Moreno Grande", "Antonia", "Moreno Grande")
+        assert(score > 2.0)
+        assert(factor < 0.2)
     def test_compare_date(self):
         '''
         Test comparison of dates with scoring

@@ -28,7 +28,7 @@ class process_a_db(object):
                  event_year_task = None):
         '''
         Constructor
-        
+        .
         db_input = the database that will be matched
         db_check = the database that will be the source of match and reference in db_input
         

@@ -46,7 +46,7 @@ class Test(unittest.TestCase):
         profile.setCheckedDate("death", 1993, accuracy="ABOUT")
         reader = valencia_reader()
         records = reader.profile_is_matched(profile)
-        assert(len(records)>6)
+        assert(len(records)>5)
     
     def test_lavanguardia(self):
         '''

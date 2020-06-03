@@ -278,7 +278,7 @@ def get_name_surname_from_complete_name(complete_name, convention="father_surnam
         else:
             name = " ".join(name_split[:surnames]).rstrip()
             surname = " ".join(name_split[surnames:]).rstrip()
-        #In the case that no name has been detected and all surnames are empty, we introduce Not Known Value 
+        #In the case that no name has been detected and all surnames are empty, we introduce Not Known Value
         if (len(name) == 0): name = NOT_KNOWN_VALUE
         if (len(surname) == 0): surname = NOT_KNOWN_VALUE
         return name,surname, abs(surnames)
@@ -412,9 +412,14 @@ def score_of_given_name_and_meta(first4jaro, list4jaro, name1, name2, factor = 0
     '''
     This function will take the maximum score between the direct comparison of the name and the phonetic comparison
     '''
+    #Jaro is creating odd situations with names which are very different in length, with this modification, we penalize lenght differences a lot
+    len_factor = (abs((len(name1) - len(name2)))/max(len(name1), len(name2)))
     score_compare = jaro(name1, name2)
     score_met = get_jaro_to_list(first4jaro, list4jaro, factor = factor)
-    return max(score_met, score_compare*score_compare)
+    if (len_factor < 0.33) or (1-len_factor)*(1-len_factor) > max(score_met, score_compare*score_compare):
+        return max(score_met, score_compare*score_compare)
+    #We undo only in case this new scoring is more negative
+    else: return (1-len_factor)*(1-len_factor)
 def get_jaro_to_list(first4jaro, list4jaro, factor = 0.9):
     result = [[0 for x in range(len(list4jaro))] for y in range(len(first4jaro))]
     loc_data = 0.0
@@ -556,6 +561,9 @@ def output_with_range(range_date):
 def get_location_standard(location):
     '''
     This function will provide a standarized comman separated location value
+    location: is an standard dict with the information of country , city and state
+    .
+    output: an string as standard in several genealogical tools separated by commas
     '''
     result = ""
     for keys_data in ["city", "county", "state", "country"]:
@@ -566,7 +574,6 @@ def get_location_standard(location):
             else:
                 result += ", " + value
     return result
-
 def formated_year(year, accuracy):
     '''
     This function will create a standard formated year
@@ -628,7 +635,7 @@ def score_factor_birth_and_death(event_earliest, event_latest, events):
                     accepted_delta = 10
                 elif   (event_earliest.get_accuracy() == "ABOUT") and (event.get_accuracy() in ["BEFORE", "EXACT"]) and (event_earliest.get_event_type() == "birth"):
                     logic_about = True
-                    accepted_delta = 10     
+                    accepted_delta = 10
                 logic_check = both_exact or before_in_earliest or before_in_event or logic_about
                 if event.get_year() and(delta_years > MAXIMUM_LIFESPAN):
                     return 0.0, 0.0

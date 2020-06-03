@@ -1,4 +1,4 @@
-__all__ = ["ancerstors_climb", "matcher_geni_profile", "process_for_matches", "quality_check"]
+__all__ = ["ancerstors_climb", "matcher_geni_profile", "process_for_matches", "quality_check", "sync_profile"]
 
 import datetime, logging
 from messages.pygenanalyzer_messages import MATCH_GENI

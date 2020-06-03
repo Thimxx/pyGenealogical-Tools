@@ -10,33 +10,38 @@ from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.gen_utils import get_name_surname_from_complete_name
 from pyRegisters.pyCommonRegisters import BaseRegister
 
-BASE_NORTE = "http://esquelas.elnortedecastilla.es/buscar?keywords="
-END_NORTE ="&location=&date_limit=&date=&type=all_memorial&_fstatus=search&location_id="
-BASE_PERSON = "http://esquelas.elnortedecastilla.es"
+BASE_SEARCH = "/buscar?keywords="
+END_SEARCH ="&location=&date_limit=&date=&type=all_memorial&_fstatus=search&location_id="
+BASE_PERSON = { "ELNORTEDECASTILLA" : "http://esquelas.elnortedecastilla.es",
+               "ELCORREO": "https://esquelas.elcorreo.com/",
+                "ELDIARIOMONTAÑES" : "https://esquelas.eldiariomontanes.es/",
+                "IDEAL" : "https://esquelas.ideal.es/",
+                "LARIOJA" : "https://esquelas.larioja.com/"}
 
-#First dead record in El Norte de Castilla
+#First dead record in Vocento's readers
 FIRST_YEAR = 2007
 
-class elnortedecastilla_reader(BaseRegister):
+class vocento_reader(BaseRegister):
     '''
     This class analyzes and finds and matches profiles with death records in
-    the obituary of the newspaper El Norte de Castilla
+    the obituary of the newspapers from Vocento
     '''
-    def __init__(self, language = "en", name_convention= "father_surname"):
+    def __init__(self, language = "en", name_convention= "father_surname", reader = "ELNORTEDECASTILLA"):
         '''
         Constructor
         '''
-        self.parser = NorteCastillaParser()
+        self.parser = VocentoParser(reader)
         self.language = language
         self.name_convention = name_convention
-        BaseRegister.__init__(self, "ELNORTEDECASTILLA", first_year = FIRST_YEAR)
+        self.reader = reader
+        BaseRegister.__init__(self, reader, first_year = FIRST_YEAR)
     def profile_is_matched(self, profile):
         '''
         This function will look in El Norte de Castilla trying to match a profile
         Input shall be a profile of common profile values
         '''
         keywords = profile.getName().strip().replace(" ", "+") + "+" + profile.getSurname().strip().replace(" ", "+")
-        url = BASE_NORTE + keywords + END_NORTE
+        url = BASE_PERSON[self.reader] + BASE_SEARCH + keywords + END_SEARCH
         final_profiles = []
         if self.continue_death_register(profile):
             data = requests.get(url)
@@ -52,17 +57,17 @@ class elnortedecastilla_reader(BaseRegister):
                         final_profiles.append(deceased)
         #If we do not execute, we also answer with not registers, we are not executing as not relevant.
         return final_profiles
-class NorteCastillaParser(HTMLParser):
+class VocentoParser(HTMLParser):
     '''
     This function will parser an specific individual to extract specific data useful for comparison
     '''
-    def __init__(self):
+    def __init__(self,reader):
         '''
         As input we intoduce
-        profile: a generic profile to be updated
-        url: the specific url address
+        reader: the specific vocento reader in place
         '''
         HTMLParser.__init__(self)
+        self.reader = reader
         self.inside_profile = False
         self.inside_description = False
         self.inside_citation = False
@@ -84,7 +89,7 @@ class NorteCastillaParser(HTMLParser):
                     self.inside_profile = True
                     self.inside_citation = True
                 elif ("href" in attr) and self.inside_profile:
-                    self.weblink = BASE_PERSON + attr[1]
+                    self.weblink = BASE_PERSON[self.reader] + attr[1]
         if (tag == "p"):
             for attr in attrs:
                 if ("class" in attr) and ("shortText" in attr):

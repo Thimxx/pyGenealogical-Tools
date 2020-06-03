@@ -8,7 +8,7 @@ from langdetect import detect
 from geotext import GeoText
 
 
-__all__ = ["pyrememori","pyelnortedecastilla", "pygenanalyzer", "pyabc", "pyCommonRegisters", "pyesquelas",
+__all__ = ["pyrememori","pyvocento", "pygenanalyzer", "pyabc", "pyCommonRegisters", "pyesquelas",
            "pycementry_valencia","pylavanguardia", "get_location_from_text", "sp_age_location_colector"]
 
 used_strings = {

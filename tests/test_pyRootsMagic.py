@@ -7,6 +7,7 @@ import unittest, os
 from pyRootsMagic.pyrm_database import database_rm
 from pyRootsMagic import return_date_from_event
 from pyGenealogy.common_profile import gen_profile
+from pyGenealogy.common_event import event_profile
 from datetime import date
 from shutil import copyfile
 from tests.FIXTURES import TEST_FACEBOOK, TEST_GOOGLE, TEST_WIKIPEDIA
@@ -264,6 +265,13 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         previous_len = len(fam4.getChildren())
         db.add_child(4, [new_child2, new_child3] )
         assert(len(fam4.getChildren()) - previous_len == 2)
+        
+        new_partner1 = gen_profile("New", "Partner")
+        new_marriage = event_profile("birth")
+        new_marriage.set_year("2019")
+        previous_partners = len(db.get_partners_from_profile(4))
+        db.add_partner(4, new_partner1, new_marriage)
+        assert( len(db.get_partners_from_profile(4))  - previous_partners == 1 )
         
         db.close_db()
         if os.path.exists(working_file): os.remove(working_file)
