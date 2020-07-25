@@ -11,6 +11,7 @@ from pyGenealogy.common_database import gen_database
 from pyGenealogy import NOT_KNOWN_VALUE
 from pyRootsMagic import collate_temp
 from messages.py_rootsmagic_messages import WARNING_UPDATE_FAMILY_PARENTS
+from openpyxl.workbook import child
 
 SEX_TO_DB = {"M" : "0", "F": "1", "U" : "2"}
 LIVING_TO_DB = {True: "1", False: "0"}
@@ -269,6 +270,18 @@ class database_rm(gen_database):
             child_ids.append(id_child)
         self.add_child_to_family(family_id, child_ids )
         return child_ids
+    def add_child_no_family(self, profile, children_profiles):
+        '''
+        It create a new child profile when there is no family existing
+        profile_id shall be a profile from rootsmagic database
+        children shall be an array of children profiles to be added
+        '''
+        father = "0"
+        mother = "0"
+        if profile.getGender() == "F": mother = profile.get_id()
+        else: father = profile.get_id()
+        family_id = self.add_family(father = father, mother = mother, children = None, marriage = None)
+        return self.add_child(family_id, children_profiles )
     def add_partner(self, profile_id, partner_profile, marriage = None):
         '''
         Adds a partner to the profile, by firstly creating the partner and afterwards

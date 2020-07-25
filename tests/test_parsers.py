@@ -8,7 +8,7 @@ from pyGenealogy.common_profile import gen_profile
 from pyRegisters.pyesquelas import esquelas_reader
 from pyRegisters.pycementry_valencia import valencia_reader
 from pyRegisters.pylavanguardia import vanguardia_reader
-from pyRegisters import sp_age_location_colector, get_location_from_text
+from pyRegisters import sp_age_location_colector
 
 class Test(unittest.TestCase):
 

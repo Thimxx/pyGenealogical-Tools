@@ -26,7 +26,7 @@ def include_task_no_duplicate(profile, task_details, priority, details):
     if introduce_task: profile.set_task(task_details, priority=priority, details= details, task_type = 0)
 def set_file(location):
     global saving_file
-    saving_file = open(location, "w")
+    saving_file = open(location, "w", encoding="utf-8")
 def print_out(message, log_level = 20):
     '''
     Function to be used for printing the obtained results

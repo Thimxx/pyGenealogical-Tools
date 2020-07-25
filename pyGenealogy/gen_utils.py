@@ -40,6 +40,8 @@ LANGUAGES_FILES = { "es" : {"surname" : "surname_es.txt", "name" : "names_es.txt
 
 LANGUAGES_DATA = {}
 
+ROMAN_NUMBERS = [ "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVI", "XVII", "XVIII", "XIX", "XX"]
+
 MAXIMUM_LIFESPAN = 123
 
 def is_year(my_potential_year):
@@ -305,7 +307,7 @@ def get_splitted_name_from_complete_name(complete_name, language="en", include_p
                 name_split[i] = ""
             places_2_join.append(i)
             name_category.append("")
-        elif particle.lower() in LANGUAGES_NEXUS.get(language, []):
+        elif (particle.lower() in LANGUAGES_NEXUS.get(language, [])) or (particle in ROMAN_NUMBERS):
             name_split[i] = ""
             places_2_join.append(i)
             name_category.append("")
@@ -381,7 +383,10 @@ def get_score_compare_names(name1, surname1, name2, surname2, language="en", con
     factor1 = score_of_given_name_and_meta(met_name1, met_name2, splitted_name1[0][0], splitted_name2[0][0])
     score1 = factor1
     #In case there is a not known value, we simply ignore the data, by not giving score
-    if (NOT_KNOWN_VALUE in [name1, name2]):
+    if (NOT_KNOWN_VALUE == name1) and (NOT_KNOWN_VALUE == name2 ):
+        factor1 = 1
+        score1 = 1
+    elif (NOT_KNOWN_VALUE in [name1, name2]):
         factor1 = 1
         score1 = 0
     #In the specific case of Spanish surnames and having different number of surnames we only check the first one
@@ -489,7 +494,7 @@ def get_score_compare_dates(event1, event2):
         is_about = False
         if "ABOUT" in [accuracy1, accuracy2]: is_about = True
         #Too early... the dates do not match!
-        if (not is_about) and event_exact.is_this_event_earlier_or_simultaneous_to_this(event_between): return 0.0, 0.0
+        if (not is_about) and (not  event_exact.is_this_event_later_or_simultaneous_to_this(event_between)): return 0.0, 0.0
         #The date provided is actually later that the range provided
         elif (not is_about) and is_this_date_earlier_or_simultaneous_to_this(event_between.get_year_end(), event_between.get_month_end(),
                             event_between.get_day_end(), event_exact.get_year(), event_exact.get_month(), event_exact.get_day()):

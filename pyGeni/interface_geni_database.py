@@ -3,13 +3,15 @@ Created on 27 jul. 2019
 
 @author: Val
 '''
+import pyGeni as s
 from pyGenealogy.common_database import gen_database
 from pyGeni.profile import profile
 from pyGeni.union import union
 from pyGeni.immediate_family import immediate_family
+from pyGeni.geniapi_common import geni_calls
 import copy
 
-class geni_database_interface(gen_database):
+class geni_database_interface(geni_calls, gen_database):
     '''
     This class is intended to act as an interface with geni database.
     '''
@@ -17,6 +19,8 @@ class geni_database_interface(gen_database):
         '''
         Simple constructor of the database
         '''
+        #We initiate the base classes
+        geni_calls.__init__(self)
         gen_database.__init__(self)
         self.equivalence = {}
         self.inmediate = {}
@@ -40,6 +44,33 @@ class geni_database_interface(gen_database):
                 self.equivalence[id_profile] = prof.get_id()
         if id_profile in self.profiles.keys(): return self.profiles[id_profile]
         else: return self.profiles[self.equivalence[id_profile]]
+    def get_several_profile_by_ID(self, ID_array):
+        '''
+        Returns a dict of profiles from Geni
+        ID_array is a list of profile IDs.
+        '''
+        input_array = ""
+        if (len(ID_array) ==1): return {ID_array[0] : self.get_profile_by_ID(ID_array[0])}
+        #This variable is used to check the case all profiles are already available to avoid a call
+        all_profiles_existing = True
+        for id_one in ID_array:
+            if id_one not in self.profiles.keys(): all_profiles_existing = False
+            input_array = input_array + "," + id_one
+        #We have 2 options, if all profiles are existing in the interface, we do not need to do the call...
+        output_array = {}
+        if all_profiles_existing:
+            for id_one in ID_array:
+                output_array[id_one] = self.get_profile_by_ID(id_one)
+        else:
+            #There is a bug in the API, apparently is not working....
+            DUMMY_INPUT = "profile-1"
+            url = s.GENI_PLUS_PROFILES + input_array[1:]+ "," + DUMMY_INPUT + self.token_string()
+            r = s.geni_request_get(url)
+            data = r.json()
+            for prof_data in data["results"]:
+                if not ( prof_data["id"] == DUMMY_INPUT):
+                    output_array[prof_data["id"]] = profile(prof_data["id"], prof_data)
+        return output_array
     def get_family_by_ID(self, id_family):
         '''
         Returns the profile by the input ID
@@ -57,7 +88,7 @@ class geni_database_interface(gen_database):
             if self.families[family_id].is_child_in_family(profile_id): return family_id, self.families[family_id]
         #If we arrived here is because the family has not been found
         link_fam = self.get_families_from_profile(profile_id)
-        if (len(link_fam.parent_union) > 0):
+        if (link_fam and (len(link_fam.parent_union) > 0)):
             union_id = link_fam.parent_union[0].get_id()
             return union_id, self.get_family_by_ID(union_id)
         else: return None, None
@@ -66,6 +97,8 @@ class geni_database_interface(gen_database):
         It will provide all the families where the profile is one of the parents
         '''
         link_fam = self.get_families_from_profile(profile_id)
+        #In case we have an error when loading the family, we will return a none
+        if link_fam is None: return None
         families = []
         for union_now in link_fam.marriage_union:
             families.append(union_now.get_id())
@@ -75,6 +108,7 @@ class geni_database_interface(gen_database):
         It will return all the families where the profile is a parent
         '''
         link_fam = self.get_families_from_profile(self.equivalence.get(profile_id,profile_id))
+        if link_fam is None: return None
         return link_fam.children
     def get_father_from_child(self, profile_id):
         '''
@@ -83,7 +117,7 @@ class geni_database_interface(gen_database):
         '''
         family = self.get_family_from_child(profile_id)[1]
         #We may get an empty family...
-        if family:
+        if family or (family == []):
             for parent in family.get_parents():
                 #We need to check each single partner to see if it is the Father or the Mother
                 parent_prof = self.get_profile_by_ID(parent)
@@ -97,7 +131,7 @@ class geni_database_interface(gen_database):
         '''
         family = self.get_family_from_child(profile_id)[1]
         #We may get an empty family...
-        if family:
+        if family or (family == []):
             for parent in family.get_parents():
                 #We need to check each single partner to see if it is the Father or the Mother
                 parent_prof = self.get_profile_by_ID(parent)
@@ -109,15 +143,19 @@ class geni_database_interface(gen_database):
         It will return all partners associated with the profile
         '''
         partners = []
-        for family_id in self.get_all_family_ids_is_parent(profile_id):
-            parents = self.get_family_by_ID(family_id).get_parents()
-            addapted_parents = []
-            #Due to bug issues in union, we will extract the actual ID.
-            for parent in parents:
-                prof_parent = self.get_profile_by_ID(parent)
-                addapted_parents.append(prof_parent.get_id())
-            addapted_parents.remove(profile_id)
-            partners += addapted_parents
+        families = self.get_all_family_ids_is_parent(profile_id)
+        if families or (families == []):
+            for family_id in self.get_all_family_ids_is_parent(profile_id):
+                parents = self.get_family_by_ID(family_id).get_parents()
+                addapted_parents = []
+                #Due to bug issues in union, we will extract the actual ID.
+                for parent in parents:
+                    prof_parent = self.get_profile_by_ID(parent)
+                    addapted_parents.append(prof_parent.get_id())
+                addapted_parents.remove(profile_id)
+                partners += addapted_parents
+        #In case we have access issues, we will receive a None
+        else: return None
         return partners
 #===============================================================================
 #         ADD methods: Add methods used to include a new profile and new family
@@ -183,6 +221,21 @@ class geni_database_interface(gen_database):
             #Now we force the update of all parents
             self.force_update_profile(parent)
         return child_ids
+    def add_child_no_family(self, profile, children_profiles):
+        '''
+        It create a new child profile when there is no family existing
+        profile_id shall be a profile from geni database
+        children shall be an array of children profiles to be added
+        '''
+        child_ids = []
+        for child in children_profiles:
+            child_instance = copy.copy(child)
+            child_instance.setComments("Profile added by [https://github.com/Thimxx/pyGenealogical-Tools pyGenealogicalTools]")
+            profile.create_as_a_child(child_instance, profile = profile, only_one_parent = True)
+            child_ids.append(child_instance.get_id())
+        #Now we force the update of the parent
+        self.force_update_profile(profile.get_id())
+        return child_ids
 #===============================================================================
 #        INTERMEDIATE methods: methods avoiding duplications
 #===============================================================================
@@ -192,6 +245,8 @@ class geni_database_interface(gen_database):
         a class instance of inmmediate_family, used in Geni
         '''
         link_fam = self.inmediate.get(profile_id, immediate_family(profile_id))
+        #When is not possible to access, we return None to inform of lack of access
+        if link_fam.error: return None
         if link_fam not in self.inmediate.keys(): self.inmediate[profile_id] = link_fam
         return link_fam
     def force_update_profile(self, profile_id):

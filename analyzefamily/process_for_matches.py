@@ -8,6 +8,7 @@ from messages.pygenanalyzer_messages import PROCESS_MATCH_NUMBER_OF_IMPACTS_BEGI
 from messages.pygenanalyzer_messages import PROCESS_ADD_PROFILE_BEGIN, PROCESS_ADD_PROFILE_END, MATCH_ADDING_PROFILES, MATCH_POTENTIAL_DUPLICATE
 from messages.pygenanalyzer_messages import PROCESS_TASK_NAME, PROCESS_TASK_DETAILS, PROCESS_NO_ACCESS, MATCH_EXISTING_PROFILES, PROCESS_LINK_PROFILE_BEGIN
 from analyzefamily.matcher_geni_profile import match_single_profile
+from analyzefamily import CHILD
 from messages import AND_STRING, TO_STRING
 from pyGenealogy.generic_functions import get_research_log_id
 from analyzefamily import include_task_no_duplicate, include_match_profile, print_out
@@ -273,6 +274,29 @@ class process_a_db(object):
                                         print_out(child_profile.nameLifespan() +PROCESS_NO_ACCESS)
                                     del temp_data[kind_db]["non_matches"][prof]
                     ################################################################
+                    # Case of profiles missing one of the parents
+                    ################################################################
+                    for db_kind in temp_data:
+                        #CASE MATCH: Missing a parents or several parents.
+                        non_match_now = temp_data[db_kind]["non_matches"]
+                        for missing_match in non_match_now:
+                            if non_match_now[missing_match] == CHILD:
+                                db_origin = temp_data[db_kind]["database"]
+                                db_destination = temp_data[db_kind]["other_db"]
+                                prof_origin = db_origin.get_profile_by_ID(missing_match)
+                                #Parent that will receive the child
+                                prof_parent = db_destination.get_profile_by_ID(temp_data[db_kind]["current_id_to_add"])
+                                added_childs = db_destination.add_child_no_family(prof_parent, [prof_origin])
+                                #Informing of the creation of hte profile
+                                Intro_sentence = PROCESS_ADD_PROFILE_BEGIN
+                                print_out(Intro_sentence + prof_origin.nameLifespan() + TO_STRING +
+                                             temp_data[kind_db]["other_db"].get_db_kind() + PROCESS_ADD_PROFILE_END + CHILD)
+                                if db_kind == "input":
+                                    child_new_prof = self.db_check.get_profile_by_ID(added_childs[0])
+                                    self.add_match_to_prof(missing_match, child_new_prof, adding = False)
+                                elif db_kind  == "check":
+                                    self.add_match_to_prof(added_childs[0], prof_origin)
+                    ################################################################
                     if len({**non_matched_profiles_input, **non_matched_profiles_check, **conflict_profiles}) == 0:
                         #In this case, we have achieved the full matching, we store the information
                         today = datetime.date.today().toordinal()
@@ -298,7 +322,8 @@ class process_a_db(object):
             #We only enter if the data has been introduced
             details = ""
             for event in profile.getEvents():
-                if event.get_year() and (event.get_year() >= self.event_year_task):
+                #We will only look task, if there is a date, if the date greater than the threshold and if has an accurracy allowing the analysis
+                if event.get_year() and (event.get_year() >= self.event_year_task) and (event.get_accuracy() not in ["AFTER", "BEFORE"]):
                     details += PROCESS_TASK_DETAILS + str(event.get_event_type()) + "/n"
             if details != "":
                 include_task_no_duplicate(profile, PROCESS_TASK_NAME, 1, details)

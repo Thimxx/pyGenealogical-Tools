@@ -28,6 +28,7 @@ class immediate_family(geni_calls):
         r = s.geni_request_get(self.union_url)
         self.data = r.json()
         #we initialize the lists
+        self.error = False
         self.union_extracted = False
         self.parents = []
         self.sibligns = []
@@ -62,3 +63,4 @@ class immediate_family(geni_calls):
                         self.marriage_union.append(tmp_union)
                         if "marriage" in marriage_union.union_data.keys():
                             self.marriage_events.append( marriage_union.union_data.get('marriage', None))
+        else: self.error = True

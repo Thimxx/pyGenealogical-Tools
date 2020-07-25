@@ -34,12 +34,13 @@ GENI_LOCATION_KEYS = ["latitude", "longitude", "county", "country", "city", "pla
 TOOL_ID = ""
 
 class profile(geni_calls, gen_profile):
-    def __init__(self, geni_input, type_geni="g", data_language = "en"):  # id int or string
+    def __init__(self, geni_input, type_geni="g", data_language = "en", data_value = None):
         '''
         The geni input provided can be:
         - The id of the profile
         - The id of the profile with g
         - Each address of the profile.
+        - data_value: is the raw output from Geni API that can be used for direct data introductions
         '''
         #Some checking parameters initiated
         self.properly_executed = False
@@ -48,9 +49,12 @@ class profile(geni_calls, gen_profile):
         self.geni_specific_data = {}
         #We initiate the base classes
         geni_calls.__init__(self)
-        url = process_geni_input(geni_input, type_geni) + self.token_string()
-        r = s.geni_request_get(url)
-        data = r.json()
+        #It is possible to introduce the direct raw data from geni to the profile
+        if data_value: data = data_value
+        else:
+            url = process_geni_input(geni_input, type_geni) + self.token_string()
+            r = s.geni_request_get(url)
+            data = r.json()
         #In case the profile has been merged to other profile, as the information is available it will be modified.
         if (data.get("merged_into", None) and data.get("deleted", None)):
             self.merged_in_geni = True
@@ -180,16 +184,20 @@ class profile(geni_calls, gen_profile):
             self.get_geni_data(data)
     @classmethod
     def create_as_a_child(cls, base_profile, union = None, profile = None,
-                          geni_input = None, type_geni="g"):
+                          geni_input = None, type_geni="g", only_one_parent = False):
         '''
         From a common profile from pyGenealogy library, a new profile will be created
         as a child of a given union of 2 profiles.
+        union the union it will be added
+        proile the geni profile
+        geni_input the inptu fro geni if avaialbel
+        only_one_parent is used when there is a sinlge parent
         '''
         union_to_use = None
         if (union is not None):
             union_to_use = union
         elif (profile is not None):
-            if (len(profile.marriage_union) == 1):
+            if (len(profile.marriage_union) == 1) and not only_one_parent:
                 union_to_use = profile.marriage_union[0].union_id
         elif (geni_input is not None):
             tmp_prof = cls.create_internally(geni_input, type_geni)
@@ -199,14 +207,16 @@ class profile(geni_calls, gen_profile):
             else:
                 #We have a problem, potentially a wrong profile
                 logging.error(NO_VALID_UNION_PROFILE + str(len(tmp_prof.marriage_union)))
-        if (union_to_use is None): return False
         #Calling essentially the constructors
         data_input = create_input_file_2_geni(base_profile)
         base_profile.__class__ = cls
         geni_calls.__init__(cls)
         #We create the url for creating the child
-        add_child = s.GENI_API + union_to_use + s.GENI_ADD_CHILD + s.GENI_INITIATE_PARAMETER + "first_name="
-        add_child += base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + s.get_token()
+        if (union_to_use is None):
+            add_child = s.GENI_API + profile.get_id()
+        else:
+            add_child = s.GENI_API + union_to_use
+        add_child += s.GENI_ADD_CHILD + s.GENI_INITIATE_PARAMETER + "first_name="+  base_profile.gen_data["name"] + s.GENI_ADD_PARAMETER + s.GENI_TOKEN + s.get_token()
         base_profile.creation_operations(add_child, data_input)
         return True
     @classmethod

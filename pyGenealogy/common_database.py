@@ -37,6 +37,16 @@ class gen_database(object):
             return self.profiles[id_profile]
         else:
             return None
+    def get_several_profile_by_ID(self, ID_array):
+        '''
+        Returns an array of profiles
+        ID_array is a dict of profiles IDs
+        '''
+        profiles = {}
+        for id_db in ID_array:
+            profiles[id_db] = self.get_profile_by_ID(id_db)
+        return profiles
+        
     def get_family_by_ID(self, id_family):
         '''
         Returns the profile by the input ID
@@ -121,8 +131,8 @@ class gen_database(object):
         families1 = self.get_all_family_ids_is_parent(partner1)
         families2 = self.get_all_family_ids_is_parent(partner2)
         #We might have the situation that the profile is not accesible by the profile, so that we will need a workaround
-        if families2 == []: return self._check_profile_in_family(families1, partner2)
-        elif families1 == []: return self._check_profile_in_family(families2, partner1)
+        if families2 is None: return self._check_profile_in_family(families1, partner2)
+        elif families1 is None: return self._check_profile_in_family(families2, partner1)
         else:
             for fam in families1:
                 if fam in families2: return fam

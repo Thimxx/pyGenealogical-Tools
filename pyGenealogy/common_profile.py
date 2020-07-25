@@ -94,7 +94,7 @@ class gen_profile(object):
                     score_nicks = score_int
                     factor_nicks = factor_int
         #We only take the new score if bigger than the previous one, but we include a penalty (we introduce preference to the score given by formal names)
-        if (score_nicks > score) and (factor_nicks > factor) and (score_nicks*factor_nicks*0.5 > score*factor):
+        if (score_nicks > 0.999*score) and (factor_nicks > 0.999*factor) and (score_nicks*factor_nicks*0.5 > score*factor):
             score = score_nicks*0.5
             factor = factor_nicks
         #Comparing big differences in events

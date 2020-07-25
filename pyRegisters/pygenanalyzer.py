@@ -39,7 +39,7 @@ class gen_analyzer(object):
         else:
             profiles = database.get_all_profiles()
         self.file = None
-        if output is not None: self.file = open(output, "w")
+        if output is not None: self.file = open(output, "w", encoding="utf-8")
         print_out("Total number of profiles = " + str(len(profiles)), self.file)
         for person in profiles:
             #Firstly, we need to analyze if we need to add the research log, if does not exist, of course
@@ -68,7 +68,7 @@ class gen_analyzer(object):
             readers_2_use["LAVANGUARDIA"] = vanguardia_reader(language=self.language, name_convention=self.name_convention)
             for reader in VOCENTO_PARSERS:
                 readers_2_use[reader] = vocento_reader(reader= reader, language=self.language, name_convention=self.name_convention)
-            
+            #Now we perform the check for each parser declared.
             for parser in ALL_PARSERS:
                 if checks_2_perform[parser]:
                     records = readers_2_use[parser].profile_is_matched(person)
@@ -129,6 +129,7 @@ def continue_analysis(profile, web_site, threshold, log_loc, file):
     - It has been confirmed before
     - It has been identified already and the timing threshold has not passed
     '''
+    confirmed_inside = False
     checked_found = False
     other_non_checked_found = False
     items = profile.get_all_research_item()
@@ -141,9 +142,12 @@ def continue_analysis(profile, web_site, threshold, log_loc, file):
             if ("CONFIRMED" in identification_note):
                 detected = False
                 for web in profile.get_all_webs():
-                    if web["name"] == web_site: detected = True
+                    if web["url"] == item["url"]:
+                        detected = True
+                        confirmed_inside = True
                 if not detected:
                     profile.setWebReference(item["url"], name=item["name"], notes=WEB_DETECTED)
+                    confirmed_inside = True
                 #If the citation has not been created before, we create it now
                 if not profile.get_citation_with_comments(item["url"]):
                     source_id = profile.get_source_id_ref(web_site)
@@ -153,7 +157,6 @@ def continue_analysis(profile, web_site, threshold, log_loc, file):
                     #Now we know source_id, let's introduce the citation
                     profile.set_citation(source_id, details=item["url"])
                     print_out("Introducing citation from " + web_site + " and location = " + item["url"], file)
-                return False
             #If closed, the analysis is not longer needed
             if ("CLOSED" in identification_note) and (not profile.getLiving()):
                 return False
@@ -171,6 +174,8 @@ def continue_analysis(profile, web_site, threshold, log_loc, file):
             #In this case, there was before an IDENTIFIED status that we converted to CHECKED.
             if ("CHECKED" in identification_note):
                 checked_found = True
+    #If we have found a confirmed inside, we return false
+    if confirmed_inside: return False
     #If we have only the checked status and no other
     if (checked_found and (not other_non_checked_found)):
         #We divide in 2 cases...

@@ -26,7 +26,7 @@ class Test(unittest.TestCase):
         profile2.setCheckedDateWithDates("birth", date(1935,4,2), "EXACT")
         reader = vocento_reader(reader = "ELCORREO")
         records = reader.profile_is_matched(profile2)
-        assert(len(records) > 1)
+        assert(len(records) > 0)
         
         profile3 = gen_profile("José", "García Pérez")
         reader = vocento_reader(reader = "ELDIARIOMONTAÑES")

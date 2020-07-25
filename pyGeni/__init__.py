@@ -23,6 +23,7 @@ GENI_VALIDATE_TOKEN = GENI_ADDRESS + "/platform/oauth/validate_token" + GENI_SIN
 GENI_API = GENI_ADDRESS + "/api/"
 GENI_PEOPLE = GENI_ADDRESS + "/people/"
 GENI_PROFILE =  GENI_API + "profile-"
+GENI_PLUS_PROFILES = GENI_API + "profile?ids="
 
 GENI_CALLED_UNIONS = {}
 
@@ -53,12 +54,14 @@ def update_geni_address(new_geni_address):
     global GENI_PROFILE
     global GENI_SINGLE_TOKEN
     global GENI_PEOPLE
+    global GENI_PLUS_PROFILES
     #We update the variables
     GENI_ADDRESS = new_geni_address
     GENI_VALIDATE_TOKEN = GENI_ADDRESS + "/platform/oauth/validate_token" + GENI_SINGLE_TOKEN
     GENI_API = GENI_ADDRESS + "/api/"
     GENI_PEOPLE = GENI_ADDRESS + "/people/"
     GENI_PROFILE =  GENI_API + "profile-"
+    GENI_PLUS_PROFILES = GENI_API + "profile?ids="
 def geni_request_get(url):
     '''
     Function to perform get calls. Contains a loop in case there is a rate limit

@@ -8,6 +8,7 @@ from messages.pygenanalyzer_messages import MATCH_PROFILE_ERROR, MATCH_CONFLICT_
 from messages.pygenanalyzer_messages import MATCH_PREVIOUS_MATCH
 from analyzefamily import CHILD, FATHER, MOTHER, PARTNER
 from analyzefamily import include_task_no_duplicate, include_match_profile, print_out
+from pyGeni.profile import profile
 
 THRESHOLD_MATCH = 2.0
 
@@ -91,11 +92,12 @@ class match_single_profile(object):
         #PARTNERS
         partners_rm = self.database.get_partners_from_profile(profile_rm.get_id())
         partners_geni = self.database_geni.get_partners_from_profile(profile_geni.get_id())
-        self._track_2_lists(partners_rm, partners_geni, PARTNER)
+        #In case we have an error accessing the data, we ignore if any of the inputs is None
+        if ((partners_rm is not None) and (partners_geni is not None)): self._track_2_lists(partners_rm, partners_geni, PARTNER)
         #CHILDREN
         children_rm = self.database.get_all_children(profile_ID)
         children_geni = self.database_geni.get_all_children(url)
-        self._track_2_lists(children_rm, children_geni, CHILD)
+        if ((children_rm is not None) and (children_geni is not None)): self._track_2_lists(children_rm, children_geni, CHILD)
         return self.non_matched_profiles_rm, self.non_matched_profiles_geni, self.conflict_profiles, self.matched_profiles
     def _match_single_pair(self, profile_rm, profile_geni):
         '''
@@ -145,50 +147,66 @@ class match_single_profile(object):
         '''
         #We store here the profiles that have been identified in profiles_geni
         profiles_not_identified = list(profiles_geni)
+        #We will create here the dictionary of the addresses
+        dict_address = {}
+        total_prof = self.database_geni.get_several_profile_by_ID(profiles_not_identified)
+        for prof in total_prof:
+            dict_address[total_prof[prof].get_this_profile_url()] = total_prof[prof].get_id()
         conflict_potential_dictionary = {}
         for rm_id in profiles_rm:
             #We might be in a situation where very small similarities might create confusion of profiles, we store the previous score
             previous_score = 0
             conflict_match = False
+            geni_matches = []
             profile_rm = self.database.get_profile_by_ID(rm_id)
             url_rm_now = profile_rm.get_specific_web(self.database_geni.get_db_kind()).get("url", None)
-            geni_matches = []
-            for geni_id in list(profiles_not_identified):
-                profile_geni = self.database_geni.get_profile_by_ID(geni_id)
+            if url_rm_now in dict_address:
+                #In this case we  have a match, and potentially will be the same profile, we avoid several checks by using one
+                profile_geni = total_prof[dict_address[url_rm_now]]
                 score, factor = profile_rm.comparison_score(profile_geni, self.data_language, self.name_convention)
                 if score*factor > self.threshold:
-                    #OPTIONS:
-                    # 1.New profile is the right one
-                    # 2.New profile is the first one
-                    # 3.New profile is not the right one.but is the previous
-                    # 4.New profile is as bad as the others.
-                    #Option 1
-                    if score*factor > 3*previous_score:
-                        recover_profs = list(geni_matches)
-                        geni_matches = [geni_id]
-                        profiles_not_identified += recover_profs
-                        previous_score = score*factor
-                        if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
-                    #Option 2
-                    elif len(geni_matches) == 0:
-                        geni_matches.append(geni_id)
-                        previous_score = score*factor
-                        if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
-                    #Option 3
-                    elif previous_score >= 3*score*factor:
-                        #In this case we ignore... we keep the previous one
-                        pass
-                    #Option 4
-                    else:
-                        if score*factor > previous_score: previous_score = score*factor
-                        if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
-                elif score >= 3*self.threshold:
-                    conflict_match = True
-                    #This is a common case, where profiles have a minimum difference but still relevant, user to check
-                    if rm_id in conflict_potential_dictionary:
-                        conflict_potential_dictionary[rm_id].append(geni_id)
-                    else:
-                        conflict_potential_dictionary[rm_id] = [geni_id]
+                    #We confirm that this link is correct, so we avoid doing the complete loop...
+                    geni_matches = [dict_address[url_rm_now]]
+                    if dict_address[url_rm_now] in profiles_not_identified: profiles_not_identified.remove(dict_address[url_rm_now])
+            #We only continue if the check of the url was not sucecssful 
+            if len(geni_matches) == 0:
+                for geni_id in list(profiles_not_identified):
+                    #We have already obtained all profiles above
+                    profile_geni = total_prof[geni_id]
+                    score, factor = profile_rm.comparison_score(profile_geni, self.data_language, self.name_convention)
+                    if score*factor > self.threshold:
+                        #OPTIONS:
+                        # 1.New profile is the right one
+                        # 2.New profile is the first one
+                        # 3.New profile is not the right one.but is the previous
+                        # 4.New profile is as bad as the others.
+                        #Option 1
+                        if score*factor > 2.5*previous_score:
+                            recover_profs = list(geni_matches)
+                            geni_matches = [geni_id]
+                            profiles_not_identified += recover_profs
+                            previous_score = score*factor
+                            if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
+                        #Option 2
+                        elif len(geni_matches) == 0:
+                            geni_matches.append(geni_id)
+                            previous_score = score*factor
+                            if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
+                        #Option 3
+                        elif previous_score >= 2.5*score*factor:
+                            #In this case we ignore... we keep the previous one
+                            pass
+                        #Option 4
+                        else:
+                            if score*factor > previous_score: previous_score = score*factor
+                            if geni_id in profiles_not_identified: profiles_not_identified.remove(geni_id)
+                    elif score >= 3*self.threshold:
+                        conflict_match = True
+                        #This is a common case, where profiles have a minimum difference but still relevant, user to check
+                        if rm_id in conflict_potential_dictionary:
+                            conflict_potential_dictionary[rm_id].append(geni_id)
+                        else:
+                            conflict_potential_dictionary[rm_id] = [geni_id]
             #Options in place with the current match of url
             # No existing url => we ignore
             # Existing so...
@@ -204,7 +222,7 @@ class match_single_profile(object):
             else:
                 #If there is no single match, we can have several options...
                 if (len(geni_matches) == 0) and (not conflict_match):
-                    if url_rm_now and (len(geni_matches) == 0):                        
+                    if url_rm_now and (len(geni_matches) == 0):                  
                         #This is the only option where we are going to generate a conflict, as existing before!
                         print_out("-    CONFLICT of profile " + str(profile_rm.nameLifespan()) + MATCH_PREVIOUS_MATCH)
                         details = MATCH_CONFLICT_URL_MESSAGE + self.current_match + " as " + kind_of_match
