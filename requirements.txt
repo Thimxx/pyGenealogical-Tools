@@ -12,3 +12,5 @@ mapbox
 geotext
 #Avoding issue detected in https://github.com/Thimxx/pyGenealogical-Tools/issues/114
 python-dateutil<2.8.1,>=2.5.0
+fuzzywuzzy
+docutils
