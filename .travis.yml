@@ -18,7 +18,7 @@ addons:
 install: 
   - sudo apt-get update
   - pip install requests coveralls nose-htmloutput nose coverage openpyxl metaphone pyexcel pyexcel-xls pyexcel-xlsx textdistance
-  - pip install gedcompy mapbox langdetect geotext
+  - pip install gedcompy mapbox langdetect geotext docutils
 services:
   - xvfb
 script: nosetests -v --with-id  --with-coverage --cover-package=./
