@@ -7,10 +7,9 @@ import unittest, os
 from pyRootsMagic.pyrm_database import database_rm
 from pyRootsMagic import return_date_from_event
 from pyGenealogy.common_profile import gen_profile
-from pyGenealogy.common_event import event_profile
 from datetime import date
 from shutil import copyfile
-from tests.FIXTURES import TEST_FACEBOOK, TEST_GOOGLE, TEST_WIKIPEDIA
+from tests.FIXTURES import TEST_FACEBOOK, TEST_GOOGLE, TEST_WIKIPEDIA, TEST_GOOGLE2
 from pyGenealogy.common_event import event_profile
 
 
@@ -155,6 +154,9 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(TEST_GOOGLE in prof.get_all_urls())
         assert(TEST_WIKIPEDIA in prof.get_all_urls())
         assert(prof.get_specific_web("Google"))
+        assert(prof.get_specific_web("Google").get("url") == TEST_GOOGLE)
+        assert(prof.update_web_ref(TEST_GOOGLE2, "Google", "A note"))
+        assert(prof.get_specific_web("Google").get("url") == TEST_GOOGLE2)
         assert(not prof.get_specific_web("Not existing"))
         
         prof.del_web_ref(TEST_WIKIPEDIA)
@@ -169,7 +171,6 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         assert(prof.get_specific_research_log("TEST_OF_LOG"))
         assert(prof.get_specific_research_log("TEST_NOT_EXISTING") == None)
         
-        
         prof.set_research_item(row_id, repository = "www.google.com", source = "GOOGLE", result = "GOOD")
         prof.update_research_item(row_id, "www.google.com", source = "GOOGLE2", result = "BAD")
         #Error when 2 research logs of the same name in the same profile.
@@ -181,6 +182,11 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         prof2 = db.get_profile_by_ID(1)
         
         assert(len(prof2.get_all_research_item()) == 2)
+        #We get first the number of items, delete one and finally we compare
+        values_prev = len(prof2.get_all_research_item())
+        prof2.delete_specific_research_log("www.google.com")
+        #This will mean that we have deleted successfully one item.
+        assert((values_prev - len(prof2.get_all_research_item())) == 1 )
         
         
         prof3 = db.get_profile_by_ID(3)
@@ -273,7 +279,26 @@ class Test_use_and_access_RootsMagic(unittest.TestCase):
         db.add_partner(4, new_partner1, new_marriage)
         assert( len(db.get_partners_from_profile(4))  - previous_partners == 1 )
         
+        #Let's test here the creation of a new family from a profile (alone profile with no existing previous family)
+        children_before = len(db.get_all_children(1))
+        new_child4 = gen_profile("No wife", "Child")
+        list_children = db.add_child(4, [new_child4] )
+        db.add_child_no_family(db.get_profile_by_ID(1), [db.get_profile_by_ID(list_children[0])])
+        children_after =  len(db.get_all_children(1))
+        
+        assert(children_after - children_before == 1)
+        
+        #Let's add a father profile to the great grand parent...
+        assert(db.get_parents_from_child(5)[0] == [None, None])
+        new_prof = gen_profile("Big big father", "of greatparent")
+        #Create mother
+        new_prof_rm = db.get_profile_by_ID(db.add_profile(new_prof))
+        db.add_parents(child_profile_id = 5, father_profile = new_prof_rm, mother_profile= new_prof, marriage_event= None)
+        assert(db.get_parents_from_child(5)[0] is not [None, None])
+        
         db.close_db()
+        
+        #Here we delete the testing file to avoid having stored data before :)
         if os.path.exists(working_file): os.remove(working_file)
     def test_common_init_functions(self):
         '''

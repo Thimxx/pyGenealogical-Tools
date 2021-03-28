@@ -109,6 +109,7 @@ class gen_database(object):
     def get_parents_from_child(self, profile_id):
         '''
         It returns the ids and profiles of the parents for the given profile
+        profile_id is the id of the profile in the corresponding database
         '''
         f_id, f_profile = self.get_father_from_child(profile_id)
         m_id, m_profile = self.get_mother_from_child(profile_id)

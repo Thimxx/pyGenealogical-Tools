@@ -42,7 +42,7 @@ It is mainly offering the following capabilities:
 * It allows to transform data from other sources (Geni, RootsMagic) into GEDCOM.
 8) Automatic investigation
 * For those interfaces avaialble, it can found potential matches in a GEDCOM.
-9) RootsMagic interface
+9) RootsMagic interface (version 7)
 * It provide a simple interface to RootsMagic database allowing to access the data and the different profiles.
 10) Matching and synchronization between different genealogical databases
 * It identifies profiles existing in 2 databases (i.e. RootsMagic and Geni) and synchronizes, by creating missing profiles

@@ -76,3 +76,32 @@ def include_match_profile(profile, profile_to_match, kind_db, db_match):
         #Ok, we have
         include_task_no_duplicate(profile, MATCH_REVIEW_TASK_BEGIN + kind_db + MATCH_REVIEW_TASK_END,
             1, details=MATCH_REVIEW_DETAILS + str(all_matches))
+def continue_execution_step(profile, match_log, status_id, threshold = 360):
+    ''''
+    This method will confirm if the function shall continue or not depending if it has been
+    previously executed and the given threshold
+    prof is the profile with the match
+    match_str is the matching string for comparing with the database
+    status_id is the internal code used for executing the given function
+    threshold is the number of days which once passed it shall be repeated
+    '''
+    item = profile.get_research_item_by_name(match_log)
+    if item:
+        identification_note = item.get("notes", "IDENTIFIED=0")
+        if (status_id in identification_note):
+            current_date = int(identification_note.replace(status_id, ""))
+            if datetime.date.today().toordinal() - current_date < threshold: return False
+    return True
+def record_research_log(profile, match_str, log_id, source_prof, notes_2add):
+    '''
+    This function will introduce research logs information about the matching
+    profile is a profile of pyGenealogy.common_profile type
+    '''
+    all_items = profile.get_all_research_item()
+    all_urls = {}
+    for item in all_items:
+        all_urls[item["url"]] = item
+    if (source_prof in all_urls.keys()):
+        profile.update_research_item(log_id, source_prof , source = match_str , result = notes_2add)
+    else:
+        profile.set_research_item(log_id, repository = source_prof, source = match_str, result = notes_2add)

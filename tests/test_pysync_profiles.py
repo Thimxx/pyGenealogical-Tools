@@ -3,12 +3,13 @@ Created on 1 jun. 2020
 
 @author: Val
 '''
-import unittest, os
+import unittest, os, logging
 from shutil import copyfile
 from pyRootsMagic.pyrm_database import database_rm
 from analyzefamily.sync_profile import sync_profiles
 from pyGeni import set_token, update_geni_address
 from pyGeni.interface_geni_database import geni_database_interface
+from datetime import datetime
 
 
 class Test(unittest.TestCase):
@@ -43,7 +44,26 @@ class Test(unittest.TestCase):
 
         sync_class = sync_profiles(db, db_geni, data_language="es", name_convention="spanish_surname")
         
+        logging.basicConfig(level=logging.INFO)
+        
+        ########
+        #PRE-CHECK PART
+        ########
+        #In RootsMagic there is not baptism
+        assert("baptism" not in db.get_profile_by_ID(2).getEventsDict())
+        #The update has been done several days ago
+        assert((datetime.today()-db.get_profile_by_ID(2).get_update_datetime()).days > 0)
+        
         sync_class.execute_sync()
+        
+        ########
+        #CHECKING STEP
+        ########
+        #Baptism should have been copied from the profile in Geni, so now it should have been created
+        assert("baptism" in db.get_profile_by_ID(2).getEventsDict())
+        #The update has been done today
+        assert((datetime.today()-db.get_profile_by_ID(2).get_update_datetime()).days == 0)
+        
         
         #We delete the testing data
         db.close_db()

@@ -10,7 +10,7 @@ from pyGenealogy.common_event import event_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, MAIN_SANDBOX_PROFILE, OLD_DELETED_SON, GENERIC_PLACE_IN_DICTIONARY, UNION_MAIN_PROFILE
 from tests.FIXTURES import SANDBOX_MAIN_ADDRESS, SANDBOX_MAIN_API_G, SANDBOX_MAIN_API_NOG, MAIN_SANDBOX_PROFILE_ID, ACTUAL_SECOND, ACTUAL_THIRD
 from tests.FIXTURES import FATHER_PROFILE_SANDBOX, BROTHER_PROFILE_SANDBOX, GENERIC_PLACE_STRING, GENI_INPUT_THROUGH, GENI_INPUT_THROUGH_API
-from tests.FIXTURES import GENI_TWO_MARRIAGES_PROFILE, GENI_TWO_MARRIAGES_PROFILE_LINK, MAIN_SANDBOX_PROFILE_API
+from tests.FIXTURES import GENI_TWO_MARRIAGES_PROFILE, GENI_TWO_MARRIAGES_PROFILE_LINK, MAIN_SANDBOX_PROFILE_API, SANDBOX_MERGED_PROFILE, GENI_2_MARRIAGES_IN_GENI
 import os
 
 class Test(unittest.TestCase):
@@ -36,11 +36,31 @@ class Test(unittest.TestCase):
         assert(prof.get_accuracy_event("baptism") == "BEFORE")
         
         #Be careful! If the profile gets changed, this checking might fail
-        assert(prof.get_update_datetime().year == 2018)
+        assert(prof.get_update_datetime().year == 2021)
         
         prof = profile.profile(MAIN_SANDBOX_PROFILE_API)
         assert(prof.gen_data["name"] == "Testing")
         assert(prof.properly_executed)
+        
+        #Testing to read old deleted profiles
+        """
+        print("HOLA")
+        from pyGeni.profile import process_geni_input
+        print("OUTPUT", process_geni_input(SANDBOX_MERGED_PROFILE, type_geni=""))
+        print("OUTPUT", process_geni_input(SANDBOX_MERGED_PROFILE, type_geni="g"))
+        print("PROFA")
+        prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, type_geni="")
+        prof = profile.profile("https://sandbox.geni.com/people/Sister-Profile/330428", type_geni="")
+        print("PROFA2")
+        
+        prof = profile.profile("https://sandbox.geni.com/people/Sister-Profile/330434", type_geni="")
+        print(prof.gen_data)
+        print("PROFA3")
+        prof = profile.profile("https://sandbox.geni.com/people/Sister-Profile/330434", type_geni="g")
+        prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, type_geni="")
+        print("ADIOS")
+        print(prof.gen_data)
+        """
         
     
     def test_creating_a_child(self):
@@ -77,9 +97,9 @@ class Test(unittest.TestCase):
         
         assert(len(prof_relations.marriage_union) == 1)
         for dif_union in prof_relations.marriage_union:
-            assert("union-156" in dif_union.union_id)
+            assert(UNION_MAIN_PROFILE in dif_union.union_id)
         for dif_union in prof_relations.parent_union:
-            assert("union-155" in dif_union.union_id)
+            assert("union-95" in dif_union.union_id)
         
         #We introduce other 2 childs using different methods
         second_profile = gen_profile(ACTUAL_SECOND, FATHER_SURNAME)
@@ -203,7 +223,7 @@ class Test(unittest.TestCase):
         '''
         Test no adding marriage data due to error
         '''
-        prof = profile.profile(GENI_TWO_MARRIAGES_PROFILE, type_geni="")
+        prof = profile.profile(GENI_2_MARRIAGES_IN_GENI, type_geni="")
         assert(prof.get_specific_event("baptism").get_accuracy() == "ABOUT")
         self.assertFalse(prof.add_marriage_in_geni())
         self.assertFalse(prof.delete_profile())

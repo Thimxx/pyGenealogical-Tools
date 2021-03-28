@@ -4,7 +4,7 @@ Created on 13 ago. 2017
 @author: Val
 '''
 from pyGenealogy.gen_utils import checkDateConsistency, get_score_compare_names, get_score_compare_dates, get_name_surname_from_complete_name
-from pyGenealogy import VALUES_ACCURACY, EVENT_TYPE
+from pyGenealogy import VALUES_ACCURACY, EVENT_TYPE, ARRAY_EVENTS
 from pyGenealogy.gen_utils import get_splitted_name_from_complete_name, LOCATION_KEYS, formated_year,score_factor_birth_and_death
 from pyGenealogy.common_event import event_profile
 from messages.pyGenealogymessages import INITIAL_PART_EVENT_ERROR, END_PART_EVENT_ERROR
@@ -13,7 +13,6 @@ from datetime import datetime
 DATA_STRING = ["name", "surname", "name_to_show", "gender", "comments", "id", "marriage_link"]
 MERGE_EVENTS = ["birth", "death", "baptism",  "burial", "marriage"]
 DATA_LISTS = ["web_ref", "nicknames"]
-ARRAY_EVENTS = ["marriage", "residence"]
 NO_ARRAY_EVENTS = ["birth", "death", "baptism",  "burial"]
 
 
@@ -355,6 +354,16 @@ class gen_profile(object):
         Function that provides back the name to be shown
         '''
         return self.gen_data["name_to_show"]
+    def getEventsDict(self):
+        '''
+        This function will provide all present events inside the profile in a dict
+        format where the event type is the key and the event is the value
+        '''
+        all_events = {}
+        impacted_events = set(EVENT_TYPE) & set(self.gen_data.keys())
+        for event_detected in impacted_events:
+            if self.gen_data[event_detected]: all_events[event_detected] = self.gen_data[event_detected]
+        return all_events
     def getEvents(self):
         '''
         This function will provide all present events inside the profile
@@ -410,6 +419,15 @@ class gen_profile(object):
         This function will provide all research items
         '''
         return self.gen_data["research_item"]
+    def get_research_item_by_name(self, name):
+        '''
+        This function will return the specific research item with a given name
+        name = the name of the research item to be found
+        It will return None dictionary if no research item is located
+        '''
+        for item in self.get_all_research_item():
+            if item.get("name", None) == name: return item
+        return None
     def get_specific_research_log(self, item):
         '''
         This function will provide the location of the research log

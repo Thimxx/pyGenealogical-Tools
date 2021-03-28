@@ -36,3 +36,7 @@ PROCESS_NO_ACCESS = " profile is skipped as there is no access to the data "
 
 PROCESS_TASK_NAME = "CHECK EVENTS"
 PROCESS_TASK_DETAILS = "Review date for search of event "
+
+#SYNC module
+SYNC_NEW_EVENT = " - Adding the new event "
+SYNC_IN_DB = " to the database "

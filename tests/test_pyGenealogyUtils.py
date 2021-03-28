@@ -345,6 +345,9 @@ class Test(unittest.TestCase):
         score, factor = get_score_compare_names("N.N.", "Moreno", "Antonia", "Moreno Grande")
         assert(score == 1.9)
         assert(factor == 0.95)
+        score, factor = get_score_compare_names("Henry", "Enrique VI", "Henry", "Enrique VI", language = "es", convention="spanish_surname")
+        assert(score == 4.0)
+        assert(factor == 1.0)
     def test_compare_date(self):
         '''
         Test comparison of dates with scoring

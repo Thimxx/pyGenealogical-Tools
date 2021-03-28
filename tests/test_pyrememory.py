@@ -3,14 +3,14 @@ Created on 16 sept. 2017
 
 @author: Val
 '''
-import unittest, requests
+import unittest, requests, os
 from datetime import date
 from pyRegisters.pyrememori import rememori_reader, RememoryPersonParser
 from pyGenealogy.common_profile import gen_profile
 
 class Test(unittest.TestCase):
 
-
+    @unittest.skipIf(os.environ['SKIP_REMEMORY'], "Skipping rememory as unstable")
     def test_reading_an_input(self):
         profile = gen_profile("Jose", "Garcia Martin")
         reader = rememori_reader()
@@ -25,6 +25,7 @@ class Test(unittest.TestCase):
         assert(date1_found)
         assert(date2_found)
     
+    @unittest.skipIf(os.environ['SKIP_REMEMORY'], "Skipping rememory as unstable")
     def test_simplifying_list(self):
         '''
         Test confirming list will be simplified
@@ -38,6 +39,7 @@ class Test(unittest.TestCase):
             if (deceased.gen_data["death"].get_date() == date(2017,2,13)): date_found = True
         assert(date_found)
     
+    @unittest.skipIf(os.environ['SKIP_REMEMORY'], "Skipping rememory as unstable")
     def test_avoiding_analysis(self):
         '''
         Test confirming no analysis if antique record
@@ -48,6 +50,7 @@ class Test(unittest.TestCase):
         records = reader.profile_is_matched(profile)
         assert(len(records) == 0)
         
+    @unittest.skipIf(os.environ['SKIP_REMEMORY'], "Skipping rememory as unstable")
     def test_person_parser(self):
         '''
         Test isolated the person parser

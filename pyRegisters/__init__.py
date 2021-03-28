@@ -9,7 +9,7 @@ from geotext import GeoText
 
 
 __all__ = ["pyrememori","pyvocento", "pygenanalyzer", "pyabc", "pyCommonRegisters", "pyesquelas",
-           "pycementry_valencia","pylavanguardia", "get_location_from_text", "sp_age_location_colector"]
+           "pylavanguardia", "get_location_from_text", "sp_age_location_colector"]
 
 used_strings = {
     "es" : {"AT AGE" : " a los ", "AT THE AGE" : " a la edad de ", "YEARS" : " años"},

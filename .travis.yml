@@ -17,7 +17,7 @@ addons:
 # command to install dependencies
 install: 
   - sudo apt-get update
-  - pip install requests coveralls nose-htmloutput nose coverage openpyxl metaphone pyexcel pyexcel-xls pyexcel-xlsx python-Levenshtein
+  - pip install requests coveralls nose-htmloutput nose coverage openpyxl metaphone pyexcel pyexcel-xls pyexcel-xlsx textdistance
   - pip install gedcompy mapbox langdetect geotext
 services:
   - xvfb

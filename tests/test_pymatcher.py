@@ -9,7 +9,7 @@ from pyRootsMagic.pyrm_database import database_rm
 from analyzefamily.matcher_geni_profile import match_single_profile
 from pyGeni import set_token, update_geni_address
 from pyGeni.interface_geni_database import geni_database_interface
-from analyzefamily import FATHER
+from tests.FIXTURES import AUNT_PROFILE
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -38,9 +38,8 @@ class Test(unittest.TestCase):
         db_geni = geni_database_interface()
         #Delete existing profiles from this testing area
         clean_geni_prof(db_geni)
-        
         matcher = match_single_profile(db, db_geni, data_language="es", name_convention="spanish_surname")
-        #Testing profile, no GENI
+        #Testing profile, no GENI. It will provide an ERROR message, but is expected
         assert(matcher.match(1) == False)
         non_matched_profiles_rm, non_matched_profiles_geni, conflict_profiles, matched_profiles = matcher.match(2)
         #=================================================
@@ -63,8 +62,7 @@ class Test(unittest.TestCase):
         #Secure detected conflicts
         assert(7 in conflict_profiles.keys())
         #Check not matched profiles
-        assert('profile-406' in non_matched_profiles_geni.keys())
-        assert('profile-930' in non_matched_profiles_geni.keys())
+        assert('profile-518' in non_matched_profiles_geni.keys())
         #No missing match in RM part
         assert(len(non_matched_profiles_rm.keys()) == 0)
         
@@ -79,8 +77,8 @@ class Test(unittest.TestCase):
         non_matched_profiles_rm2, non_matched_profiles_geni2, conflict_profiles2, matched_profiles2 = matcher.match(11)
         assert(12 in non_matched_profiles_rm2.keys())
         #assert(13 in non_matched_profiles_rm2.keys())
-        assert("profile-3798" in non_matched_profiles_geni2.keys())
-        assert("profile-30062" in non_matched_profiles_geni2.keys())
+        assert("profile-553" in non_matched_profiles_geni2.keys())
+        assert("profile-579" in non_matched_profiles_geni2.keys())
         assert(not conflict_profiles2)
         assert(10 in matched_profiles2.keys())
         #Delete existing profiles from this testing area
@@ -94,7 +92,7 @@ def clean_geni_prof(db_geni):
     This function will clean any profile created
     '''
     #First step will be to make sure that the profile of Father Aunt is not existing and deleted.
-    profile_aunt = db_geni.get_profile_by_ID("https://sandbox.geni.com/people/Aunt-Profile/1231306")
+    profile_aunt = db_geni.get_profile_by_ID(AUNT_PROFILE)
     father_aunt_prof = db_geni.get_father_from_child(profile_aunt.get_id())[1]
     if father_aunt_prof:
         father_aunt_prof.delete_profile()

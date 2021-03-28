@@ -10,6 +10,7 @@ from analyzefamily.process_for_matches import process_a_db
 from pyGeni.interface_geni_database import geni_database_interface
 from pyGeni import set_token
 from pyGeni import profile
+from tests.FIXTURES import AUNT_PROFILE
 
 class Test_processor_for_db(unittest.TestCase):
     '''
@@ -40,7 +41,7 @@ class Test_processor_for_db(unittest.TestCase):
         processor = process_a_db(db, db_geni, event_year_task = 1)
         processor.process()
         
-        aunt_prof = db_geni.get_profile_by_ID("https://sandbox.geni.com/people/Aunt-Profile/1231306")
+        aunt_prof = db_geni.get_profile_by_ID(AUNT_PROFILE)
         partners = db_geni.get_partners_from_profile(aunt_prof.get_id())
         for prof_id in partners:
             partner_prof = db_geni.get_profile_by_ID(prof_id)

@@ -5,7 +5,7 @@ Created on 26 mar. 2018
 '''
 import unittest, os
 from pyGeni import profile, set_token, geni2gedcom
-from tests.FIXTURES import GRANDFATHER_SANDBOX
+from tests.FIXTURES import GRANDFATHER_SANDBOX, GENI2GEDCOM_DUPLICATED
 
 
 class Test(unittest.TestCase):
@@ -32,10 +32,9 @@ class Test(unittest.TestCase):
         tester = geni2gedcom.geni2gedcom(prof)
         geddb = tester.get_gedcom(file_ged)
         
-        #gedcomfile = gedcom.parse(file_ged)
         counts = 0
         for person in geddb.get_all_profiles():
-            if "Avoid Duplicate in Gedcom" in person.getName2Show(): counts += 1
+            if GENI2GEDCOM_DUPLICATED in person.getName2Show(): counts += 1
         assert(counts == 1)
         
         if os.path.exists(file_ged): os.remove(file_ged)

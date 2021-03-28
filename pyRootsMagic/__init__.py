@@ -3,10 +3,14 @@ Created on 6 July 2019
 
 @author: Val
 '''
+from datetime import datetime
+from docutils.nodes import table
+from fuzzywuzzy.string_processing import string
 
-__all__ = ["pyrm_database", "rootsmagic_family", "rootsmagic_profile", "collate_temp", "return_date_from_event"]
+__all__ = ["pyrm_database", "rootsmagic_family", "rootsmagic_profile", "collate_temp", "return_date_from_event", "transform_edit_date"]
 
 GEOLOCATION = {}
+REFERENCE_ORDINAL = 693594
 
 
 def collate_temp(string1, string2):
@@ -61,3 +65,14 @@ def set_geolocated(geo_string, location):
     It will link an specific string with the obtained geolocation
     '''
     GEOLOCATION[geo_string] = location
+def transform_edit_date(date_info):
+    '''
+    This function will transform an input string from RootsMagic and return Back
+    in datetime format
+    '''
+    return datetime.fromordinal(int(date_info) + REFERENCE_ORDINAL)
+def edit_data_value():
+    '''
+    Returns the current edit date as string as understood by RM
+    '''
+    return str( (datetime.today()- datetime(1899,12,30) ).days + 0.01)

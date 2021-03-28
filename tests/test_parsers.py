@@ -6,7 +6,6 @@ Created on 15 oct. 2019
 import unittest
 from pyGenealogy.common_profile import gen_profile
 from pyRegisters.pyesquelas import esquelas_reader
-from pyRegisters.pycementry_valencia import valencia_reader
 from pyRegisters.pylavanguardia import vanguardia_reader
 from pyRegisters import sp_age_location_colector
 
@@ -37,16 +36,6 @@ class Test(unittest.TestCase):
         reader = esquelas_reader()
         records = reader.profile_is_matched(profile)
         assert(len(records) > 1)
-        
-    def test_valencia(self):
-        '''
-        Tests the database of valencia cementry
-        '''
-        profile = gen_profile("José", "García López")
-        profile.setCheckedDate("death", 1993, accuracy="ABOUT")
-        reader = valencia_reader()
-        records = reader.profile_is_matched(profile)
-        assert(len(records)>5)
     
     def test_lavanguardia(self):
         '''

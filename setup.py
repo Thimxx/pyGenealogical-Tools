@@ -25,7 +25,7 @@ setuptools.setup(name='pyGenealogicalTools',
         "Operating System :: OS Independent",
         "Topic :: Sociology :: Genealogy",],
       install_requires = ['requests', 'openpyxl', 'pyexcel', 'pyexcel-xls',
-                          'python-Levenshtein', 'pyexcel-xlsx', 'metaphone',
+                          'textdistance', 'pyexcel-xlsx', 'metaphone',
                           'langdetect', 'mapbox', "geotext", "python-dateutil"
                           ],
       )

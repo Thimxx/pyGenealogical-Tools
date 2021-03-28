@@ -9,7 +9,7 @@ from messages.pyGenealogymessages import NO_VALID_BIRTH_DATE, NO_VALID_DEATH_DAT
 from datetime import date
 from pyGenealogy import VALUES_ACCURACY, get_mapbox_key, NOT_KNOWN_VALUE
 from metaphone import doublemetaphone
-from Levenshtein import jaro
+import textdistance
 import math, copy
 import pyGenealogy, os, re
 from mapbox import Geocoder
@@ -101,7 +101,7 @@ def get_name_from_fullname(full_name, list_father_surnames, list_mother_surnames
             #The methapone algorithm is not perfect... so that we include here a crosschecking of very close phonetical, but far written data.
             similar = 0
             for compared in merged_list:
-                if jaro(adapted_surname, compared) > similar: similar = jaro(adapted_surname, compared)
+                if textdistance.JaroWinkler(winklerize=False, external=False)(adapted_surname, compared) > similar: similar = textdistance.JaroWinkler(winklerize=False, external=False)(adapted_surname, compared)
             if similar > THRESHOLD_JARO:
                 full_name_list[0][i] = ""
     return " ".join(full_name_list[0]).rstrip()
@@ -125,10 +125,13 @@ def adapted_doublemetaphone(data, language="en"):
             #In spanish b and v are pronunced equally, if we know the language is spanish we shall remove!
             result.append(doublemetaphone(data2met.lower().replace("v", "b").replace("gi","ji").replace("ge","je").replace("ph","f")))
         result.append(doublemetaphone(data2met))
+    solution = result
     if using_string:
-        return result[0]
-    else:
-        return result
+        solution = result[0]
+    #There has been an specific case where it has been found a complete second row empty. This is fixing it.
+    if (len(solution) == 4) and (solution[-2:] == [('', ''), ('', '')]):
+        solution = solution[:2]
+    return solution
 def checkDateConsistency(all_events):
     '''
     Checker of the different dates are consistent
@@ -216,7 +219,11 @@ def get_formatted_location(location_string):
         logging.warning(NO_VALID_KEY)
         return output
     else:
-        mapbox_results = Geocoder(access_token=get_mapbox_key()).forward(location_string).json()
+        try:
+            mapbox_results = Geocoder(access_token=get_mapbox_key()).forward(location_string).json()
+        except:
+            #In case we have a problem with the key from mapbox or internet is down
+            return output
     wrong_message = ("message" in mapbox_results.keys())
     if ( (not wrong_message) and (len(mapbox_results) > 0) and (len(mapbox_results["features"]) > 0)  and ("context" in mapbox_results["features"][0])):
         #Received data is ok, we can proceed
@@ -358,7 +365,7 @@ def get_compared_data_file(data, language="en", data_kind = "surname"):
                     candidate_temp = candidate.lower()
                     for notnorm in norm.keys():
                         candidate_temp = candidate_temp.replace(notnorm, norm[notnorm])
-                    results[candidate] = jaro(candidate_temp, data_temp)
+                    results[candidate] = textdistance.JaroWinkler(winklerize=False, external=False)(candidate_temp, data_temp)
                 if (any(results)):
                     return max(results, key=results.get), max(results.values())
                 else:
@@ -417,9 +424,11 @@ def score_of_given_name_and_meta(first4jaro, list4jaro, name1, name2, factor = 0
     '''
     This function will take the maximum score between the direct comparison of the name and the phonetic comparison
     '''
+    #Important to check that we are not receiving empty files...
+    if(max(len(name1), len(name2))) == 0: return 0.0
     #Jaro is creating odd situations with names which are very different in length, with this modification, we penalize lenght differences a lot
     len_factor = (abs((len(name1) - len(name2)))/max(len(name1), len(name2)))
-    score_compare = jaro(name1, name2)
+    score_compare = textdistance.JaroWinkler(winklerize=False, external=False)(name1, name2)
     score_met = get_jaro_to_list(first4jaro, list4jaro, factor = factor)
     if (len_factor < 0.33) or (1-len_factor)*(1-len_factor) > max(score_met, score_compare*score_compare):
         return max(score_met, score_compare*score_compare)
@@ -434,9 +443,9 @@ def get_jaro_to_list(first4jaro, list4jaro, factor = 0.9):
     for i,item in enumerate(first4jaro):
         for j,data in enumerate(list4jaro):
             if (item[1] == "") or (data[1] == ""):
-                result[i][j] =  jaro(item[0],data[0])
+                result[i][j] =  textdistance.JaroWinkler(winklerize=False, external=False)(item[0],data[0])
             else:
-                result[i][j] =jaro(item[0],data[0])*jaro(item[1],data[1])
+                result[i][j] =textdistance.JaroWinkler(winklerize=False, external=False)(item[0],data[0])*textdistance.JaroWinkler(winklerize=False, external=False)(item[1],data[1])
             if result[i][j]  > loc_data:
                 loc_data = result[i][j]
                 loc_i = i

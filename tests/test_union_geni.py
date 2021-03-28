@@ -6,7 +6,7 @@ Created on 19 sept. 2017
 import unittest, os
 import pyGeni as geni
 from pyGeni.union import union
-from tests.FIXTURES import UNION_SANDBOX
+from tests.FIXTURES import MARRIAGE_ID
 from datetime import date
 
 class Test(unittest.TestCase):
@@ -22,19 +22,18 @@ class Test(unittest.TestCase):
         '''
         Test union in sandbox
         '''
-        un1 =union(UNION_SANDBOX)
-        assert(un1.union_data["id"] == "union-155")
-        assert(un1.union_data["url"] == "https://api.sandbox.geni.com/union-155")
-        assert(un1.union_data["guid"] == "1149813")
-        assert(un1.union_data["marriage"].get_date() == date(1923,4,3))
-        assert(un1.union_data["marriage"].get_location()["county"] == 'Madrid')
+        un1 =union(MARRIAGE_ID)
+        assert(un1.union_data["id"] == MARRIAGE_ID)
+        assert(un1.union_data["url"] == "https://api.sandbox.geni.com/union-96")
+        assert(un1.union_data["guid"] == "328817")
+        assert(un1.union_data["marriage"].get_date() == date(1960,1,30))
+        assert(un1.union_data["marriage"].get_location()["city"] == 'Madrid')
         assert(len(un1.union_data["partners"]) == 2)
-        assert(len(un1.union_data["children"]) == 4)
+        assert(len(un1.union_data["children"]) == 3)
         #Testing base function
-        assert(len(un1.getChildren()) == 4)
-        assert(un1.getFather() == "profile-403")
-        assert(un1.getMother() == "profile-404")
-
+        assert(len(un1.getChildren()) == 3)
+        assert(un1.getFather() == "profile-452")
+        assert(un1.getMother() == "profile-459")
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_union_geni_in_sandbox']

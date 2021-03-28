@@ -85,6 +85,7 @@ class gen_analyzer(object):
                 is_stored = False
                 if storage:
                     is_stored = store_url_task_in_db(person, list(obtained.get_all_urls().keys())[0], web_site, log_id)
+                    #TODO delete not foudn here
                 #We add all the identified urls for creating a single task later on
                 if is_stored:
                     self.urls_task += list(obtained.get_all_urls().keys())[0] + "\n"
@@ -108,12 +109,13 @@ def store_url_task_in_db(profile, url, web_site, log_id, notes_toadd=None):
     '''
     This function will store the url as weblink, and the task to review
     '''
+    #This is the follow up string we are going to store
+    today = datetime.date.today().toordinal()
+    if not notes_toadd: notes_toadd = "IDENTIFIED=" + str(today)
     all_items = profile.get_all_research_item()
     all_urls = {}
     for item in all_items:
         all_urls[item["url"]] = item
-    today = datetime.date.today().toordinal()
-    if not notes_toadd: notes_toadd = "IDENTIFIED=" + str(today)
     if (url in all_urls.keys()) and (all_urls[url]["notes"] != "CHECKED"):
         profile.update_research_item(log_id, url , result = notes_toadd)
         return True
@@ -165,7 +167,7 @@ def continue_analysis(profile, web_site, threshold, log_loc, file):
                 checked_found = True
                 store_url_task_in_db(profile, item["url"], web_site, log_loc, notes_toadd="CHECKED")
             if ("IDENTIFIED" in identification_note):
-                #In case there is somebody with "IDENTFIED" and "Not Found", it means it turned to be death, so we force analysis
+                #In case there is somebody with "IDENTIFIED" and "Not Found", it means it turned to be death, so we force analysis
                 if ( ("Not found in " in item["url"]) and (not profile.getLiving())):
                     return True
                 other_non_checked_found = True

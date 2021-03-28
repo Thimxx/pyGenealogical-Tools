@@ -4,7 +4,7 @@ Created on 13 ago. 2017
 @author: Val
 '''
 import unittest
-from datetime import date
+from datetime import date, datetime
 from pyGenealogy.common_profile import gen_profile
 from pyGenealogy.common_event import event_profile
 from tests.FIXTURES import ACTUAL_NAME, FATHER_SURNAME, GENERIC_PLACE_STRING, GENERIC_PLACE_WITH_PLACE
@@ -25,6 +25,10 @@ class Test(unittest.TestCase):
         self.assertFalse(profile.setCheckedGender("J"))
         profile.setLiving(True)
         assert(profile.getLiving())
+        
+        #We test some None values and other outputs from common_profile
+        profile2 = gen_profile(ACTUAL_NAME, FATHER_SURNAME)
+        assert(profile2.get_earliest_event() is None)
     
     def test_merge_profile(self):
         '''
@@ -54,6 +58,8 @@ class Test(unittest.TestCase):
         profile2.setWebReference("OTHER")
         profile.gen_data["birth_place"] = {}
         profile.gen_data["birth_place"]["raw"] = "a"
+        profile.set_accessible(True)
+        profile.set_main_language("es")
         profile2.setPlaces("birth", GENERIC_PLACE_WITH_PLACE)
         
         result = profile.merge_profile(profile2, language="es", convention="spanish_surname")
@@ -75,6 +81,8 @@ class Test(unittest.TestCase):
         assert(profile2.get_specific_event("baptism").get_accuracy() == "ABOUT")
         assert(profile2.get_specific_event("birth").get_location()["place_name"] == "Calle Nuestra Señora De Los Remedios")
         assert(profile2.get_this_profile_url() == None)
+        #From the moment, the common profile class provides only the date of today as common date, to be improved in the future
+        assert(profile.get_update_datetime().day == datetime.now().day)
     
         profile3 = gen_profile("Juana", "Bargas")
         profile4 = gen_profile("Facundo", "Smith")

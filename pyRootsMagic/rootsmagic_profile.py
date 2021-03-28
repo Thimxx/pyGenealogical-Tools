@@ -5,7 +5,7 @@ Created on 7 jul. 2019
 '''
 from pyGenealogy import common_profile
 from pyGenealogy.common_event import event_profile
-from pyRootsMagic import collate_temp, return_date_from_event, get_geolocated_before, set_geolocated
+from pyRootsMagic import collate_temp, return_date_from_event, get_geolocated_before, set_geolocated, transform_edit_date, edit_data_value
 from messages.py_rootsmagic_messages import WARNING_RESEARCH_LOG, PROFILE_RESEARCH_LOG
 from datetime import date, datetime
 import logging
@@ -70,6 +70,15 @@ class rootsmagic_profile(common_profile.gen_profile):
             living = int(person_data[10])
             if living == 1: return True
             else: return False
+    def get_update_datetime(self):
+        '''
+        It will return a datetime object with the modification date. In Common profile we include today
+        as modification date
+        '''
+        person_data = self.return_person_in_PersonTable()
+        if person_data:
+            return transform_edit_date(person_data[3])
+        return None
 #===============================================================================
 #    These functions are left in the base function: getComments, getName2Show, get_all_urls
 #===============================================================================
@@ -98,6 +107,29 @@ class rootsmagic_profile(common_profile.gen_profile):
                 else:
                     loop_fetch = False
         return all_events
+    def getEventsDict(self):
+        '''
+        This function will provide all present events inside the profile in a dict
+        format where the event type is the key and the event is the value
+        '''
+        all_events = {}
+        marriages = self.getMarriages()
+        if marriages: all_events["marriage"] = marriages
+        input_database = "SELECT * FROM EventTable WHERE OwnerType=0 AND OwnerId= ?"
+        events = self.database.execute(input_database, (str(self.get_id()),) )
+        loop_fetch = True
+        while loop_fetch:
+            this_event = events.fetchone()
+            if this_event:
+                new_event = self.return_event_from_database_info(this_event)
+                if new_event and (new_event.get_event_type() in ARRAY_EVENTS):
+                    if new_event.get_event_type() in all_events: all_events[new_event.get_event_type()].append(new_event)
+                    else: all_events[new_event.get_event_type()] = [new_event]
+                    all_events.append(new_event)
+                elif new_event: all_events[new_event.get_event_type()] = new_event
+            else:
+                loop_fetch = False
+                return all_events
     def getEvents(self):
         '''
         This function will provide all present events inside the profile
@@ -179,13 +211,18 @@ class rootsmagic_profile(common_profile.gen_profile):
             return logs_data[0]
         else:
             return None
+    def get_all_research_logs(self):
+        '''
+        It will return all the research logs associated to the profile
+        '''
+        input_logs = "SELECT * FROM ResearchTable WHERE OwnerID=? AND TaskType=2"
+        return self.database.execute( input_logs, (str(self.get_id()),) ).fetchall()
     def get_all_research_item(self):
         '''
         This function will return all the research logs linked to a given profile
         '''
         items = []
-        input_logs = "SELECT * FROM ResearchTable WHERE OwnerID=? AND TaskType=2"
-        logs_info = self.database.execute( input_logs, (str(self.get_id()),) ).fetchall()
+        logs_info = self.get_all_research_logs()
         #With the following code we will obtain all the research logs in place in the profile
         all_items = []
         for logs in logs_info:
@@ -340,10 +377,12 @@ class rootsmagic_profile(common_profile.gen_profile):
                 empty_value =""
                 latitude = str(int(location.get("latitude", "0")*10000000))
                 longitude = str(int(location.get("longitude", "0")*10000000))
+                self.database.create_collation("RMNOCASE", collate_temp)
                 new_item = "INSERT INTO PlaceTable(PlaceType,Name,Abbrev,Normalized,Latitude,Longitude,LatLongExact,MasterID,Note) VALUES(1,?,?,?,?,?,0,0,?)"
                 cursor = self.database.cursor()
                 cursor.execute( new_item, (name_loc,empty_value,empty_value,latitude,longitude,empty_value,) )
                 place_id = cursor.lastrowid
+                self.database.create_collation("RMNOCASE", None)
                 self.database.commit()
         return place_id
     def setNewEvent(self,event):
@@ -362,6 +401,8 @@ class rootsmagic_profile(common_profile.gen_profile):
                          "IsPrivate,Proof,Status,EditDate,Sentence,Details,Note) VALUES(?,0,?,0,?,0,?,0,0,0,0,?,?,?,?)")
             self.database.execute( new_event, (DATE_EVENT_ID[event.get_event_type()],
                                 str(self.get_id()),place_id,dateRTM,edit_date_value, empty_value,empty_value,empty_value, ) )
+            update_item = "UPDATE PersonTable SET EditDate = ? WHERE PersonID = ?"
+            self.database.execute( update_item, (edit_data_value(), str(self.get_id()),) )
             self.database.commit()
     def setNewMarriage(self,event, family_id):
         '''
@@ -391,6 +432,15 @@ class rootsmagic_profile(common_profile.gen_profile):
         web_del = "DELETE FROM URLTable WHERE URL=? AND OwnerID=?"
         self.database.execute( web_del, ( url , str(self.get_id()),  ) )
         self.database.commit()
+    def delete_specific_research_log(self, repository):
+        '''
+        This function will delete a specific research log linked to the profile
+        repository corresponds to the repository in the data structure 
+        '''
+        logs_info = self.get_all_research_logs()
+        for logs in logs_info:
+            web_del = "DELETE FROM ResearchItemTable WHERE Repository=? AND LogID=?"
+            self.database.execute( web_del, ( repository , str(logs[0]),  ) )
 #===============================================================================
 #         UPDATE methods: modified inputs which depend on database
 #===============================================================================
@@ -409,6 +459,7 @@ class rootsmagic_profile(common_profile.gen_profile):
             self.database.commit()
             return True
         elif name in self.get_all_url_names():
+            #This option occurs when we try to update the web of a given site with a new one
             if url:
                 update_name = "UPDATE URLTable SET URL = ? WHERE Name=? AND OwnerID=?"
                 self.database.execute( update_name, (str(url), str(name), str(self.get_id()), ) )

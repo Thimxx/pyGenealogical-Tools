@@ -76,11 +76,15 @@ class testAncestorsClimb(unittest.TestCase):
         assert(total_outside == 0) 
         
         total_final = 0
+        #We are counting here the number of cousing of the generation selected.
+        #However, I noticed that this number varies... I selected an historical person
+        #Philip IV of Spain, but apparently hundreds of years after... still new cousins appear.
+        #TODO: fix this with a more stable profile, potentially from sandbox.
         for i in range(0, generations+1):
             for j in range(0, generations + 1):
                 total_final = total_final + anc_count[i][j]
-        assert(total_final == 36)
-        assert(len(profiles) == 36)
+        assert(total_final == 32)
+        assert(len(profiles) == 32)
     
     def test_using_roots_magic(self):
         '''

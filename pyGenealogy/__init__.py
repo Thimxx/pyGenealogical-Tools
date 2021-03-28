@@ -4,6 +4,8 @@ VALUES_ACCURACY = ["EXACT", "BEFORE", "AFTER", "ABOUT", "BETWEEN"]
 
 EVENT_TYPE = ["birth", "death", "baptism",  "burial", "marriage", "residence"]
 
+ARRAY_EVENTS = ["marriage", "residence"]
+
 NOT_KNOWN_VALUE = "N.N."
 
 from os import environ, getenv

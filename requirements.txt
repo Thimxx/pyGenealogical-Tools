@@ -4,7 +4,7 @@ metaphone
 openpyxl>=2.6.1
 pyexcel 
 pyexcel-xls 
-python-Levenshtein
+textdistance
 #As per resolution in https://github.com/Thimxx/pyGenealogical-Tools/issues/115
 pyexcel-xlsx>=0.5.8
 langdetect

@@ -17,7 +17,6 @@ UNION_EXAMPLE_CHILD  = "profile-99981031"
 UNION_EXAMPLE_NOT_INCLUDED = "profile-00000000"
 UNION_EXAMPLE_NUMBER_CHILDREN = 9
 UNION_MARRIAGE = "https://www.geni.com/api/union-8813338"
-UNION_SANDBOX = "union-155"
 
 #Cousing test, using a profile with smaller documented relatives!
 COUSIN_PROFILE = "6000000014013164881"
@@ -49,25 +48,29 @@ ACTUAL_SECOND = "Alberto"
 ACTUAL_THIRD = "Camilo"
 
 #SANDBOX Data
-MAIN_SANDBOX_PROFILE = "399"
-MAIN_SANDBOX_PROFILE_API = "profile-399"
-MAIN_SANDBOX_WIFE = "408"
-OLD_DELETED_SON = "415"
-UNION_MAIN_PROFILE = "union-156"
-SANDBOX_MAIN_ADDRESS = "https://sandbox.geni.com/people/Testing-Profile/1149101"
-SANDBOX_MAIN_API_G = "https://sandbox.geni.com/api/profile-g1149101"
-SANDBOX_MAIN_API_NOG = "https://sandbox.geni.com/api/profile-399"
-MAIN_SANDBOX_PROFILE_ID = "profile-399"
-FATHER_PROFILE_SANDBOX = "https://sandbox.geni.com/api/profile-g1149810"
-BROTHER_PROFILE_SANDBOX = "https://sandbox.geni.com/api/profile-g1150205"
-GRANDFATHER_SANDBOX = "https://sandbox.geni.com/people/GrandFather-Profile/1230605"
+MAIN_SANDBOX_PROFILE = "452"
+MAIN_SANDBOX_PROFILE_API = "profile-452"
+MAIN_SANDBOX_WIFE = "459"
+OLD_DELETED_SON = "460"
+UNION_MAIN_PROFILE = "union-96"
+SANDBOX_MAIN_ADDRESS = "https://sandbox.geni.com/people/Testing-Profile/328802" 
+SANDBOX_MAIN_API_G = "https://sandbox.geni.com/api/profile-g328802"
+SANDBOX_MAIN_API_NOG = "https://api.sandbox.geni.com/profile-452"
+MAIN_SANDBOX_PROFILE_ID = "profile-452"
+FATHER_PROFILE_SANDBOX = "https://sandbox.geni.com/api/profile-g328903"
+BROTHER_PROFILE_SANDBOX = "https://sandbox.geni.com/api/profile-g328909"
+GRANDFATHER_SANDBOX = "https://sandbox.geni.com/people/GrandFather-Profile/330607"
+SANDBOX_MERGED_PROFILE = "https://sandbox.geni.com/people/Sister-Profile/13259711"#REVIEW
+GENI2GEDCOM_DUPLICATED = "Sister Profile"
+AUNT_PROFILE = "https://sandbox.geni.com/people/Aunt-Profile/330707"
 
 #Other data
 GENI_INPUT_THROUGH = "https://www.geni.com/people/Leoncio-Cerro-Siguenza/6000000048574355159?through=6000000048688500197"
 GENI_INPUT_THROUGH_API = "https://sandbox.geni.com/api/profile-g6000000048574355159"
 GENI_WRONG_GET_METHOD =  "https://www.geni.com/api/profiles-g6000000048374355159?tokren=sfsdfsdfsdfsd"
-GENI_TWO_MARRIAGES_PROFILE = "https://sandbox.geni.com/people/Tow-Marriages-Profile/1161868"
-GENI_TWO_MARRIAGES_PROFILE_LINK = "https://api.sandbox.geni.com/profile-930"
+GENI_TWO_MARRIAGES_PROFILE = "https://sandbox.geni.com/people/Aunt-Profile/330707"
+GENI_TWO_MARRIAGES_PROFILE_LINK = "https://api.sandbox.geni.com/profile-506"
+GENI_2_MARRIAGES_IN_GENI = "https://sandbox.geni.com/people/Two-Marriages-Profile/331267"
 #Wrong token for testing execution
 WRONG_TOKEN='iSNPWCfIVKI2vH2HQLUnYppCssIMVN17kpno9ZTe'
 
@@ -78,6 +81,15 @@ ROOTS_MAGIC_GEN_ANALYZER = "RootsMagicGenAnalyzer.rmgc"
 
 #Examples of ADDRESES
 TEST_GOOGLE = "http://www.google.com"
+TEST_GOOGLE2 = "http://www.google2.com"
 TEST_FACEBOOK = "http://www.facebook.com"
 TEST_WIKIPEDIA = "http://www.wikipedia.com"
 
+#Test database Geni profiles
+UNCLE_ID = "330704"
+UNCLE_PROF_ID = "profile-505"
+FATHER_PROF_ID = "profile-453"
+FATHER_MOTHER_UNION_ID = "union-95"
+MARRIAGE_ID = "union-96"
+SON_PROF_ID = "profile-551"
+WIFE_PROF_ID = "profile-459"

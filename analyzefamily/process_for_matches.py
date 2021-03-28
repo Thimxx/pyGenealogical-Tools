@@ -8,7 +8,7 @@ from messages.pygenanalyzer_messages import PROCESS_MATCH_NUMBER_OF_IMPACTS_BEGI
 from messages.pygenanalyzer_messages import PROCESS_ADD_PROFILE_BEGIN, PROCESS_ADD_PROFILE_END, MATCH_ADDING_PROFILES, MATCH_POTENTIAL_DUPLICATE
 from messages.pygenanalyzer_messages import PROCESS_TASK_NAME, PROCESS_TASK_DETAILS, PROCESS_NO_ACCESS, MATCH_EXISTING_PROFILES, PROCESS_LINK_PROFILE_BEGIN
 from analyzefamily.matcher_geni_profile import match_single_profile
-from analyzefamily import CHILD
+from analyzefamily import CHILD, continue_execution_step, record_research_log
 from messages import AND_STRING, TO_STRING
 from pyGenealogy.generic_functions import get_research_log_id
 from analyzefamily import include_task_no_duplicate, include_match_profile, print_out
@@ -57,7 +57,7 @@ class process_a_db(object):
         for prof_id in linked_profiles:
             if (profiles_2_analyze == "all") or (prof_id in profiles_2_analyze):
                 prof_in_study = linked_profiles[prof_id]
-                if continue_match(prof_in_study, match_str, threshold = threshold):
+                if continue_execution_step(prof_in_study, match_str, STATUS_MATCHED, threshold = threshold):
                     prof_linked_id = prof_in_study.get_specific_web(kind_match)["url"]
                     prof_linked = self.db_check.get_profile_by_ID(prof_linked_id)
                     #In order to get the marriage, first we get the family from the other database
@@ -280,10 +280,14 @@ class process_a_db(object):
                         #CASE MATCH: Missing a parents or several parents.
                         non_match_now = temp_data[db_kind]["non_matches"]
                         for missing_match in non_match_now:
-                            if non_match_now[missing_match] == CHILD:
-                                db_origin = temp_data[db_kind]["database"]
-                                db_destination = temp_data[db_kind]["other_db"]
-                                prof_origin = db_origin.get_profile_by_ID(missing_match)
+                            #Firstly we define the different databases
+                            db_origin = temp_data[db_kind]["database"]
+                            db_destination = temp_data[db_kind]["other_db"]
+                            #Now, we take the profile which is missing
+                            prof_origin = db_origin.get_profile_by_ID(missing_match)
+                            #This is going of check if the parent of the child is today included in the conflict list, and avoid including the children until is fixed
+                            child_from_non_mathced_partner = any(x in conflict_profiles.keys() for x in db_origin.get_parents_from_child(missing_match)[0])
+                            if (non_match_now[missing_match] == CHILD) and (not child_from_non_mathced_partner) :
                                 #Parent that will receive the child
                                 prof_parent = db_destination.get_profile_by_ID(temp_data[db_kind]["current_id_to_add"])
                                 added_childs = db_destination.add_child_no_family(prof_parent, [prof_origin])
@@ -346,25 +350,13 @@ class process_a_db(object):
 def continue_match(profile, match_log, threshold = 360):
     ''''
     This function will confirm if match should or not continue
+    match_log is the matching string to be used
+    threshold is the number of minimum days to repeat the check
     '''
-    items = profile.get_all_research_item()
-    for item in items:
-        if item.get("name", None) == match_log:
-            identification_note = item.get("notes", "IDENTIFIED=0")
-            if (STATUS_MATCHED in identification_note):
-                current_date = int(identification_note.replace(STATUS_MATCHED, ""))
-                if datetime.date.today().toordinal() - current_date < threshold: return False
+    item = profile.get_research_item_by_name(match_log)
+    if item:
+        identification_note = item.get("notes", "IDENTIFIED=0")
+        if (STATUS_MATCHED in identification_note):
+            current_date = int(identification_note.replace(STATUS_MATCHED, ""))
+            if datetime.date.today().toordinal() - current_date < threshold: return False
     return True
-def record_research_log(profile, match_str, log_id, source_prof, notes_2add):
-    '''
-    This function will introduce research logs information about the matching
-    profile is a profile of pyGenealogy.common_profile type
-    '''
-    all_items = profile.get_all_research_item()
-    all_urls = {}
-    for item in all_items:
-        all_urls[item["url"]] = item
-    if (source_prof in all_urls.keys()):
-        profile.update_research_item(log_id, source_prof , source = match_str , result = notes_2add)
-    else:
-        profile.set_research_item(log_id, repository = source_prof, source = match_str, result = notes_2add)

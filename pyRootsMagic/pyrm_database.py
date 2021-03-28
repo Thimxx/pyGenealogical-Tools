@@ -4,12 +4,11 @@ Created on 6 jul. 2019
 @author: Val
 '''
 import sqlite3, logging
-from datetime import datetime
 from pyRootsMagic.rootsmagic_profile import rootsmagic_profile
 from pyRootsMagic.rootsmagic_family import rootsmagic_family
 from pyGenealogy.common_database import gen_database
 from pyGenealogy import NOT_KNOWN_VALUE
-from pyRootsMagic import collate_temp
+from pyRootsMagic import collate_temp, edit_data_value
 from messages.py_rootsmagic_messages import WARNING_UPDATE_FAMILY_PARENTS
 from openpyxl.workbook import child
 
@@ -143,14 +142,14 @@ class database_rm(gen_database):
     def add_profile(self, profile, parentid = 0, spouseid = 0):
         '''
         It will add a new profile in the database
+        profile: it shall be a profile class derived from common_profile class
         '''
-        edit_date_value = str( (datetime.today()- datetime(1899,12,31) ).days)
         empty_value=""
         #Adding the Person before the name
         new_person = ("INSERT INTO PersonTable (Sex, EditDate, ParentID, SpouseID, Color, Relate1, Relate2, Flags, Living, IsPrivate,Proof,Bookmark,Note)"
                     " VALUES(?,?,?,?,0,0,0,0,?,0,0,0,?)")
         cursor = self.database.cursor()
-        cursor.execute(new_person, (SEX_TO_DB[profile.getGender()], edit_date_value, str(parentid), str(spouseid),
+        cursor.execute(new_person, (SEX_TO_DB[profile.getGender()], edit_data_value(), str(parentid), str(spouseid),
                                   LIVING_TO_DB[profile.getLiving()], empty_value,
                                    ) )
         row_data = cursor.lastrowid
@@ -168,10 +167,10 @@ class database_rm(gen_database):
                                 empty_value, ".", "0.0",empty_value,empty_value,birth_year,death_year,
                                 ) )
         added_profile = self.get_profile_by_ID(row_data)
-        for event in profile.getEvents():
-            added_profile.setNewEvent(event)
         #We remove the collation to secure we can continue using the database
         self.database.create_collation("RMNOCASE", None)
+        for event in profile.getEvents():
+            added_profile.setNewEvent(event)
         self.database.commit()
         return row_data
     def add_family(self, father = "0", mother = "0", children = None, marriage = None):
@@ -272,7 +271,7 @@ class database_rm(gen_database):
         return child_ids
     def add_child_no_family(self, profile, children_profiles):
         '''
-        It create a new child profile when there is no family existing
+        It creates a new child profile when there is no family existing
         profile_id shall be a profile from rootsmagic database
         children shall be an array of children profiles to be added
         '''
